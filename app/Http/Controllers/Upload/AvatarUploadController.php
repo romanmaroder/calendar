@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Upload\UploadAvatarRequest;
 use Illuminate\Support\Facades\Storage;
 
-class UserAvatarUploadController extends Controller
+class AvatarUploadController extends Controller
 {
     public function store(UploadAvatarRequest $request)
     {
@@ -21,6 +21,10 @@ class UserAvatarUploadController extends Controller
                 'message'=>'Image uploaded successfully'
             ];
         }
+        return [
+            'code'=>'400',
+            'message'=>'Something went wrong'
+        ];
     }
 
     public function delete(UploadAvatarRequest $request)

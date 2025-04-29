@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Client;
 
-use App\Models\User;
+use App\Models\Client;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules;
 
 class Request extends FormRequest
 {
@@ -36,8 +35,7 @@ class Request extends FormRequest
             'records'=>'nullable|numeric',
             'total'=>'nullable|numeric',
             'source'=>'nullable|string',
-            'email' => 'nullable|string|lowercase|email|max:255|unique:'.User::class,
-            //'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => 'nullable|string|lowercase|email|max:255|unique:'.Client::class,
         ];
     }
 }

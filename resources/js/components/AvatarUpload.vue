@@ -29,7 +29,7 @@ const message = ref('');
 let file =null;
 let formData = null;
 
-const storeImage = (e: Event) => {
+const uploadImage = (e: Event) => {
     if (avatar.value) {
 
         showUploadProgress.value = true;
@@ -60,7 +60,7 @@ const storeImage = (e: Event) => {
     }
 };
 
-const uploadReset = () => {
+const resetUpload = () => {
     axios.post('/api/delete', { name: names.value }).then((res) => {
         url.value = '';
         message.value = res.data.message;
@@ -74,7 +74,7 @@ const uploadReset = () => {
         <img v-else src="../../../resources/img/no_avatar_big.png" alt="avatar" />
         <span
             v-if="url"
-            @click.prevent="uploadReset"
+            @click.prevent="resetUpload"
             class="relative z-20 flex flex-row items-center space-x-1 font-medium text-gray-900 transition-colors hover:text-gray-500"
         >
             <span v-if="showUploadProgress">Uploading: {{ uploadPercent }} %</span>
@@ -86,7 +86,7 @@ const uploadReset = () => {
         </span>
     </Label>
 
-    <Input id="avatar" type="file" ref="avatar" name="avatar" @change="storeImage" class="hidden" />
+    <Input id="avatar" type="file" ref="avatar" name="avatar" @change="uploadImage" class="hidden" />
 </template>
 
 <style scoped></style>

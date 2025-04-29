@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogClose, DialogContentWithoutBtnClose, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import UserAvatarUpload from '@/components/UserAvatarUpload.vue';
+import AvatarUpload from '@/components/AvatarUpload.vue';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Toaster, toast } from 'vue-sonner';
@@ -42,7 +42,7 @@ const form = useForm({
 const submit = (e: Event) => {
     e.preventDefault();
 
-    form.post(route('users.store'), {
+    form.post(route('clients.store'), {
         preserveScroll: true,
         onSuccess: function () {
             wait().then(() => (open.value = false));
@@ -66,9 +66,6 @@ const onUpdateAvatar=(data)=>{
     message.value = data.message;
     toast.success(data.message);
 }
-
-
-
 </script>
 
 <template>
@@ -87,7 +84,7 @@ const onUpdateAvatar=(data)=>{
                     <div class="parent grid gap-x-[6px] gap-y-[6px] md:grid-cols-[repeat(3,_1fr)] md:grid-rows-[repeat(5,_auto)]">
                         <div class="div1 [grid-area:1_/_1_/_2_/_2]">
                             <div class="max-h-[200px] max-w-[180px] rounded-[4px] bg-[#83BCE1] p-4 shadow-md">
-                                <UserAvatarUpload text-add="Добавить фото"
+                                <AvatarUpload text-add="Добавить фото"
                                                   text-delete="Удалить фото"
                                                   @updateAvatar="onUpdateAvatar"
 

@@ -1,27 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Client;
 use App\Models\User;
-use App\Http\Requests\Client\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
-class UserController extends Controller
+class ClientController extends Controller
 {
     public function index()
     {
-        $count = User::count();
-        return Inertia::render('User/Index', ['users' => User::all(),'count' => $count]);
+        $count = Client::count();
+        return Inertia::render('Client/Index', ['users' => Client::all(),'count' => $count]);
     }
 
     public function create()
     {
-        return Inertia::render('User/Create');
+        return Inertia::render('Client/Create');
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Client\Request $request)
     {
 
         $data = $request->validated();
@@ -38,5 +39,4 @@ class UserController extends Controller
 
         return to_route('users');
     }
-
 }
