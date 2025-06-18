@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import ClientFilter from '@/components/client/ClientFilter.vue';
-import ClientTable from '@/components/client/ClientTable.vue';
+import ClientArchiveTable from '@/components/client/ClientArchiveTable.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Archive', href: '/archive' }];
 
- defineProps({
+  defineProps({
     clients: {
         type: Object,
         required: true,
@@ -20,7 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
 </script>
 
 <template>
-    <Head title="Clients" />
+    <Head title="Archive" />
     <Layout :breadcrumbs="breadcrumbs">
         <Toast />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -28,9 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
                 Карточки клиентов на базе номеров мобильных телефонов. Всего карточек:
                 {{ count }}
             </div>
-            <ClientFilter :clients="clients" />
-
-            <ClientTable :clients="clients" />
+            <ClientArchiveTable :clients="clients" :count="count" />
         </div>
     </Layout>
 </template>

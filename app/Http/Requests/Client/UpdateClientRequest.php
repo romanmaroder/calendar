@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Client;
 
-use App\Models\Client;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class Request extends FormRequest
+class UpdateClientRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,8 @@ class Request extends FormRequest
     public function rules(): array
     {
         return [
-            'avatar'=>'string',
+            'id'=>'required|exists:clients,id',
+            'avatar'=>'nullable|string',
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
@@ -35,7 +36,10 @@ class Request extends FormRequest
             'records'=>'nullable|numeric',
             'total'=>'nullable|numeric',
             'source'=>'nullable|string',
-            'email' => 'nullable|string|lowercase|email|max:255|unique:'.Client::class,
+            'email' => ['string','lowercase','email','max:255',
+                Rule::unique('clients')->ignore($this->client)
+            ],
+            'password' => 'nullable|string|min:6|confirmed',
         ];
     }
 }

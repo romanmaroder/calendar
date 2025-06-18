@@ -8,8 +8,9 @@ import { Link } from '@inertiajs/vue3';
 import {
     BookOpen,
     Folder,
-    LayoutGrid,
-    UsersIcon
+    LayoutGrid, UserRoundXIcon,
+    Users2,
+    UsersIcon,
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
@@ -19,15 +20,24 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
+];
+const mainNavItemsUser: NavItem[] = [
     {
         title: 'Users',
         href: '/users',
         icon: UsersIcon,
     },
+];
+const mainNavItemsClient: NavItem[] = [
     {
         title: 'Clients',
         href: '/clients',
-        icon: UsersIcon,
+        icon: Users2,
+    },
+    {
+        title: 'Clients trash ',
+        href: '/archive',
+        icon: UserRoundXIcon,
     },
 ];
 
@@ -46,7 +56,7 @@ const footerNavItems: NavItem[] = [
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset">
+    <Sidebar collapsible="icon" variant="inset" >
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
@@ -60,7 +70,9 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavMain :items="mainNavItems" group-label="Main" />
+            <NavMain :items="mainNavItemsUser" group-label="Users" />
+            <NavMain :items="mainNavItemsClient" group-label="Clients"/>
         </SidebarContent>
 
         <SidebarFooter>

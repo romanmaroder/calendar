@@ -2,12 +2,10 @@
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItemType } from '@/types';
-import AddUser from '@/components/AddUser.vue';
 
 defineProps<{
     breadcrumbs?: BreadcrumbItemType[];
 }>();
-
 </script>
 
 <template>

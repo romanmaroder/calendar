@@ -51,7 +51,9 @@ useEventListener('keydown', (event: KeyboardEvent) => {
 
 // We add a state so that we can do data-state="expanded" or "collapsed".
 // This makes it easier to style the sidebar with Tailwind classes.
-const state = computed(() => open.value ? 'expanded' : 'collapsed')
+//const state = computed(() => open.value ? 'expanded' : 'collapsed')
+
+const state = computed(() => open.value ? 'collapsed' : 'expanded')
 
 provideSidebarContext({
   state,

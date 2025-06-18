@@ -17,23 +17,32 @@ class AvatarUploadController extends Controller
             return [
                 'url' => Storage::url($path),
                 'name' => $request->file('avatar')->hashName(),
-                'code'=>'200',
-                'message'=>'Image uploaded successfully'
+                'code' => '200',
+                'message' => 'Image uploaded successfully'
             ];
         }
         return [
-            'code'=>'400',
-            'message'=>'Something went wrong'
+            'code' => '400',
+            'message' => 'Something went wrong'
         ];
     }
 
     public function delete(UploadAvatarRequest $request)
     {
-            $request->validated();
+        $request->validated();
+        if ($request['name'] !=null) {
             Storage::disk('public')->delete('/avatars/' . $request['name']);
             return [
                 'code' => '200',
-                'message' => 'Delete success'
+                'message' => 'Avatar delete success',
+                'url'=>''
             ];
+        }
+        return [
+            'code' => '404',
+            'message' => 'Avatar not found',
+            'url'=>''
+        ];
+
     }
 }

@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -39,5 +40,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('clients');
+        Schema::table('clients', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
     }
 };
