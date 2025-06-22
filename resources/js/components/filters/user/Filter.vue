@@ -10,12 +10,16 @@ import { useToast } from 'primevue/usetoast';
 
 
 const props = defineProps({
-    clients: {
+    entities: {
         type: Object,
         default() {
             return {};
         },
     },
+    urlToRefresh:{
+        type:String,
+        required:true
+    }
 });
 const toast = useToast();
 
@@ -31,10 +35,10 @@ const form = useForm({
 const submit = (e: Event) => {
     e.preventDefault();
     if (form.id || form.name || form.surname || form.middleName || form.phone || form.email) {
-        form.get(route('clients.index'), {
+        form.get(route(props.urlToRefresh), {
             preserveScroll: true,
             onSuccess: function (page) {
-                if (page.props.clients.data.length < 1) {
+                if (page.props.entities?.data.length < 1) {
                     toast.add({
                         severity: 'error',
                         summary: 'The client was not found.',
@@ -45,7 +49,7 @@ const submit = (e: Event) => {
                     toast.add({
                         severity: 'success',
                         summary: 'The client was found',
-                        detail: page.props.clients.data[0]?.name + ' ' + page.props.clients?.data[0]?.surname,
+                        detail: page.props.entities?.data[0].name + ' ' + page.props.entities?.data[0].surname,
                         life: 3000,
                     });
 
@@ -68,7 +72,7 @@ const items = [
         label: 'Сбросить',
         icon: 'pi pi-sync',
         command: () => {
-            window.location.href = route('clients.index');
+            window.location.href = route(props.urlToRefresh);
         },
     },
 ];
@@ -76,8 +80,8 @@ const items = [
 const disabled = ref(false);
 
 onMounted(() => {
-    if (props.clients.data.length == 1) {
-        Object.entries(props.clients.data[0]).forEach((entry) => {
+    if (props.entities.data.length == 1) {
+        Object.entries(props.entities.data[0]).forEach((entry) => {
             const [key, value] = entry;
             form[`${key}`] = value;
         });
