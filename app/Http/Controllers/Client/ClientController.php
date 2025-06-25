@@ -38,10 +38,11 @@ class ClientController extends Controller
                                                                                 ])->thenReturn();
         $count = $clients->count();
         $clients = $clients->paginate($count);
-        //dd($clients);
+
         return Inertia::render('Client/Index', [
             'clients' => $clients,
-            'count' => $count
+            'count' => $count,
+            'columns' => Client::columns(['deleted_at','surname','middleName']),
         ]);
     }
 
@@ -157,7 +158,8 @@ class ClientController extends Controller
         $count = Client::onlyTrashed()->count();
         return Inertia::render('Client/Archive', [
             'clients' => Client::onlyTrashed()->latest('created_at')->paginate($count),
-            'count' => $count
+            'count' => $count,
+            'columns' => Client::columns(['surname','middleName','comment','records','total','source','discount','blacklist','prepayment']),
         ]);
     }
 

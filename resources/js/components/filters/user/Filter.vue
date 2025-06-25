@@ -80,7 +80,7 @@ const items = [
 const disabled = ref(false);
 
 onMounted(() => {
-    if (props.entities.data.length == 1) {
+    if (props.entities.data?.length == 1) {
         Object.entries(props.entities.data[0]).forEach((entry) => {
             const [key, value] = entry;
             form[`${key}`] = value;

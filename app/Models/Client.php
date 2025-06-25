@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\UseColumns;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,8 +11,10 @@ use Illuminate\Notifications\Notifiable;
 class Client extends Model
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, UseColumns;
 
+    protected string $field = 'field';
+    protected string $header = 'header';
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +26,7 @@ class Client extends Model
         'surname',
         'middleName',
         'phone',
+        'email',
         'comment',
         'blacklist',
         'prepayment',
@@ -30,8 +34,6 @@ class Client extends Model
         'records',
         'total',
         'source',
-        'avatar',
-        'email',
         'password',
         'deleted_at',
     ];
@@ -44,6 +46,8 @@ class Client extends Model
     protected $hidden = [
         'password',
         'remember_token',
+        'updated_at',
+        'email_verified_at'
     ];
 
     /**

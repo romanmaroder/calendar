@@ -16,13 +16,8 @@ return new class extends Migration
             $table->string('middleName')->nullable()->after('surname');
             $table->string('phone')->nullable()->after('middleName');
             $table->string('comment',1000)->nullable()->after('phone');
-            $table->boolean('blacklist')->nullable()->after('comment');
-            $table->boolean('prepayment')->nullable()->after('blacklist');
-            $table->smallInteger('discount')->nullable()->after('prepayment');
-            $table->integer('records')->nullable()->after('discount');
-            $table->integer('total')->nullable()->after('records');
-            $table->string('source')->nullable()->after('total');
-            $table->string('avatar')->nullable()->after('source');
+            $table->string('birthday')->nullable()->after('comment');
+            $table->string('avatar')->nullable()->after('birthday');
         });
     }
 
@@ -36,12 +31,7 @@ return new class extends Migration
            $table->dropColumn('middleName');
            $table->dropColumn('phone');
            $table->dropColumn('comment');
-           $table->dropColumn('blacklist');
-           $table->dropColumn('prepayment');
-           $table->dropColumn('discount');
-           $table->dropColumn('records');
-           $table->dropColumn('total');
-           $table->dropColumn('source');
+           $table->dropColumn('birthday');
            $table->dropColumn('avatar');
         });
     }

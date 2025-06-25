@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import ClientCreateDialog from '@/components/client/ClientCreateDialog.vue';
-import ClientDeleteDialog from '@/components/client/ClientDeleteDialog.vue';
-import ClientMultiDeleteDialog from '@/components/client/ClientMultiDeleteDialog.vue';
-import ClientUpdateDialog from '@/components/client/ClientUpdateDialog.vue';
+import ClientCreateDialog from '@/components/client/CreateDialog.vue';
+import ClientDeleteDialog from '@/components/client/DeleteDialog.vue';
+import ClientMultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
+import ClientUpdateDialog from '@/components/client/UpdateDialog.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
@@ -21,6 +21,8 @@ const props = defineProps({
     count: {
         type: Number,
     },
+    columns: {
+    }
 });
 
 
@@ -141,6 +143,29 @@ const getStatusLabel = (status:any) => {
             <template #empty><p class="text-center text-xl font-bold">No Clients</p></template>
             <template #loading> Loading customers data. Please wait. </template>
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
+            <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
+                <template v-if="col.field === 'avatar' || col.field ==='photo' || col.field ==='image'" #body="slotProps">
+                    <img v-if="slotProps.data.avatar" :src="slotProps.data.avatar" :alt="slotProps.data.avatar" class="rounded" style="width: 64px" />
+                    <img v-else class="rounded" style="width: 64px" src="../../../../public/no_avatar_big.png" alt="" />
+                </template>
+                <template v-else-if="col.field ==='name'" #body="slotProps">
+                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
+                        <p>
+                            {{ slotProps.data.name }}
+                            {{ slotProps.data.middleName }}
+                            {{ slotProps.data.surname }}
+                        </p>
+                    </div>
+                    <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
+                </template>
+                <template v-else-if="col.field ==='blacklist'" #body="slotProps">
+                    <Tag :value="slotProps.data.blacklist" :severity="getStatusLabel(slotProps.data.blacklist)" />
+                </template>
+                <template  v-else-if="col.field ==='prepayment'" #body="slotProps">
+                    <Tag :value="slotProps.data.prepayment" :severity="getStatusLabel(slotProps.data.prepayment)" />
+                </template>
+            </Column>
+<!--            <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column header="Avatar" frozen alignFrozen="right">
                 <template #body="slotProps">
                     <img v-if="slotProps.data.avatar" :src="slotProps.data.avatar" :alt="slotProps.data.avatar" class="rounded" style="width: 64px" />
@@ -177,7 +202,7 @@ const getStatusLabel = (status:any) => {
             </Column>
             <Column field="discount" header="Discount" :sortable=true style="min-width: 5rem"></Column>
             <Column field="records" header="Records" :sortable=true style="min-width: 5rem"></Column>
-            <Column field="total" header="Total" :sortable=true style="min-width: 5rem"></Column>
+            <Column field="total" header="Total" :sortable=true style="min-width: 5rem"></Column>-->
             <Column :exportable="false" header="Tools" style="min-width: 8rem">
                 <template #body="slotProps">
                     <span class="flex flex-row items-center justify-center">

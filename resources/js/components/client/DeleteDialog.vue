@@ -16,9 +16,9 @@ import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 const wait = (time = 2000) => new Promise((resolve) => setTimeout(resolve, time));
-const emit = defineEmits(['deleteCustomer']);
+const emit = defineEmits(['deleteItem']);
 const props = defineProps({
-    client: {
+    entity: {
         type: Object,
         required: true,
         default() {
@@ -40,7 +40,7 @@ const props = defineProps({
 
 function handleAction() {
         axios
-            .post(route(props.urlToDelete, props.client.id), { _method: 'delete' })
+            .post(route(props.urlToDelete, props.entity.id), { _method: 'delete' })
             .then((response) => {
                 wait();
                 toast.add({
@@ -49,7 +49,7 @@ function handleAction() {
                     detail: response.data.message,
                     life: 3000,
                 });
-                emit('deleteCustomer', props.client.id, response.data.message);
+                emit('deleteItem', props.entity.id, response.data.message);
             })
             .catch(function(error) {
                 wait();
@@ -78,7 +78,7 @@ function handleAction() {
             >
                 <AlertDialogTitle class="m-0 text-[17px] font-semibold text-black"> Are you absolutely sure? </AlertDialogTitle>
                 <AlertDialogDescription class="mt-4 mb-5 text-sm leading-normal text-black">
-                    {{ client.name }} will be moved to the basket.
+                    {{ entity.name }} will be moved to the basket.
                 </AlertDialogDescription>
                 <div class="flex justify-end gap-4">
                     <AlertDialogCancel

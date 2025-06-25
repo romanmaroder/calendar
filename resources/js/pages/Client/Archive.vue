@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import ClientArchiveTable from '@/components/client/ClientArchiveTable.vue';
+import DataTable from '@/components/tables/user/DataTable.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
+import { ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Archive', href: '/archive' }];
 
-  defineProps({
+defineProps({
     clients: {
         type: Object,
         required: true,
@@ -15,7 +16,15 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Archive', href: '/archive' }];
     count: {
         type: Number,
     },
+    columns: {
+        type: Object,
+    },
 });
+
+const total = ref();
+const counter = (num: number) => {
+    total.value = num;
+};
 </script>
 
 <template>
@@ -23,11 +32,18 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Archive', href: '/archive' }];
     <Layout :breadcrumbs="breadcrumbs">
         <Toast />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="client-cards-description">
-                Карточки клиентов на базе номеров мобильных телефонов. Всего карточек:
-                {{ count }}
+            <div class="client-cards-description">Всего карточек в корзине:
+                {{ total }}
             </div>
-            <ClientArchiveTable :clients="clients" :count="count" />
+            <DataTable :entities="clients"
+                       :columns="columns"
+                       :count="count"
+                       restore
+                       tools
+                       remove
+
+                       @count="counter"
+            />
         </div>
     </Layout>
 </template>

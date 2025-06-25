@@ -18,13 +18,12 @@ import { onUpdated, ref } from 'vue';
 
 const toast = useToast();
 const wait = (time = 2000) => new Promise((resolve) => setTimeout(resolve, time));
-const emit = defineEmits(['deleteCustomers']);
+const emit = defineEmits(['deleteItems']);
 const count = ref(0);
 
 const props = defineProps({
-    client: {
+    entity: {
         type: Object,
-        required: true,
         default() {
             return {};
         },
@@ -46,16 +45,16 @@ const props = defineProps({
 });
 
 onUpdated(()=>{
-    if (props.client == null) {
+    if (props.entity == null) {
         count.value = 0;
     } else {
-        count.value = props.client.length;
+        count.value = props.entity.length;
     }
 })
 
 function handleAction() {
     axios
-        .post(route(props.urlToDelete, { ids: props.client.map((val: any) => val.id) }), { _method: 'delete' })
+        .post(route(props.urlToDelete, { ids: props.entity.map((val: any) => val.id) }), { _method: 'delete' })
         .then((response) => {
             wait();
             toast.add({
@@ -64,7 +63,7 @@ function handleAction() {
                 detail: response.data.message,
                 life: 3000,
             });
-            emit('deleteCustomers', props.client, response.data.message);
+            emit('deleteItems', props.entity, response.data.message);
         })
         .catch(function (error) {
             wait();
@@ -97,7 +96,7 @@ function handleAction() {
             >
                 <AlertDialogTitle class="m-0 text-[17px] font-semibold text-black"> Are you absolutely sure? </AlertDialogTitle>
                 <AlertDialogDescription class="mt-4 mb-5 text-sm leading-normal text-black">
-                    <span v-for="item in client" :key="item.id"> {{ item.name }} {{item.surname}}<br /> </span>
+                    <span v-for="item in entity" :key="item.id"> {{ item.name }} {{item.surname}}<br /> </span>
                     <span class="text-red-500"><b> will be moved to the basket.</b></span>
                 </AlertDialogDescription>
                 <div class="flex justify-end gap-4">

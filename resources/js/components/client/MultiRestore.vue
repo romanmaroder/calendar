@@ -7,13 +7,15 @@ import { useToast } from 'primevue/usetoast';
 import { onMounted, onUpdated, ref } from 'vue';
 
 const toast = useToast();
-const emit = defineEmits(['restoreCustomers']);
+const emit = defineEmits(['restoreItems']);
 const count = ref(0);
 
 const props = defineProps({
-    client: {
+    entity: {
         type: Object,
-        required: true,
+        default() {
+            return {};
+        },
     },
     label: {
         type: String,
@@ -29,14 +31,14 @@ const props = defineProps({
 });
 
 onMounted(() => {
-    console.log(props.client);
+    //console.log(props.entity);
 });
 
 onUpdated(() => {
-    if (props.client == null) {
+    if (props.entity == null) {
         count.value = 0;
     } else {
-        count.value = props.client.length;
+        count.value = props.entity.length;
     }
 });
 
@@ -50,7 +52,7 @@ const restore = (ids: any) => {
                 detail: response.data.message,
                 life: 3000,
             });
-            emit('restoreCustomers', props.client, response.data.message);
+            emit('restoreItems', props.entity, response.data.message);
         })
         .catch(function (error) {
             toast.add({
@@ -64,7 +66,7 @@ const restore = (ids: any) => {
 </script>
 
 <template>
-    <Button severity="primary" @click.prevent="restore(props.client)" raised >
+    <Button severity="primary" @click.prevent="restore(props.entity)" raised >
         <Icon v-if="iconName" :name="iconName" class="mr-1" />
         <span v-else>{{ label }}</span>
         <Badge severity="secondary">{{ count }}</Badge>
