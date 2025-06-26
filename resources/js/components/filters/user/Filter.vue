@@ -38,7 +38,7 @@ const submit = (e: Event) => {
         form.get(route(props.urlToRefresh), {
             preserveScroll: true,
             onSuccess: function (page) {
-                if (page.props.entities?.data.length < 1) {
+                if (page.props.clients?.data.length < 1) {
                     toast.add({
                         severity: 'error',
                         summary: 'The client was not found.',
@@ -49,10 +49,9 @@ const submit = (e: Event) => {
                     toast.add({
                         severity: 'success',
                         summary: 'The client was found',
-                        detail: page.props.entities?.data[0].name + ' ' + page.props.entities?.data[0].surname,
+                        detail: page.props.clients?.data[0].name + ' ' + page.props.clients?.data[0].surname,
                         life: 3000,
                     });
-
                 }
             },
             onFinish: function () {},
@@ -98,19 +97,19 @@ onMounted(() => {
             <FloatLabel variant="on" class="sm:order-1 md:order-1">
                 <InputNumber
                     v-model="form.id"
-                    id="on_label"
+                    input-id="id"
                     autocomplete="off"
                     class="h-[28px] w-full"
-                    aria-labelledby="Id"
+                    aria-labelledby="id"
                     :disabled="disabled"
                     size="large"
                     inputClass="w-full"
                 />
-                <label for="on_label" class="font-light!">ID</label>
+                <label for="id" class="font-light!">ID</label>
             </FloatLabel>
             <FloatLabel variant="on" class="sm:order-3 md:order-2">
                 <InputText
-                    id="in_label"
+                    id="name"
                     v-model="form.name"
                     autocomplete="off"
                     class="h-[28px] w-full"
@@ -118,11 +117,11 @@ onMounted(() => {
                     :disabled="disabled"
                     size="large"
                 />
-                <label for="on_label" class="font-light!">Имя:</label>
+                <label for="name" class="font-light!">Имя:</label>
             </FloatLabel>
             <FloatLabel variant="on" class="sm:order-5 md:order-3">
                 <InputText
-                    id="in_label"
+                    id="surname"
                     v-model="form.surname"
                     autocomplete="off"
                     class="h-[28px] w-full"
@@ -130,11 +129,11 @@ onMounted(() => {
                     :disabled="disabled"
                     size="large"
                 />
-                <label for="on_label" class="font-light!">Фамилия:</label>
+                <label for="surname" class="font-light!">Фамилия:</label>
             </FloatLabel>
             <FloatLabel variant="on" class="sm:order-2 md:order-4">
                 <InputText
-                    id="in_label"
+                    id="phone"
                     v-model="form.phone"
                     type="tel"
                     autocomplete="off"
@@ -143,20 +142,20 @@ onMounted(() => {
                     :disabled="disabled"
                     size="large"
                 />
-                <label for="on_label" class="font-light!">Телефон:</label>
+                <label for="phone" class="font-light!">Телефон:</label>
             </FloatLabel>
             <FloatLabel variant="on" class="sm:order-4 md:order-5">
                 <InputText
-                    id="in_label"
+                    id="email"
                     v-model="form.email"
                     type="email"
                     autocomplete="off"
                     class="h-[28px] w-full"
-                    aria-labelledby="Email"
+                    aria-labelledby="email"
                     :disabled="disabled"
                     size="large"
                 />
-                <label for="on_label" class="font-light!">Email:</label>
+                <label for="email" class="font-light!">Email:</label>
             </FloatLabel>
             <SplitButton
                 @click="submit"
