@@ -26,6 +26,9 @@ const props = defineProps({
     columns: {
         type: Object,
     },
+    filtersFields: {
+        type: Object,
+    },
     tools: {
         type: Boolean,
         default: false,
@@ -58,6 +61,7 @@ const selectedItems = ref();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+const fields = ref([]);
 
 const loading = ref(true);
 const pagination = ref(false);
@@ -68,6 +72,16 @@ onMounted(() => {
         pagination.value = true;
     }
     loading.value = false;
+
+    Object.entries(props.filtersFields).forEach(([key1, value1]) => {
+        Object.entries(value1).forEach(([key2, value2]) => {
+            if (key2 === 'field') {
+                fields.value.push(value2);
+            }
+        });
+    });
+    console.log(fields.value);
+console.log(props.filtersFields);
 });
 
 onBeforeUpdate(() => {
@@ -134,7 +148,10 @@ const operationWithSelectedItems = () => {
 const operationWithSingleItem = (id: any) => {
     items.value = items.value.filter((val: any) => val.id !== id);
 };
+
+
 </script>
+<!--:globalFilterFields="['id', 'name', 'surname', 'middleName', 'phone', 'email', 'comment', 'discount', 'source']"-->
 
 <template>
     <div class="grid auto-cols-fr">
@@ -177,6 +194,7 @@ const operationWithSingleItem = (id: any) => {
             :paginator="pagination"
             :rows="10"
             :filters="filters"
+            :globalFilterFields="fields"
             sort
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -191,16 +209,28 @@ const operationWithSingleItem = (id: any) => {
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value"
-                                   class="h-[28px]"
-                                   placeholder="Search..." size="small" />
+                        <InputText v-model="filters['global'].value" name="search" class="h-[28px]" placeholder="Search..." size="small" />
                     </IconField>
                 </div>
             </template>
             <template #empty><p class="text-center text-xl font-bold">No entities</p></template>
             <template #loading> Loading items data. Please wait.</template>
-            <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-            <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable>
+            <Column
+                selectionMode="multiple"
+                style="width: 3rem"
+                :exportable="false"
+                :pt="{
+                    pcRowCheckbox: {
+                        input: {
+                            name: 'selectedItem',
+                        },
+                    },
+                    pcHeaderCheckbox: {
+                        input: { name: 'allSelected' },
+                    },
+                }"
+            ></Column>
+            <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true">
                 <template v-if="col.field === 'avatar' || col.field === 'photo' || col.field === 'image'" #body="slotProps">
                     <img v-if="slotProps.data.avatar" :src="slotProps.data.avatar" :alt="slotProps.data.avatar" class="rounded" style="width: 64px" />
                     <img v-else class="rounded" style="width: 64px" src="../../../../../public/no_avatar_big.png" alt="" />

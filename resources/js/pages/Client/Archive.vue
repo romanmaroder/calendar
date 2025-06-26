@@ -19,6 +19,9 @@ defineProps({
     columns: {
         type: Object,
     },
+    filters: {
+        type: Object,
+    },
 });
 
 const total = ref();
@@ -32,18 +35,11 @@ const counter = (num: number) => {
     <Layout :breadcrumbs="breadcrumbs">
         <Toast />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="client-cards-description">Всего карточек в корзине:
+            <div class="client-cards-description">
+                Всего карточек в корзине:
                 {{ total }}
             </div>
-            <DataTable :entities="clients"
-                       :columns="columns"
-                       :count="count"
-                       restore
-                       tools
-                       remove
-
-                       @count="counter"
-            />
+            <DataTable :entities="clients" :columns="columns"  restore tools remove :filters-fields="filters" @count="counter" />
         </div>
     </Layout>
 </template>

@@ -43,6 +43,7 @@ class ClientController extends Controller
             'clients' => $clients,
             'count' => $count,
             'columns' => Client::columns(['deleted_at','surname','middleName']),
+            'filters' => Client::columns(['deleted_at','avatar','blacklist','prepayment'])
         ]);
     }
 
@@ -160,6 +161,7 @@ class ClientController extends Controller
             'clients' => Client::onlyTrashed()->latest('created_at')->paginate($count),
             'count' => $count,
             'columns' => Client::columns(['surname','middleName','comment','records','total','source','discount','blacklist','prepayment']),
+            'filters' => Client::columns(['comment','records','total','source','discount','blacklist','prepayment'],['name']), //TODO подумать над фильтром по запросу
         ]);
     }
 
