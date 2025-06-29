@@ -20,6 +20,9 @@ defineProps({
     columns: {
         type: Object,
     },
+    filters:{
+        type: Object,
+    }
 });
 
 const total = ref();
@@ -38,7 +41,7 @@ const counter = (num: number) => {
                 {{ total }}
             </div>
             <Filter :entities="users" url-to-refresh="users" />
-            <DataTable :entities="users" :columns="columns" :create="true" @count="counter" />
+            <DataTable :entities="users" :columns="columns" :filters-fields="filters" :create="true" @count="counter" />
         </div>
     </Layout>
 </template>

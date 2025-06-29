@@ -15,10 +15,11 @@ class UserController extends Controller
     {
         $count = User::count();
         $columns = User::columns(['surname','middleName']);
+        $filters = User::columns(['avatar'],['surname','middleName']);
 
         return Inertia::render(
             'User/Index',
-            ['users' => User::paginate($count), 'count' => $count, 'columns' =>$columns]
+            ['users' => User::paginate($count), 'count' => $count, 'columns' =>$columns, 'filters'=>$filters]
         );
     }
 
