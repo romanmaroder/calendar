@@ -42,7 +42,7 @@ class ClientController extends Controller
         return Inertia::render('Client/Index', [
             'clients' => $clients,
             'count' => $count,
-            'columns' => Client::columns(['deleted_at','surname','middleName']),
+            'columns' => Client::columns(['deleted_at']),
             'filters' => Client::columns(['deleted_at','avatar','blacklist','prepayment'])
         ]);
     }
@@ -161,7 +161,7 @@ class ClientController extends Controller
             'clients' => Client::onlyTrashed()->latest('created_at')->paginate($count),
             'count' => $count,
             'columns' => Client::columns(['surname','middleName','comment','records','total','source','discount','blacklist','prepayment']),
-            'filters' => Client::columns(['comment','records','total','source','discount','blacklist','prepayment'],['name']), //TODO подумать над фильтром по запросу
+            'filters' => Client::columns(['comment','records','total','source','discount','blacklist','prepayment'],['name']),
         ]);
     }
 

@@ -5,9 +5,10 @@ namespace App\Traits;
 trait UseColumns
 {
     /**
-     * @param array $makeHidden
-     * @param array $makeVisible
+     * @param array $makeHidden - массив с полями которые надо скрыть.
+     * @param array $makeVisible - массив с полями который нужно отобразить
      * @return array
+     *
      */
     public static function columns( array $makeHidden=[], array $makeVisible=[]): array
     {

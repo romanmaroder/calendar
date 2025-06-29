@@ -73,15 +73,7 @@ onMounted(() => {
     }
     loading.value = false;
 
-    Object.entries(props.filtersFields).forEach(([key1, value1]) => {
-        Object.entries(value1).forEach(([key2, value2]) => {
-            if (key2 === 'field') {
-                fields.value.push(value2);
-            }
-        });
-    });
-    console.log(fields.value);
-console.log(props.filtersFields);
+    filterFields();
 });
 
 onBeforeUpdate(() => {
@@ -90,6 +82,7 @@ onBeforeUpdate(() => {
         pagination.value = false;
     }
 });
+
 const onAddItem = (data: object) => {
     items.value.push(data);
     items.value = props.entities.data;
@@ -114,6 +107,11 @@ const onRestoreSelectedItems = () => {
 const onDeleteItem = (id: any) => {
     operationWithSingleItem(id);
 };
+
+const onDeleteSelectedItems = () => {
+    operationWithSelectedItems();
+};
+
 const findIndexById = (id: any) => {
     let index = -1;
     for (let i = 0; i < items.value.length; i++) {
@@ -124,11 +122,6 @@ const findIndexById = (id: any) => {
     }
     return index;
 };
-
-const onDeleteSelectedItems = () => {
-    operationWithSelectedItems();
-};
-
 const getStatusLabel = (status: any) => {
     switch (status) {
         case true:
@@ -140,6 +133,25 @@ const getStatusLabel = (status: any) => {
     }
 };
 
+const filterFields = () => {
+    if (props.filtersFields) {
+        Object.entries(props.filtersFields).forEach(([key1, value1]) => {
+            Object.entries(value1).forEach(([key2, value2]) => {
+                if (key2 === 'field') {
+                    fields.value.push(value2);
+                }
+            });
+        });
+    } else {
+        Object.entries(props.columns).forEach(([key1, value1]) => {
+            Object.entries(value1).forEach(([key2, value2]) => {
+                if (key2 === 'field') {
+                    fields.value.push(value2);
+                }
+            });
+        });
+    }
+};
 const operationWithSelectedItems = () => {
     items.value = items.value.filter((val: any) => !selectedItems.value.includes(val));
     selectedItems.value = null;
@@ -148,10 +160,7 @@ const operationWithSelectedItems = () => {
 const operationWithSingleItem = (id: any) => {
     items.value = items.value.filter((val: any) => val.id !== id);
 };
-
-
 </script>
-<!--:globalFilterFields="['id', 'name', 'surname', 'middleName', 'phone', 'email', 'comment', 'discount', 'source']"-->
 
 <template>
     <div class="grid auto-cols-fr">
@@ -185,6 +194,7 @@ const operationWithSingleItem = (id: any) => {
                 </div>
             </template>
         </Toolbar>
+
         <DataTable
             class="text-[15px]"
             ref="dt"
