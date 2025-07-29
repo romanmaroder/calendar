@@ -19,12 +19,13 @@ import Checkbox from 'primevue/checkbox';
 import FloatLabel from 'primevue/floatlabel';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
-import { ref } from 'vue';
+import {  ref } from 'vue';
+import InputMask from 'primevue/inputmask';
 
 const props = defineProps({
-    urlToUpdate: {
+    route: {
         type: String,
-        default: 'clients.store',
+        default: '#',
     },
     iconName: {
         type: String,
@@ -62,15 +63,12 @@ const form = useForm({
     records: '',
 });
 
-const emit = defineEmits(['addItem']);
-
 const submit = (e: Event) => {
     e.preventDefault();
-    form.post(route(props.urlToUpdate), {
+    form.post(route(props.route), {
         preserveScroll: true,
         onSuccess: function () {
             wait().then(() => (open.value = false));
-            emit('addItem', form.data());
             toast.add({
                 severity: 'info',
                 summary: 'Info',
@@ -151,76 +149,69 @@ const onUpdateAvatar = (data: any) => {
                     </div>
                     <div class="mt-2 space-y-4 md:[grid-area:1_/_2_/_2_/_3] lg:space-y-5">
                         <FloatLabel variant="on" class="">
-                            <InputText
-                                id="in_label"
-                                v-model="form.name"
-                                autocomplete="off"
-                                class="h-[28px] w-full"
-                                aria-labelledby="name"
-                                size="small"
-                            />
-                            <label for="on_label" class="font-light!">Имя:</label>
+                            <InputText id="name" v-model="form.name" autocomplete="off" class="h-[28px] w-full" aria-labelledby="name" size="small" />
+                            <label for="name" class="font-light!">{{ form.name || 'Имя:' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.name" class="mb-2" />
-
+                        <InputError :message="form.errors.name" class="mb-2 -mt-2" />
                         <FloatLabel variant="on" class="">
                             <InputText
-                                id="in_label"
-                                v-model="form.surname"
-                                autocomplete="off"
-                                class="h-[28px] w-full"
-                                aria-labelledby="surname"
-                                size="small"
-                            />
-                            <label for="on_label" class="font-light!">Фамилия:</label>
-                        </FloatLabel>
-                        <InputError :message="form.errors.surname" class="mb-2" />
-
-                        <FloatLabel variant="on" class="">
-                            <InputText
-                                id="in_label"
+                                id="middleName"
                                 v-model="form.middleName"
                                 autocomplete="off"
                                 class="h-[28px] w-full"
                                 aria-labelledby="middleName"
                                 size="small"
                             />
-                            <label for="on_label" class="font-light!">Отчество:</label>
+                            <label for="middleName" class="font-light!">{{ form.middleName || 'Отчество:' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.middleName" class="mb-2" />
-                    </div>
-                    <div class="mt-2 space-y-4 md:[grid-area:1_/_3_/_2_/_4] lg:space-y-5">
+                        <InputError :message="form.errors.middleName" class="mb-2 -mt-2" />
                         <FloatLabel variant="on" class="">
                             <InputText
-                                id="in_label"
+                                id="surname"
+                                v-model="form.surname"
+                                autocomplete="off"
+                                class="h-[28px] w-full"
+                                aria-labelledby="surname"
+                                size="small"
+                            />
+                            <label for="surname" class="font-light!">{{ form.surname || 'Фамилия:' }}</label>
+                        </FloatLabel>
+                        <InputError :message="form.errors.surname" class="mb-2 -mt-2" />
+                    </div>
+                    <div class="mt-2 space-y-4 md:[grid-area:1_/_3_/_2_/_4] lg:space-y-5">
+                        <FloatLabel variant="on">
+                            <InputMask
+                                id="phone"
                                 v-model="form.phone"
                                 type="tel"
-                                autocomplete="off"
                                 class="h-[28px] w-full"
                                 aria-labelledby="phone"
                                 size="small"
+                                ref="phoneInput"
+                                mask="+9 999 999 99 99"
                             />
-                            <label for="on_label" class="font-light!">Телефон:</label>
+                            <label for="phone" class="font-light!">{{ form.phone || '+9 999 999 99 99' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.phone" class="mb-2" />
+                        <InputError :message="form.errors.phone" class="mb-2 -mt-2" />
 
                         <FloatLabel variant="on" class="">
                             <InputText
-                                id="in_label"
+                                id="email"
                                 v-model="form.email"
                                 type="email"
                                 autocomplete="off"
                                 class="h-[28px] w-full"
                                 aria-labelledby="email"
                                 size="small"
+                                required
                             />
-                            <label for="on_label" class="font-light!">Email:</label>
+                            <label for="email" class="font-light!">Email:</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.email" class="mb-2" />
+                        <InputError :message="form.errors.email" class="mb-2 -mt-2" />
 
                         <FloatLabel variant="on" class="">
                             <InputText
-                                id="in_label"
+                                id="source"
                                 v-model="form.source"
                                 type="text"
                                 autocomplete="off"
@@ -228,21 +219,21 @@ const onUpdateAvatar = (data: any) => {
                                 aria-labelledby="source"
                                 size="small"
                             />
-                            <label for="on_label" class="font-light!">Источник:</label>
+                            <label for="source" class="font-light!">Источник:</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.source" class="mb-2" />
+                        <InputError :message="form.errors.source" class="mb-2 -mt-2" />
                     </div>
                     <div class="mt-2 md:[grid-area:2_/_1_/_3_/_4]">
                         <FloatLabel variant="on">
-                            <Textarea id="on_label" v-model="form.comment" rows="4" cols="15" autoResize size="small" class="w-full" />
-                            <label for="on_label">Заметка</label>
+                            <Textarea id="comment" v-model="form.comment" rows="4" cols="15" autoResize size="small" class="w-full" />
+                            <label for="comment">Заметка</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.comment" class="mb-2" />
+                        <InputError :message="form.errors.comment" class="mb-2 -mt-2" />
                     </div>
                     <div class="mb-2 md:[grid-area:3_/_1_/_4_/_4]">
                         <FloatLabel variant="on" class="">
                             <InputText
-                                id="in_label"
+                                id="discount"
                                 v-model="form.discount"
                                 type="text"
                                 autocomplete="off"
@@ -250,9 +241,9 @@ const onUpdateAvatar = (data: any) => {
                                 aria-labelledby="discount"
                                 size="small"
                             />
-                            <label for="on_label" class="font-light!">Персональная скидка:</label>
+                            <label for="discount" class="font-light!">Персональная скидка:</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.discount" class="mb-2" />
+                        <InputError :message="form.errors.discount" class="mb-2 -mt-2" />
                     </div>
                     <div class="grid gap-y-1.5 md:[grid-area:4_/_1_/_5_/_4]">
                         <div class="card flex flex-col flex-wrap gap-4 dark:text-white">
@@ -273,8 +264,7 @@ const onUpdateAvatar = (data: any) => {
                                 {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
                             </Button>
                             <DialogClose as-child>
-                                <Button severity="secondary" @click="close"
-                                        class="h-[30px] cursor-pointer rounded-sm py-1.5 font-normal" raised>
+                                <Button severity="secondary" @click="close" class="h-[30px] cursor-pointer rounded-sm py-1.5 font-normal" raised>
                                     Отмена
                                 </Button>
                             </DialogClose>

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Models\Client;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Email;
 
 class UpdateClientRequest extends FormRequest
 {
@@ -23,8 +25,8 @@ class UpdateClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>'required|exists:clients,id',
-            'avatar'=>'nullable|string',
+            'id' => 'required|exists:clients,id',
+            'avatar' => 'nullable|string',
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
@@ -33,12 +35,15 @@ class UpdateClientRequest extends FormRequest
             'blacklist' => 'nullable|boolean',
             'prepayment' => 'nullable|boolean',
             'discount' => 'nullable|numeric|min:0|max:100',
-            'records'=>'nullable|numeric',
-            'total'=>'nullable|numeric',
-            'source'=>'nullable|string',
-            'email' => ['string','lowercase','email','max:255',
-                Rule::unique('clients')->ignore($this->client)
-            ],
+            'records' => 'nullable|numeric',
+            'total' => 'nullable|numeric',
+            'source' => 'nullable|string',
+            /*'email' => ['nullable','string','lowercase','email','max:255',
+                Rule::unique(Client::class)->ignore($this->client)
+            ],*/
+            'email' => $this->isPrecognitive()
+                ? ['string', 'email:rfc,dns']
+                : ['nullable', 'string', 'email:rfc,dns','lowercase','max:255',Rule::unique(Client::class)->ignore($this->client)],
             'password' => 'nullable|string|min:6|confirmed',
         ];
     }

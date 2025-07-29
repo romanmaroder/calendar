@@ -14,6 +14,8 @@ use App\Http\Requests\Client\FilterClientRequest;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Models\Client;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -21,13 +23,13 @@ use Inertia\Inertia;
 
 class ClientController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
     public function index(FilterClientRequest $request)
     {
         $data = $request->validated();
-
         $clients = app()->make(Pipeline::class)->send(Client::query())->through([
                                                                                     Id::class,
                                                                                     Name::class,
@@ -39,11 +41,25 @@ class ClientController extends Controller
         $count = $clients->count();
         $clients = $clients->paginate($count);
 
-        return Inertia::render('Client/Index', [
+        return Inertia::render('client/Index', [
             'clients' => $clients,
             'count' => $count,
-            'columns' => Client::columns(['deleted_at']),
-            'filters' => Client::columns(['deleted_at','avatar','blacklist','prepayment'])
+            'columns' => Client::columns(
+                [
+                    'deleted_at',
+                    'surname',
+                    'middleName',
+                    'records',
+                    'total',
+                    'discount',
+                    'source',
+                    'blacklist',
+                    'prepayment',
+                    'comment'
+                ]
+            ),
+            'filters' => Client::columns(['deleted_at', 'avatar', 'blacklist', 'prepayment']),
+
         ]);
     }
 
@@ -52,7 +68,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Client/Create');
+        return Inertia::render('client/Create');
     }
 
     /**
@@ -80,17 +96,18 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        return Inertia::render('Client/Edit', [
-            'client' => $client,
+        return Inertia::render('client/Edit', [
+            'entity' => $client,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    public function update(UpdateClientRequest $request, Client $client): RedirectResponse
     {
         $data = $request->validated();
+
         $client->update($data);
 
         return to_route('clients.index');
@@ -133,7 +150,7 @@ class ClientController extends Controller
 
         return [
             'code' => 404,
-            'message' => 'Client not found'
+            'message' => 'client not found'
         ];
     }
 
@@ -144,32 +161,46 @@ class ClientController extends Controller
         if (Client::destroy($ids)) {
             return [
                 'code' => 200,
-                'message' => 'Moven to the basket.'
+                'message' => 'Move to the basket.'
             ];
         }
 
         return [
             'code' => 404,
-            'message' => 'Client not found'
+            'message' => 'client not found'
         ];
     }
 
     public function archive()
     {
         $count = Client::onlyTrashed()->count();
-        return Inertia::render('Client/Archive', [
+        return Inertia::render('client/Archive', [
             'clients' => Client::onlyTrashed()->latest('created_at')->paginate($count),
             'count' => $count,
-            'columns' => Client::columns(['surname','middleName','comment','records','total','source','discount','blacklist','prepayment']),
-            'filters' => Client::columns(['comment','records','total','source','discount','blacklist','prepayment'],['name']),
+            'columns' => Client::columns(
+                [
+                    'surname',
+                    'middleName',
+                    'comment',
+                    'records',
+                    'total',
+                    'source',
+                    'discount',
+                    'blacklist',
+                    'prepayment'
+                ]
+            ),
+            'filters' => Client::columns(
+                ['comment', 'records', 'total', 'source', 'discount', 'blacklist', 'prepayment'],
+                ['name']
+            ),
         ]);
     }
 
-
     public function restore($id)
     {
-        $client = Client::where('id',$id)->onlyTrashed()->firstOrFail();
-        if($client->restore()){
+        $client = Client::where('id', $id)->onlyTrashed()->firstOrFail();
+        if ($client->restore()) {
             return [
                 'code' => 200,
                 'message' => 'ID:' . $client->id . ' ' . $client->surname . ' restored.'
@@ -177,7 +208,7 @@ class ClientController extends Controller
         }
         return [
             'code' => 404,
-            'message' => 'Client not found'
+            'message' => 'client not found'
         ];
     }
 
@@ -185,17 +216,17 @@ class ClientController extends Controller
     {
         $ids = explode(',', $ids);
         $clients = Client::whereIn('id', $ids)->onlyTrashed()->get();
-        $response =[];
+        $response = [];
         foreach ($clients as $client) {
             if ($client->restore()) {
-                $response=[
+                $response = [
                     'code' => 200,
-                    'message' => 'Client restored'
+                    'message' => 'client restored'
                 ];
-            }else{
-                $response=[
+            } else {
+                $response = [
                     'code' => 404,
-                    'message' => 'Client already restored'
+                    'message' => 'client already restored'
                 ];
             }
         }

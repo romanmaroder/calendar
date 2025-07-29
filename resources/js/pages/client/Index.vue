@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import Filter from '@/components/filters/user/Filter.vue';
-import DataTable from '@/components/tables/user/DataTable.vue';
+import DataTable from '@/components/client/DataTable.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { ref } from 'vue';
+import {  ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
 
-defineProps({
+const props = defineProps({
     clients: {
         type: Object,
         required: true,
@@ -21,9 +21,14 @@ defineProps({
         type: Object,
     },
     filters: {
-        type:Object,
+        type: Object,
+    },
+    errors:{
+        type: Object,
     }
 });
+
+
 
 const total = ref();
 const counter = (num: number) => {
@@ -40,9 +45,27 @@ const counter = (num: number) => {
                 Карточки клиентов на базе номеров мобильных телефонов. Всего карточек:
                 {{ total }}
             </div>
-            <Filter :entities="clients" url-to-refresh="clients.index" />
-            <DataTable :entities="clients" :columns="columns" :filtersFields="filters" create tools remove update
-                       @count="counter" />
+            <Filter :entities="clients" :route="{index:'clients.index'}" />
+            <DataTable
+                :entities="clients"
+                :columns="columns"
+                :filtersFields="filters"
+                :tools="{
+                    create: true,
+                    update: true,
+                    remove: true,
+                }"
+                :routes="{
+                    create: 'clients.store',
+                    update: 'clients.update',
+                    delete: 'clients.destroy',
+                    multiDestroy: 'multiDestroy',
+                    restore: 'clients.restore',
+                    multiRestore: 'multiRestore',
+                }"
+                :errors="errors"
+                @count="counter"
+            />
         </div>
     </Layout>
 </template>
