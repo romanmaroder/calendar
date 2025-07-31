@@ -26,12 +26,6 @@ const props = defineProps({
             return {};
         },
     },
-    columns: {
-        type: Object,
-    },
-    filtersFields: {
-        type: Object,
-    },
     tools: {
         type: Object,
         default() {
@@ -62,8 +56,9 @@ const selectedItems = ref();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
-const fields = ref([]);
-
+const formatCurrency = (value: any) => {
+    return value?.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' });
+};
 const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
@@ -74,8 +69,6 @@ onMounted(() => {
         pagination.value = true;
     }
     loading.value = false;
-
-    filterFields();
 });
 
 onUpdated(() => {
@@ -103,29 +96,30 @@ const getStatusLabel = (status: any) => {
         case false:
             return 'warn';
         default:
-            return null;
+            return undefined;
     }
 };
 
+/*Для динамических таблиц
 const filterFields = () => {
-    if (props.filtersFields) {
-        Object.entries(props.filtersFields).forEach(([key1, value1]) => {
-            Object.entries(value1).forEach(([key2, value2]) => {
-                if (key2 === 'field') {
-                    fields.value.push(value2);
-                }
-            });
-        });
-    } else {
-        Object.entries(props.columns).forEach(([key1, value1]) => {
-            Object.entries(value1).forEach(([key2, value2]) => {
-                if (key2 === 'field') {
-                    fields.value.push(value2);
-                }
-            });
-        });
-    }
-};
+   if (props.filtersFields) {
+       Object.entries(props.filtersFields).forEach(([key1, value1]) => {
+           Object.entries(value1).forEach(([key2, value2]) => {
+               if (key2 === 'field') {
+                   fields.value.push(value2);
+               }
+           });
+       });
+   } else {
+       Object.entries(props.columns).forEach(([key1, value1]) => {
+           Object.entries(value1).forEach(([key2, value2]) => {
+               if (key2 === 'field') {
+                   fields.value.push(value2);
+               }
+           });
+       });
+   }
+};*/
 
 const operationWithSelectedItems = () => {
     items.value = items.value.filter((val: any) => !selectedItems.value.includes(val));
@@ -147,14 +141,14 @@ const trimPhone = (phoneNumber: string) => {
             <template #start>
                 <div class="flex flex-row items-start space-x-2">
                     <span class="sm:hidden">
-                            <CreateForm
-                                v-if="tools.create"
-                                icon-name="UserRoundPlus"
-                                label="New"
-                                title="New client"
-                                :route="routes.create"
-                                @create-item="onLoadItem"
-                            />
+                        <CreateForm
+                            v-if="tools.create"
+                            icon-name="UserRoundPlus"
+                            label="New"
+                            title="New client"
+                            :route="routes.create"
+                            @create-item="onLoadItem"
+                        />
                     </span>
                     <span class="hidden sm:table-cell">
                         <CreateDialog v-if="tools.create" icon-name="UserRoundPlus" label="New" title="New client" :route="routes.create" />
@@ -171,14 +165,18 @@ const trimPhone = (phoneNumber: string) => {
                 </div>
             </template>
             <template #end>
-                <Drawer v-model:visible="visible" header="Filter" :pt="{
-                    header:{
-                        class:'!py-[0.5rem]'
-                    },
-                    title:{
-                        class:'!text-lg'
-                    }
-                }">
+                <Drawer
+                    v-model:visible="visible"
+                    header="Filter"
+                    :pt="{
+                        header: {
+                            class: '!py-[0.5rem]',
+                        },
+                        title: {
+                            class: '!text-lg',
+                        },
+                    }"
+                >
                     <Filter :entities="entities" :route="{ index: 'clients.index' }" class-name="grid items-end gap-5 mt-2" />
                 </Drawer>
                 <Button icon="pi pi-search" @click="visible = true" size="small" />
@@ -189,12 +187,13 @@ const trimPhone = (phoneNumber: string) => {
             class="text-[15px]"
             ref="dt"
             v-model:selection="selectedItems"
+            v-model:filters="filters"
             :value="items"
             dataKey="id"
             :paginator="pagination"
             :rows="10"
-            :filters="filters"
-            :globalFilterFields="fields"
+            filterDisplay="menu"
+            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'created_at', 'total']"
             sortMode="multiple"
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -220,16 +219,16 @@ const trimPhone = (phoneNumber: string) => {
                 :exportable="false"
                 :pt="{
                     root: {
-                        class: 'hidden sm:table-cell'
+                        class: 'hidden sm:table-cell',
                     },
                     pcRowCheckbox: {
                         input: {
-                            name: 'selectedItem'
-                        }
+                            name: 'selectedItem',
+                        },
                     },
                     pcHeaderCheckbox: {
-                        input: { name: 'allSelected' }
-                    }
+                        input: { name: 'allSelected' },
+                    },
                 }"
             ></Column>
             <Column
@@ -237,8 +236,8 @@ const trimPhone = (phoneNumber: string) => {
                 header="Avatar"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell'
-                    }
+                        class: 'hidden lg:table-cell',
+                    },
                 }"
             >
                 <template #body="slotProps">
@@ -246,10 +245,7 @@ const trimPhone = (phoneNumber: string) => {
                     <img v-else class="max-w-[48px] rounded" src="../../../../public/no_avatar_big.png" alt="" />
                 </template>
             </Column>
-            <Column
-                field="name"
-                    header="Name"
-                    :sortable="true">
+            <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
                     <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
                         <p>
@@ -272,8 +268,8 @@ const trimPhone = (phoneNumber: string) => {
                 :sortable="true"
                 :pt="{
                     root: {
-                        class: 'sm:hidden'
-                    }
+                        class: 'sm:hidden',
+                    },
                 }"
             >
                 <template #body="slotProps">
@@ -316,8 +312,8 @@ const trimPhone = (phoneNumber: string) => {
                 header="Phone/Email"
                 :pt="{
                     root: {
-                        class: 'hidden sm:table-cell'
-                    }
+                        class: 'hidden sm:table-cell',
+                    },
                 }"
             >
                 <template #body="slotProps">
@@ -340,8 +336,8 @@ const trimPhone = (phoneNumber: string) => {
                 :sortable="true"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell'
-                    }
+                        class: 'hidden lg:table-cell',
+                    },
                 }"
             ></Column>
             <Column
@@ -349,17 +345,21 @@ const trimPhone = (phoneNumber: string) => {
                 header="Total"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell'
-                    }
+                        class: 'hidden lg:table-cell',
+                    },
                 }"
-            ></Column>
+            >
+                <template #body="slotProps">
+                    {{ formatCurrency(slotProps.data.total) }}
+                </template>
+            </Column>
             <Column
                 field="email"
                 header="Email"
                 :pt="{
                     root: {
-                        class: 'hidden 2xl:table-cell'
-                    }
+                        class: 'hidden 2xl:table-cell',
+                    },
                 }"
             ></Column>
             <Column
@@ -368,8 +368,8 @@ const trimPhone = (phoneNumber: string) => {
                 :sortable="true"
                 :pt="{
                     root: {
-                        class: 'hidden xl:table-cell'
-                    }
+                        class: 'hidden xl:table-cell',
+                    },
                 }"
             >
                 <template #body="slotProps">
@@ -382,8 +382,8 @@ const trimPhone = (phoneNumber: string) => {
                 :sortable="true"
                 :pt="{
                     root: {
-                        class: 'hidden xl:table-cell'
-                    }
+                        class: 'hidden xl:table-cell',
+                    },
                 }"
             >
                 <template #body="slotProps">
@@ -395,8 +395,8 @@ const trimPhone = (phoneNumber: string) => {
                 header="Comment"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell max-w-[250px]'
-                    }
+                        class: 'hidden lg:table-cell max-w-[250px]',
+                    },
                 }"
             ></Column>
             <Column
@@ -404,8 +404,8 @@ const trimPhone = (phoneNumber: string) => {
                 header="Source"
                 :pt="{
                     root: {
-                        class: 'hidden 2xl:table-cell'
-                    }
+                        class: 'hidden 2xl:table-cell',
+                    },
                 }"
             ></Column>
             <Column
@@ -413,8 +413,8 @@ const trimPhone = (phoneNumber: string) => {
                 header="Tools"
                 :pt="{
                     root: {
-                        class: 'hidden sm:table-cell'
-                    }
+                        class: 'hidden sm:table-cell',
+                    },
                 }"
             >
                 <template #body="slotProps">

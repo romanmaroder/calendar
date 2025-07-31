@@ -15,7 +15,6 @@ use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Models\Client;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -44,22 +43,6 @@ class ClientController extends Controller
         return Inertia::render('client/Index', [
             'clients' => $clients,
             'count' => $count,
-            'columns' => Client::columns(
-                [
-                    'deleted_at',
-                    'surname',
-                    'middleName',
-                    'records',
-                    'total',
-                    'discount',
-                    'source',
-                    'blacklist',
-                    'prepayment',
-                    'comment'
-                ]
-            ),
-            'filters' => Client::columns(['deleted_at', 'avatar', 'blacklist', 'prepayment']),
-
         ]);
     }
 

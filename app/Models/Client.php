@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\UseColumns;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 class Client extends Model
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes, UseColumns;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected string $field = 'field';
     protected string $header = 'header';

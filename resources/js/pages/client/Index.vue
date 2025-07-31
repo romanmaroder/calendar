@@ -15,13 +15,7 @@ const props = defineProps({
     },
     count: {
         type: Number,
-    },
-    columns: {
-        type: Object,
-    },
-    filters: {
-        type: Object,
-    },
+    }
 });
 
 const items = ref();
@@ -53,8 +47,6 @@ const counter = (num: number) => {
             <div class="card">
                 <ClientTable
                     :entities="clients"
-                    :columns="columns"
-                    :filtersFields="filters"
                     :tools="{
                         create: true,
                         update: true,
