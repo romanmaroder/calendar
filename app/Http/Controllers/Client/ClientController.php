@@ -157,26 +157,18 @@ class ClientController extends Controller
     public function archive()
     {
         $count = Client::onlyTrashed()->count();
+
+        $clients = app()->make(Pipeline::class)->send(Client::query())->through([
+                                                                                    Id::class,
+                                                                                    Name::class,
+                                                                                    Surname::class,
+                                                                                    MiddleName::class,
+                                                                                    Phone::class,
+                                                                                    Email::class,
+                                                                                ])->thenReturn();
         return Inertia::render('client/Archive', [
-            'clients' => Client::onlyTrashed()->latest('created_at')->paginate($count),
+            'clients' =>$clients->onlyTrashed()->latest('created_at')->paginate($count),
             'count' => $count,
-            'columns' => Client::columns(
-                [
-                    'surname',
-                    'middleName',
-                    'comment',
-                    'records',
-                    'total',
-                    'source',
-                    'discount',
-                    'blacklist',
-                    'prepayment'
-                ]
-            ),
-            'filters' => Client::columns(
-                ['comment', 'records', 'total', 'source', 'discount', 'blacklist', 'prepayment'],
-                ['name']
-            ),
         ]);
     }
 
