@@ -4,6 +4,7 @@ import CreateForm from '@/components/client/CreateForm.vue';
 import DeleteDialog from '@/components/client/DeleteDialog.vue';
 import MultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
 import UpdateDialog from '@/components/client/UpdateDialog.vue';
+import UpdateForm from '@/components/client/UpdateForm.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import Button from 'primevue/button';
@@ -245,7 +246,10 @@ const trimPhone = (phoneNumber: string) => {
                     <img v-else class="max-w-[48px] rounded" src="../../../../public/no_avatar_big.png" alt="" />
                 </template>
             </Column>
-            <Column field="name" header="Name" :sortable="true">
+            <Column
+                field="name"
+                    header="Name"
+                    :sortable="true">
                 <template #body="slotProps">
                     <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
                         <p>
@@ -288,12 +292,12 @@ const trimPhone = (phoneNumber: string) => {
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
                     </p>
                     <div class="mt-3 flex items-center justify-between text-xs font-normal text-gray-900 dark:text-gray-300">
-                        <UpdateDialog
+                        <UpdateForm
                             :key="slotProps.data.id"
                             v-if="tools.update"
                             :entity="slotProps.data"
                             icon-name="Edit2"
-                            label="Edit item"
+                            label=""
                             :route="routes.update"
                             @update-item="onLoadItem"
                         />
