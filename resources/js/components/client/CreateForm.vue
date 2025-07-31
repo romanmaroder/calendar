@@ -84,6 +84,7 @@ const submit = (e: Event) => {
                 detail: showErrors(errors),
                 life: 2000,
             });
+            form.defaults();
         },
     });
 };
