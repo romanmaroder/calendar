@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import CreateDialog from '@/components/client/CreateDialog.vue';
-import CreateForm from '@/components/client/CreateForm.vue';
+import UpdateDialog from '@/components/client/UpdateDialog.vue';
 import DeleteDialog from '@/components/client/DeleteDialog.vue';
 import MultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
-import UpdateDialog from '@/components/client/UpdateDialog.vue';
+import CreateForm from '@/components/client/CreateForm.vue';
 import UpdateForm from '@/components/client/UpdateForm.vue';
+import MultiRestore from '@/components/client/MultiRestore.vue';
+import Restore from '@/components/client/Restore.vue';
 import Filter from '@/components/filters/user/Filter.vue';
+import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
@@ -18,7 +21,7 @@ import SpeedDial from 'primevue/speeddial';
 import Tag from 'primevue/tag';
 import Toolbar from 'primevue/toolbar';
 import { onMounted, onUpdated, ref } from 'vue';
-import Icon from '@/components/Icon.vue';
+
 
 const props = defineProps({
     entities: {
@@ -65,7 +68,6 @@ const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
 
-
 onMounted(() => {
     items.value = props.entities.data;
     if (items.value.length > 0) {
@@ -86,6 +88,14 @@ const onDeleteItem = (id: any) => {
 };
 const onLoadItem = () => {
     items.value = props.entities.data;
+};
+
+const onRestoreItem = (id: any) => {
+    operationWithSingleItem(id);
+};
+
+const onRestoreSelectedItems = () => {
+    operationWithSelectedItems();
 };
 
 const onDeleteSelectedItems = () => {
@@ -157,6 +167,17 @@ const trimPhone = (phoneNumber: string) => {
                         <CreateDialog v-if="tools.create" icon-name="UserRoundPlus" label="New" title="New client" :route="routes.create" />
                     </span>
                     <span class="hidden sm:table-cell">
+                        <MultiRestore
+                            v-if="tools.restore"
+                            :entity="selectedItems"
+                            label="Восстановить"
+                            icon-name="Undo2"
+                            :route="routes.multiRestore"
+                            @restore-items="onRestoreSelectedItems"
+                            :disabled="!selectedItems || !selectedItems.length"
+                        />
+                    </span>
+                    <span class="hidden sm:table-cell">
                         <MultiDeleteDialog
                             :entity="selectedItems"
                             icon-name=""
@@ -180,7 +201,7 @@ const trimPhone = (phoneNumber: string) => {
                         },
                     }"
                 >
-                    <Filter :entities="entities" :route="{ index: 'clients.index' }" class-name="grid items-end gap-5 mt-2" />
+                    <Filter :entities="entities" :route="routes" class-name="grid items-end gap-5 mt-2" />
                 </Drawer>
                 <Button icon="pi pi-search" @click="visible = true" size="small" />
             </template>
@@ -291,30 +312,43 @@ const trimPhone = (phoneNumber: string) => {
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
                     </p>
                     <div class="mt-3 flex items-center justify-between text-xs font-normal text-gray-900 dark:text-gray-300">
-                        <SpeedDial :model="[{command: () => {}}]" direction="right" :radius=20  class="relative items-center"
-                                   buttonClass="!max-w-[1.5rem] !max-h-[1.5rem]"  >
+                        <SpeedDial
+                            :model="[{ command: () => {} }]"
+                            direction="right"
+                            :radius="20"
+                            class="relative items-center"
+                            buttonClass="!max-w-[1.5rem] !max-h-[1.5rem]"
+                        >
                             <template #icon>
-                                <Icon name="Settings"/>
+                                <Icon name="Settings" />
                             </template>
-                            <template  #item>
-                            <UpdateForm
-                                :key="slotProps.data.id"
-                                v-if="tools.update"
-                                :entity="slotProps.data"
-                                icon-name="UserPen"
-                                label=""
-                                :route="routes.update"
-                                @update-item="onLoadItem"
-                            />
-                            <DeleteDialog
-                                v-if="tools.remove"
-                                :entity="slotProps.data"
-                                icon-name="UserMinus"
-                                :route="routes.delete"
-                                @delete-item="onDeleteItem"
-                            /></template>
+                            <template #item>
+                                <Restore
+                                    v-if="tools.restore"
+                                    :id="slotProps.data.id"
+                                    icon-name="Undo2"
+                                    :route="routes.restore"
+                                    @restore-customer="onRestoreItem"
+                                />
+                                <UpdateForm
+                                    :key="slotProps.data.id"
+                                    v-if="tools.update"
+                                    :entity="slotProps.data"
+                                    icon-name="UserPen"
+                                    label=""
+                                    :route="routes.update"
+                                    @update-item="onLoadItem"
+                                />
+                                <DeleteDialog
+                                    v-if="tools.remove"
+                                    :entity="slotProps.data"
+                                    icon-name="UserMinus"
+                                    :route="routes.delete"
+                                    @delete-item="onDeleteItem"
+                                />
+                            </template>
                         </SpeedDial>
-                            </div>
+                    </div>
                 </template>
             </Column>
             <Column
@@ -437,6 +471,13 @@ const trimPhone = (phoneNumber: string) => {
                             label="Edit item"
                             :route="routes.update"
                             @update-item="onLoadItem"
+                        />
+                        <Restore
+                            v-if="tools.restore"
+                            :id="slotProps.data.id"
+                            icon-name="Undo2"
+                            :route="routes.restore"
+                            @restore-customer="onRestoreItem"
                         />
                         <DeleteDialog
                             v-if="tools.remove"
