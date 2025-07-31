@@ -32,7 +32,7 @@ const props = defineProps({
     iconName: {
         type: String,
     },
-    urlToDelete: {
+    route: {
         type: String,
         default: 'clients.destroy',
     },
@@ -40,7 +40,7 @@ const props = defineProps({
 
 function handleAction() {
         axios
-            .post(route(props.urlToDelete, props.entity.id), { _method: 'delete' })
+            .post(route(props.route, props.entity.id), { _method: 'delete' })
             .then((response) => {
                 wait();
                 toast.add({
