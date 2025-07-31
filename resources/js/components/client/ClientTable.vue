@@ -14,9 +14,11 @@ import Drawer from 'primevue/drawer';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
+import SpeedDial from 'primevue/speeddial';
 import Tag from 'primevue/tag';
 import Toolbar from 'primevue/toolbar';
 import { onMounted, onUpdated, ref } from 'vue';
+import Icon from '@/components/Icon.vue';
 
 const props = defineProps({
     entities: {
@@ -62,6 +64,7 @@ const formatCurrency = (value: any) => {
 const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
+
 
 onMounted(() => {
     items.value = props.entities.data;
@@ -288,23 +291,30 @@ const trimPhone = (phoneNumber: string) => {
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
                     </p>
                     <div class="mt-3 flex items-center justify-between text-xs font-normal text-gray-900 dark:text-gray-300">
-                        <UpdateForm
-                            :key="slotProps.data.id"
-                            v-if="tools.update"
-                            :entity="slotProps.data"
-                            icon-name="Edit2"
-                            label=""
-                            :route="routes.update"
-                            @update-item="onLoadItem"
-                        />
-                        <DeleteDialog
-                            v-if="tools.remove"
-                            :entity="slotProps.data"
-                            icon-name="Trash2"
-                            :route="routes.delete"
-                            @delete-item="onDeleteItem"
-                        />
-                    </div>
+                        <SpeedDial :model="[{command: () => {}}]" direction="right" :radius=20  class="relative items-center"
+                                   buttonClass="!max-w-[1.5rem] !max-h-[1.5rem]"  >
+                            <template #icon>
+                                <Icon name="Settings"/>
+                            </template>
+                            <template  #item>
+                            <UpdateForm
+                                :key="slotProps.data.id"
+                                v-if="tools.update"
+                                :entity="slotProps.data"
+                                icon-name="UserPen"
+                                label=""
+                                :route="routes.update"
+                                @update-item="onLoadItem"
+                            />
+                            <DeleteDialog
+                                v-if="tools.remove"
+                                :entity="slotProps.data"
+                                icon-name="UserMinus"
+                                :route="routes.delete"
+                                @delete-item="onDeleteItem"
+                            /></template>
+                        </SpeedDial>
+                            </div>
                 </template>
             </Column>
             <Column
@@ -423,7 +433,7 @@ const trimPhone = (phoneNumber: string) => {
                             :key="slotProps.data.id"
                             v-if="tools.update"
                             :entity="slotProps.data"
-                            icon-name="Edit2"
+                            icon-name="UserPen"
                             label="Edit item"
                             :route="routes.update"
                             @update-item="onLoadItem"
@@ -431,7 +441,7 @@ const trimPhone = (phoneNumber: string) => {
                         <DeleteDialog
                             v-if="tools.remove"
                             :entity="slotProps.data"
-                            icon-name="Trash2"
+                            icon-name="UserMinus"
                             :route="routes.delete"
                             @delete-item="onDeleteItem"
                         />
