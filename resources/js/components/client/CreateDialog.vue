@@ -17,10 +17,10 @@ import { useToast } from 'primevue/usetoast';
 
 import Checkbox from 'primevue/checkbox';
 import FloatLabel from 'primevue/floatlabel';
+import InputMask from 'primevue/inputmask';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
-import {  ref } from 'vue';
-import InputMask from 'primevue/inputmask';
+import { ref } from 'vue';
 
 const props = defineProps({
     route: {
@@ -43,6 +43,7 @@ const props = defineProps({
 
 const wait = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 const open = ref(false);
+
 const toast = useToast();
 
 const form = useForm({
@@ -72,42 +73,32 @@ const submit = (e: Event) => {
             toast.add({
                 severity: 'info',
                 summary: 'Info',
-                detail: form.name + ' ' + form.surname + ' - client add successfully.',
+                detail: form.name + ' ' + form.surname + ' - add successfully.',
                 life: 3000,
             });
             closeModal();
         },
         onFinish: function () {
-            showErrors(form.errors);
+            form.reset()
+        },
+        onError: function (errors) {
+            toast.add({
+                severity: 'error',
+                summary: 'Validation Error',
+                detail: showErrors(errors),
+                life: 2000,
+            });
+            form.defaults();
         },
     });
 };
 
-const showErrors = (errors) => {
-    if (errors.name) {
-        toast.add({
-            severity: 'error',
-            summary: 'Error Message',
-            detail: errors.name,
-            life: 3000,
-        });
+const showErrors = (errors: any) => {
+    let message = '';
+    for (const key in errors) {
+        message += `${errors[key]}` + '\n';
     }
-    if (errors.phone) {
-        toast.add({
-            severity: 'error',
-            summary: 'Error Message',
-            detail: errors.phone,
-            life: 3000,
-        });
-    }
-    if (errors.email) {
-        toast.add({
-            severity: 'error',
-            summary: 'Error Message',
-            detail: errors.email,
-            life: 3000,
-        });
-    }
+    return message;
 };
 
 const closeModal = () => {
@@ -127,7 +118,7 @@ const onUpdateAvatar = (data: any) => {
 <template>
     <Dialog v-model:open="open">
         <DialogTrigger as-child>
-            <Button class="cursor-pointer" size="small" raised>
+            <Button  size="small" raised>
                 <Icon :name="iconName" />
                 {{ label }}
             </Button>
@@ -152,7 +143,7 @@ const onUpdateAvatar = (data: any) => {
                             <InputText id="name" v-model="form.name" autocomplete="off" class="h-[28px] w-full" aria-labelledby="name" size="small" />
                             <label for="name" class="font-light!">{{ form.name || 'Имя:' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.name" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.name" class="-mt-2 mb-2" />
                         <FloatLabel variant="on" class="">
                             <InputText
                                 id="middleName"
@@ -164,7 +155,7 @@ const onUpdateAvatar = (data: any) => {
                             />
                             <label for="middleName" class="font-light!">{{ form.middleName || 'Отчество:' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.middleName" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.middleName" class="-mt-2 mb-2" />
                         <FloatLabel variant="on" class="">
                             <InputText
                                 id="surname"
@@ -176,7 +167,7 @@ const onUpdateAvatar = (data: any) => {
                             />
                             <label for="surname" class="font-light!">{{ form.surname || 'Фамилия:' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.surname" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.surname" class="-mt-2 mb-2" />
                     </div>
                     <div class="mt-2 space-y-4 md:[grid-area:1_/_3_/_2_/_4] lg:space-y-5">
                         <FloatLabel variant="on">
@@ -192,7 +183,7 @@ const onUpdateAvatar = (data: any) => {
                             />
                             <label for="phone" class="font-light!">{{ form.phone || '+9 999 999 99 99' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.phone" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.phone" class="-mt-2 mb-2" />
 
                         <FloatLabel variant="on" class="">
                             <InputText
@@ -207,7 +198,7 @@ const onUpdateAvatar = (data: any) => {
                             />
                             <label for="email" class="font-light!">Email:</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.email" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.email" class="-mt-2 mb-2" />
 
                         <FloatLabel variant="on" class="">
                             <InputText
@@ -221,16 +212,16 @@ const onUpdateAvatar = (data: any) => {
                             />
                             <label for="source" class="font-light!">Источник:</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.source" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.source" class="-mt-2 mb-2" />
                     </div>
                     <div class="mt-2 md:[grid-area:2_/_1_/_3_/_4]">
                         <FloatLabel variant="on">
                             <Textarea id="comment" v-model="form.comment" rows="4" cols="15" autoResize size="small" class="w-full" />
                             <label for="comment">Заметка</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.comment" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.comment" class="mt-1 mb-2" />
                     </div>
-                    <div class="mb-2 md:[grid-area:3_/_1_/_4_/_4]">
+                    <div class="mt-2 mb-2 md:[grid-area:3_/_1_/_4_/_4]">
                         <FloatLabel variant="on" class="">
                             <InputText
                                 id="discount"
@@ -243,7 +234,7 @@ const onUpdateAvatar = (data: any) => {
                             />
                             <label for="discount" class="font-light!">Персональная скидка:</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.discount" class="mb-2 -mt-2" />
+                        <InputError :message="form.errors.discount" class="mt-1 mb-2" />
                     </div>
                     <div class="grid gap-y-1.5 md:[grid-area:4_/_1_/_5_/_4]">
                         <div class="card flex flex-col flex-wrap gap-4 dark:text-white">
