@@ -4,7 +4,6 @@ import CreateForm from '@/components/client/CreateForm.vue';
 import DeleteDialog from '@/components/client/DeleteDialog.vue';
 import MultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
 import UpdateDialog from '@/components/client/UpdateDialog.vue';
-//import UpdateDialog from '../../pages/client/Edit.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import Button from 'primevue/button';
@@ -392,7 +391,7 @@ const trimPhone = (phoneNumber: string) => {
                 header="Comment"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell'
+                        class: 'hidden lg:table-cell max-w-[250px]'
                     }
                 }"
             ></Column>
