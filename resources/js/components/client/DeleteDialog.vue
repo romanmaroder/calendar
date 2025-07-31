@@ -66,7 +66,7 @@ function handleAction() {
 <template>
     <AlertDialogRoot>
         <AlertDialogTrigger
-            class="inline-flex h-[35px] cursor-pointer items-center justify-center rounded-md px-[15px] text-sm leading-none font-semibold transition-all outline-none hover:shadow-sm focus:shadow-[0_0_0_1px] focus:shadow-emerald-500 dark:focus:shadow-green-800"
+            class="inline-flex h-[35px] cursor-pointer items-center justify-center rounded-md px-[15px] text-sm leading-none font-semibold transition-all outline-none hover:shadow-sm focus:shadow-[0_0_0_1px] focus:shadow-red-500 dark:focus:shadow-red-800"
         >
             <Icon v-if="iconName" :name="iconName" class="mr-1 text-red-600 hover:text-red-900 focus:text-red-900" />
             <span class="text-stone-400 dark:text-stone-700" v-else>{{ text }}</span>
