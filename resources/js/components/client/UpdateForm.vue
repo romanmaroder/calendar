@@ -104,6 +104,7 @@ const closeModal = () => {
     form.clearErrors();
     form.defaults();
     form.reset();
+    visible.value = false;
 };
 const onUpdateAvatar = (data: any) => {
     form.avatar = data.url;

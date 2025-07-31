@@ -99,6 +99,7 @@ const showErrors = (errors: any) => {
 const closeModal = () => {
     form.clearErrors();
     form.reset();
+    visible.value = false;
 };
 
 const onUpdateAvatar = (data: any) => {
@@ -144,7 +145,9 @@ const onUpdateAvatar = (data: any) => {
 
                 <div class="mt-2 space-y-4">
                     <FloatLabel variant="on" class="">
-                        <InputText id="name" v-model="form.name" autocomplete="off" class="h-[28px] w-full" aria-labelledby="name" size="small" />
+                        <InputText id="name" v-model="form.name" autocomplete="off"
+                                   class="h-[28px] w-full"
+                                   aria-labelledby="name" size="small" />
                         <label for="name" class="font-light!">{{ form.name || 'Имя:' }}</label>
                     </FloatLabel>
                     <InputError :message="form.errors.name" class="-mt-2 mb-2" />
