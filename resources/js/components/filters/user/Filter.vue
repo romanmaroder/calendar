@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import type { SharedData } from '@/types';
+import { useForm, usePage } from '@inertiajs/vue3';
 import FloatLabel from 'primevue/floatlabel';
 import InputIcon from 'primevue/inputicon';
+import InputMask from 'primevue/inputmask';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
 import SplitButton from 'primevue/splitbutton';
-import { onMounted, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import InputMask from 'primevue/inputmask';
+import { onMounted, ref } from 'vue';
 
+const parseUrl = (str: any) => {
+    return str
+        .split(/[?#]/)[0]
+        .replace(/[^\w ]/, '')
+        .replace(/\//g, '.');
+};
 
 const props = defineProps({
     entities: {
@@ -21,13 +28,17 @@ const props = defineProps({
         type: Object,
         required: true,
         default() {
-            return {}
-        }
+            return {};
+        },
     },
     className: String,
 });
+
+const page = usePage<SharedData>();
+const currentUrl = parseUrl(page.url);
+
 const toast = useToast();
-const classAttr = ref('grid items-end gap-5 mt-2 sm:grid-cols-2 md:grid-cols-3 md:gap-3 lg:grid-cols-6 ')
+const classAttr = ref('grid items-end gap-5 mt-2 sm:grid-cols-2 md:grid-cols-3 md:gap-3 lg:grid-cols-6 ');
 
 const form = useForm({
     id: null,
@@ -41,7 +52,7 @@ const form = useForm({
 const submit = (e: Event) => {
     e.preventDefault();
     if (form.id || form.name || form.surname || form.middleName || form.phone || form.email) {
-        form.get(route(props.route.index), {
+        form.get(route(currentUrl), {
             preserveScroll: true,
             onSuccess: function (page) {
                 if (page.props.clients?.data.length < 1) {
@@ -51,7 +62,7 @@ const submit = (e: Event) => {
                         detail: 'The client was not found.',
                         life: 3000,
                     });
-                }else{
+                } else {
                     toast.add({
                         severity: 'success',
                         summary: 'The client was found',
@@ -62,7 +73,7 @@ const submit = (e: Event) => {
             },
             onFinish: function () {},
         });
-    }else{
+    } else {
         toast.add({
             severity: 'warn',
             summary: 'Warning Message',
@@ -70,14 +81,13 @@ const submit = (e: Event) => {
             life: 3000,
         });
     }
-
 };
 const items = [
     {
         label: 'Сбросить',
         icon: 'pi pi-sync',
         command: () => {
-            window.location.href = route(props.route.index);
+            window.location.href = route(currentUrl);
         },
     },
 ];
@@ -102,8 +112,7 @@ onMounted(() => {
 
 <template>
     <form>
-        <div
-            :class="classAttr">
+        <div :class="classAttr">
             <FloatLabel variant="on" class="sm:order-1 md:order-1">
                 <InputNumber
                     v-model="form.id"
@@ -177,8 +186,7 @@ onMounted(() => {
                     root: 'w-full row-end-auto order-6',
                     label: 'text-lg! text-violet-500! dark:text-violet-400!',
                     pcButton: {
-                        root:
-                        'border-none! h-[30px]! cursor-pointer!  py-1.5! font-normal! text-white! transition-colors!',
+                        root: 'border-none! h-[30px]! cursor-pointer!  py-1.5! font-normal! text-white! transition-colors!',
                     },
                     pcMenu: {
                         itemLabel: 'text-sm!',
@@ -202,4 +210,3 @@ onMounted(() => {
         </div>
     </form>
 </template>
-
