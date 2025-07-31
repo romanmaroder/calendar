@@ -7,6 +7,7 @@ import InputText from 'primevue/inputtext';
 import SplitButton from 'primevue/splitbutton';
 import { onMounted, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import InputMask from 'primevue/inputmask';
 
 
 const props = defineProps({
@@ -16,12 +17,17 @@ const props = defineProps({
             return {};
         },
     },
-    urlToRefresh:{
-        type:String,
-        required:true
-    }
+    route: {
+        type: Object,
+        required: true,
+        default() {
+            return {}
+        }
+    },
+    className: String,
 });
 const toast = useToast();
+const classAttr = ref('grid items-end gap-5 mt-2 sm:grid-cols-2 md:grid-cols-3 md:gap-3 lg:grid-cols-6 ')
 
 const form = useForm({
     id: null,
@@ -35,7 +41,7 @@ const form = useForm({
 const submit = (e: Event) => {
     e.preventDefault();
     if (form.id || form.name || form.surname || form.middleName || form.phone || form.email) {
-        form.get(route(props.urlToRefresh), {
+        form.get(route(props.route.index), {
             preserveScroll: true,
             onSuccess: function (page) {
                 if (page.props.clients?.data.length < 1) {
@@ -71,7 +77,7 @@ const items = [
         label: 'Сбросить',
         icon: 'pi pi-sync',
         command: () => {
-            window.location.href = route(props.urlToRefresh);
+            window.location.href = route(props.route.index);
         },
     },
 ];
@@ -88,12 +94,16 @@ onMounted(() => {
     if (form.id != null) {
         disabled.value = true;
     }
+    if (props.className) {
+        classAttr.value = props.className;
+    }
 });
 </script>
 
 <template>
     <form>
-        <div class="grid items-end gap-5 sm:grid-cols-2 md:grid-cols-3 md:gap-3 lg:grid-cols-6">
+        <div
+            :class="classAttr">
             <FloatLabel variant="on" class="sm:order-1 md:order-1">
                 <InputNumber
                     v-model="form.id"
@@ -132,15 +142,15 @@ onMounted(() => {
                 <label for="surname" class="font-light!">Фамилия:</label>
             </FloatLabel>
             <FloatLabel variant="on" class="sm:order-2 md:order-4">
-                <InputText
+                <InputMask
                     id="phone"
                     v-model="form.phone"
                     type="tel"
-                    autocomplete="off"
                     class="h-[28px] w-full"
                     aria-labelledby="phone"
-                    :disabled="disabled"
-                    size="large"
+                    size="small"
+                    ref="phoneInput"
+                    mask="+9 999 999 99 99"
                 />
                 <label for="phone" class="font-light!">Телефон:</label>
             </FloatLabel>
