@@ -9,6 +9,7 @@ import { useToast } from 'primevue/usetoast';
 import Checkbox from 'primevue/checkbox';
 import Drawer from 'primevue/drawer';
 import FloatLabel from 'primevue/floatlabel';
+import Inplace from 'primevue/inplace';
 import InputMask from 'primevue/inputmask';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
@@ -99,9 +100,6 @@ const closeModal = () => {
     form.clearErrors();
     form.reset();
 };
-const close = () => {
-    closeModal();
-};
 
 const onUpdateAvatar = (data: any) => {
     form.avatar = data.url;
@@ -110,23 +108,40 @@ const onUpdateAvatar = (data: any) => {
 </script>
 
 <template>
-    <Drawer v-model:visible="visible" :header="title" :blockScroll="true" :pt="{
-                    header:{
-                        class:'!py-[0.5rem]'
-                    },
-                    title:{
-                        class:'!text-lg'
-                    }
-                }">
-        <form class="overflow-y-auto p-3.5 dark:bg-black">
-            <div class="grid items-end gap-5">
-                <div class="mx-auto mb-2">
-                    <div class="max-h-[200px] max-w-[180px] rounded-[4px] bg-[#83BCE1] p-4 shadow-md">
-                        <AvatarUpload text-add="Добавить фото" text-delete="Удалить фото" updateUrl="avatar" @updateAvatar="onUpdateAvatar" />
-                    </div>
+    <Drawer
+        v-model:visible="visible"
+        :header="title"
+        :blockScroll="true"
+        :pt="{
+            header: {
+                class: '!py-[0.5rem]',
+            },
+            title: {
+                class: '!text-lg',
+            },
+        }"
+    >
+        <form class="p-3.5 dark:bg-black">
+            <div class="grid gap-5">
+                <Inplace class="flex justify-center" :pt="{display:{class:'!inline-flex !flex-col !items-center'}}">
+                    <template #display> Add Avatar
+                        <Icon name="Camera" class="w-[28px] h-[28px]" />
+                    </template>
+                    <template #content="{ closeCallback }">
+                        <div class="inline-flex items-center gap-2 relative max-h-[200px] max-w-[180px] rounded-[4px] bg-[#83BCE1] p-4 shadow-md">
+                                    <AvatarUpload
+                                        text-add="Добавить фото"
+                                        text-delete="Удалить фото"
+                                        updateUrl="avatar"
+                                        @updateAvatar="onUpdateAvatar"
+                                    />
+                                <InputError :message="form.errors.avatar" class="my-2" />
+                            <Button icon="pi pi-times" text severity="danger" @click="closeCallback"
+                                    class="!absolute !top-[0px] !right-[0px]" />
+                        </div>
+                    </template>
+                </Inplace>
 
-                    <InputError :message="form.errors.avatar" class="my-2" />
-                </div>
                 <div class="mt-2 space-y-4">
                     <FloatLabel variant="on" class="">
                         <InputText id="name" v-model="form.name" autocomplete="off" class="h-[28px] w-full" aria-labelledby="name" size="small" />
@@ -243,7 +258,8 @@ const onUpdateAvatar = (data: any) => {
                             <Icon name="Save" />
                             {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
                         </Button>
-                        <Button severity="secondary" @click="close" class="h-[30px] cursor-pointer rounded-sm py-1.5 font-normal" raised>
+                        <Button severity="secondary" @click="closeModal"
+                                class="h-[30px] cursor-pointer rounded-sm py-1.5 font-normal" raised>
                             Отмена
                         </Button>
                     </div>
@@ -253,6 +269,6 @@ const onUpdateAvatar = (data: any) => {
     </Drawer>
     <Button @click="visible = true" size="small">
         <Icon :name="iconName" />
-        {{label}}
+        {{ label }}
     </Button>
 </template>
