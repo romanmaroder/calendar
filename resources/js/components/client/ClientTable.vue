@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import CreateDialog from '@/components/client/CreateDialog.vue';
-import UpdateDialog from '@/components/client/UpdateDialog.vue';
+import CreateForm from '@/components/client/CreateForm.vue';
 import DeleteDialog from '@/components/client/DeleteDialog.vue';
 import MultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
-import CreateForm from '@/components/client/CreateForm.vue';
-import UpdateForm from '@/components/client/UpdateForm.vue';
 import MultiRestore from '@/components/client/MultiRestore.vue';
 import Restore from '@/components/client/Restore.vue';
+import UpdateDialog from '@/components/client/UpdateDialog.vue';
+import UpdateForm from '@/components/client/UpdateForm.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
@@ -21,7 +21,6 @@ import SpeedDial from 'primevue/speeddial';
 import Tag from 'primevue/tag';
 import Toolbar from 'primevue/toolbar';
 import { onMounted, onUpdated, ref } from 'vue';
-
 
 const props = defineProps({
     entities: {
@@ -271,12 +270,11 @@ const trimPhone = (phoneNumber: string) => {
             </Column>
             <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
-                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
-                        <p>
-                            {{ slotProps.data.name }}
-                            {{ slotProps.data.middleName }}
-                            {{ slotProps.data.surname }}
-                        </p>
+                    <div
+                        class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
+                        {{ slotProps.data.name }}
+                        {{ slotProps.data.middleName }}
+                        {{ slotProps.data.surname }}
                     </div>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
@@ -331,7 +329,6 @@ const trimPhone = (phoneNumber: string) => {
                                     @restore-customer="onRestoreItem"
                                 />
                                 <UpdateForm
-                                    :key="slotProps.data.id"
                                     v-if="tools.update"
                                     :entity="slotProps.data"
                                     icon-name="UserPen"
