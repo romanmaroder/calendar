@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import CreateDialog from '@/components/client/CreateDialog.vue';
-import CreateForm from '@/components/client/CreateForm.vue';
+import Create from '@/components/client/Create.vue';
 import DeleteDialog from '@/components/client/DeleteDialog.vue';
 import MultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
 import MultiRestore from '@/components/client/MultiRestore.vue';
 import Restore from '@/components/client/Restore.vue';
 import UpdateDialog from '@/components/client/UpdateDialog.vue';
-import UpdateForm from '@/components/client/UpdateForm.vue';
+import Update from '@/components/client/Update.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
@@ -153,7 +153,7 @@ const trimPhone = (phoneNumber: string) => {
             <template #start>
                 <div class="flex flex-row items-start space-x-2">
                     <span class="sm:hidden">
-                        <CreateForm
+                        <Create
                             v-if="tools.create"
                             icon-name="UserRoundPlus"
                             label="New"
@@ -328,7 +328,7 @@ const trimPhone = (phoneNumber: string) => {
                                     :route="routes.restore"
                                     @restore-customer="onRestoreItem"
                                 />
-                                <UpdateForm
+                                <Update
                                     v-if="tools.update"
                                     :entity="slotProps.data"
                                     icon-name="UserPen"
