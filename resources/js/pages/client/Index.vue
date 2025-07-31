@@ -4,26 +4,22 @@ import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
 
-const props = defineProps({
+ defineProps({
     clients: {
         type: Object,
         required: true,
     },
     count: {
         type: Number,
-    }
+    },
 });
 
-const items = ref();
 const total = ref();
 
-onMounted(() => {
-    items.value = props.clients.data;
-});
 const counter = (num: number) => {
     total.value = num;
 };
