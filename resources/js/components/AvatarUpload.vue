@@ -125,5 +125,3 @@ const resetUpload = () => {
     </Label>
     <Input id="avatar" type="file" ref="avatar" name="avatar" @change="uploadImage" class="hidden" />
 </template>
-
-<style scoped></style>

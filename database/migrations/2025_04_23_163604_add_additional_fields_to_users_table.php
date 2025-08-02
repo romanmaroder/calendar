@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('comment',1000)->nullable()->after('phone');
             $table->string('birthday')->nullable()->after('comment');
             $table->string('avatar')->nullable()->after('birthday');
+            $table->softDeletes();
         });
     }
 
@@ -33,6 +34,9 @@ return new class extends Migration
            $table->dropColumn('comment');
            $table->dropColumn('birthday');
            $table->dropColumn('avatar');
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropSoftDeletes();
         });
     }
 };

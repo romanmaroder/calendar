@@ -10,7 +10,7 @@ import {
     Folder,
     LayoutGrid, UserRoundXIcon,
     Users2,
-    UsersIcon,
+    UsersIcon, UserX
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
@@ -26,6 +26,11 @@ const mainNavItemsUser: NavItem[] = [
         title: 'Users',
         href: '/users',
         icon: UsersIcon,
+    },
+    {
+        title: 'Users trash ',
+        href: '/users/archive',
+        icon: UserX,
     },
 ];
 const mainNavItemsClient: NavItem[] = [
