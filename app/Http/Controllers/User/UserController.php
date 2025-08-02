@@ -30,16 +30,10 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validated();
-        //$password = Hash::make($data['password']);
         $password = Hash::make(12345678);
         $data['password'] = $password;
-        //dd(new AvatarResource($path));
 
-        $user = User::create($data);
-
-        //event(new Registered($user));
-
-        //Auth::login($user);
+        User::create($data);
 
         return to_route('users');
     }
@@ -170,7 +164,7 @@ class UserController extends Controller
                     'code' => 200,
                     'message' => 'User has been deleted'
                 ];
-            };
+            }
         }
         return $response;
     }
