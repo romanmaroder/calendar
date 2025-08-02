@@ -198,7 +198,8 @@ const trimPhone = (phoneNumber: string) => {
                         },
                     }"
                 >
-                    <Filter :entities="entities" :route="routes" class-name="grid items-end gap-5 mt-2" />
+                    <Filter :entities="entities" :route="routes" class-name="grid items-end gap-5 mt-2 !hidden" />
+                    <p class="text-center text-gray-500">Фильтр для модели User в разработке</p>
                 </Drawer>
                 <Button icon="pi pi-search" @click="visible = true" size="small" />
             </template>
