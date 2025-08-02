@@ -3,7 +3,7 @@
 use App\Http\Controllers\Client\ClientController;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 
-Route::middleware(['auth',HandlePrecognitiveRequests::class])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::redirect('clients', '/clients/index');
 
     Route::get('archive', [ClientController::class, 'archive'])->name('archive');
