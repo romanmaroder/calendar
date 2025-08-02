@@ -30,7 +30,8 @@ class UpdateClientRequest extends FormRequest
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
-            'phone' => 'required|string|max:255',
+            'phone' => ['required','string','max:255',
+                Rule::unique(Client::class, 'phone')->ignore($this->client)],
             'comment' => 'nullable|string|max:255',
             'blacklist' => 'nullable|boolean',
             'prepayment' => 'nullable|boolean',
@@ -38,13 +39,9 @@ class UpdateClientRequest extends FormRequest
             'records' => 'nullable|numeric',
             'total' => 'nullable|numeric',
             'source' => 'nullable|string',
-            /*'email' => ['nullable','string','lowercase','email','max:255',
+            'email' => ['nullable','string','lowercase','email','max:255',
                 Rule::unique(Client::class)->ignore($this->client)
-            ],*/
-            'email' => $this->isPrecognitive()
-                ? ['string', 'email:rfc,dns']
-                : ['nullable', 'string', 'email:rfc,dns','lowercase','max:255',Rule::unique(Client::class)->ignore($this->client)],
-            'password' => 'nullable|string|min:6|confirmed',
+            ],
         ];
     }
 }

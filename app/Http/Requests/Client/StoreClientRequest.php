@@ -27,7 +27,7 @@ class StoreClientRequest extends FormRequest
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
-            'phone' => 'required|string|max:255',
+            'phone' => 'required|string|max:255|unique:'.Client::class,
             'comment' => 'nullable|string|max:255',
             'blacklist' => 'nullable|boolean',
             'prepayment' => 'nullable|boolean',
