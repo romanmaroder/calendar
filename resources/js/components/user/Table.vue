@@ -20,7 +20,6 @@ import InputText from 'primevue/inputtext';
 import SpeedDial from 'primevue/speeddial';
 import Toolbar from 'primevue/toolbar';
 import { onMounted, onUpdated, ref } from 'vue';
-
 const props = defineProps({
     entities: {
         type: Object,
@@ -198,8 +197,8 @@ const trimPhone = (phoneNumber: string) => {
                         },
                     }"
                 >
-                    <Filter :entities="entities" :route="routes" class-name="grid items-end gap-5 mt-2 !hidden" />
                     <p class="text-center text-gray-500">Фильтр для модели User в разработке</p>
+                    <Filter :entities="entities"  class-name="grid items-end gap-5 mt-2 !hidden" />
                 </Drawer>
                 <Button icon="pi pi-search" @click="visible = true" size="small" />
             </template>
