@@ -7,8 +7,6 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -132,12 +130,12 @@ class UserController extends Controller
             if ($user->restore()) {
                 $response = [
                     'code' => 200,
-                    'message' => 'user restored'
+                    'message' => 'User restored'
                 ];
             } else {
                 $response = [
                     'code' => 404,
-                    'message' => 'user already restored'
+                    'message' => 'User already restored'
                 ];
             }
         }

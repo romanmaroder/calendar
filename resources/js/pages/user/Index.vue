@@ -51,7 +51,7 @@ const counter = (num: number) => {
                     delete: 'users.destroy',
                     multiDestroy: 'users.multiDestroy',
                     restore: 'users.restore',
-                    multiRestore: 'users.multiRestore',
+                    multiRestore: 'multiRestore',
                 }"
                     @count="counter"
                 />

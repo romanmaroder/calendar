@@ -18,7 +18,6 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
 import SpeedDial from 'primevue/speeddial';
-import Tag from 'primevue/tag';
 import Toolbar from 'primevue/toolbar';
 import { onMounted, onUpdated, ref } from 'vue';
 
@@ -60,9 +59,7 @@ const selectedItems = ref();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
-const formatCurrency = (value: any) => {
-    return value?.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' });
-};
+
 const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
@@ -217,7 +214,8 @@ const trimPhone = (phoneNumber: string) => {
             :paginator="pagination"
             :rows="10"
             filterDisplay="menu"
-            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'created_at', 'total']"
+            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'created_at',
+            'birthday']"
             sortMode="multiple"
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -373,29 +371,6 @@ const trimPhone = (phoneNumber: string) => {
                 </template>
             </Column>
             <Column
-                field="discount"
-                header="Discount"
-                :sortable="true"
-                :pt="{
-                    root: {
-                        class: 'hidden lg:table-cell',
-                    },
-                }"
-            ></Column>
-            <Column
-                field="total"
-                header="Total"
-                :pt="{
-                    root: {
-                        class: 'hidden lg:table-cell',
-                    },
-                }"
-            >
-                <template #body="slotProps">
-                    {{ formatCurrency(slotProps.data.total) }}
-                </template>
-            </Column>
-            <Column
                 field="email"
                 header="Email"
                 :pt="{
@@ -405,8 +380,8 @@ const trimPhone = (phoneNumber: string) => {
                 }"
             ></Column>
             <Column
-                field="blacklist"
-                header="Blacklist"
+                field="birthday"
+                header="Birthday"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -414,23 +389,6 @@ const trimPhone = (phoneNumber: string) => {
                     },
                 }"
             >
-                <template #body="slotProps">
-                    <Tag :value="slotProps.data.blacklist" :severity="getStatusLabel(slotProps.data.blacklist)" />
-                </template>
-            </Column>
-            <Column
-                field="prepayment"
-                header="Prepayment"
-                :sortable="true"
-                :pt="{
-                    root: {
-                        class: 'hidden xl:table-cell',
-                    },
-                }"
-            >
-                <template #body="slotProps">
-                    <Tag :value="slotProps.data.prepayment" :severity="getStatusLabel(slotProps.data.prepayment)" />
-                </template>
             </Column>
             <Column
                 field="comment"
@@ -438,15 +396,6 @@ const trimPhone = (phoneNumber: string) => {
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell max-w-[250px]',
-                    },
-                }"
-            ></Column>
-            <Column
-                field="source"
-                header="Source"
-                :pt="{
-                    root: {
-                        class: 'hidden 2xl:table-cell',
                     },
                 }"
             ></Column>

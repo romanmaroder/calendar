@@ -43,9 +43,12 @@ onUpdated(() => {
 });
 
 const restore = (ids: any) => {
+    console.log(props.route);
+    console.log(ids.map((val: any) => val.id) );
     axios
         .post(route(props.route, { ids: ids.map((val: any) => val.id) }), { _method: 'put' })
         .then((response) => {
+            console.log(response);
             toast.add({
                 severity: 'info',
                 summary: 'Info',
@@ -55,6 +58,7 @@ const restore = (ids: any) => {
             emit('restoreItems', props.entity, response.data.message);
         })
         .catch(function (error) {
+            console.log(error);
             toast.add({
                 severity: 'error',
                 summary: 'Error',
