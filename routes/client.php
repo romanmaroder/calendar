@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Client\ClientController;
-use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('clients', '/clients/index');
