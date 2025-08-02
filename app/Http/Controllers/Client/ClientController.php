@@ -167,7 +167,7 @@ class ClientController extends Controller
                                                                                     Email::class,
                                                                                 ])->thenReturn();
         return Inertia::render('client/Archive', [
-            'clients' =>$clients->onlyTrashed()->latest('created_at')->paginate($count),
+            'clients' => $clients->onlyTrashed()->latest('created_at')->paginate($count),
             'count' => $count,
         ]);
     }

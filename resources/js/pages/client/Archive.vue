@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DataTable from '@/components/tables/user/DataTable.vue';
+import Table from '@/components/client/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
@@ -16,12 +16,6 @@ defineProps({
     count: {
         type: Number,
     },
-    columns: {
-        type: Object,
-    },
-    filters: {
-        type: Object,
-    },
 });
 
 const total = ref();
@@ -33,13 +27,35 @@ const counter = (num: number) => {
 <template>
     <Head title="Archive" />
     <Layout :breadcrumbs="breadcrumbs">
-        <Toast />
+        <Toast
+            :pt="{
+                root: {
+                    class: '!max-w-max',
+                },
+            }"
+        />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="client-cards-description">
                 Всего карточек в корзине:
-                {{ total }}
+                {{ total || count }}
             </div>
-            <DataTable :entities="clients" :columns="columns"  restore tools remove :filters-fields="filters" @count="counter" />
+            <div class="card">
+                <Table
+                    :entities="clients"
+                    :tools="{
+                        restore: true,
+                        remove: true,
+                    }"
+                    :routes="{
+                        archive: 'archive',
+                        delete: 'trash',
+                        multiDestroy: 'trash',
+                        restore: 'clients.restore',
+                        multiRestore: 'multiRestore',
+                    }"
+                    @count="counter"
+                />
+            </div>
         </div>
     </Layout>
 </template>

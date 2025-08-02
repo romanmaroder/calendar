@@ -459,7 +459,7 @@ const trimPhone = (phoneNumber: string) => {
                 }"
             >
                 <template #body="slotProps">
-                    <span class="flex flex-row items-center justify-center">
+                    <span class="flex flex-row items-start justify-start">
                         <UpdateDialog
                             :key="slotProps.data.id"
                             v-if="tools.update"
