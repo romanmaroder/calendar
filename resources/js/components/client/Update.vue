@@ -3,14 +3,6 @@ import AvatarUpload from '@/components/AvatarUpload.vue';
 import Icon from '@/components/Icon.vue';
 import InputError from '@/components/InputError.vue';
 import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import Checkbox from 'primevue/checkbox';
-import Drawer, { DrawerEmitsOptions } from 'primevue/drawer';
-import FloatLabel from 'primevue/floatlabel';
-import Inplace from 'primevue/inplace';
-import InputMask from 'primevue/inputmask';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
 

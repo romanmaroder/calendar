@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
-import Button from 'primevue/button';
 import { useToast } from 'primevue/usetoast';
-import Badge from 'primevue/badge';
 import {
     AlertDialogAction,
     AlertDialogCancel,

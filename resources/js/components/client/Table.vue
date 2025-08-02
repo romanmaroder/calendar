@@ -10,16 +10,6 @@ import Update from '@/components/client/Update.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Drawer from 'primevue/drawer';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import InputText from 'primevue/inputtext';
-import SpeedDial from 'primevue/speeddial';
-import Tag from 'primevue/tag';
-import Toolbar from 'primevue/toolbar';
 import { onMounted, onUpdated, ref } from 'vue';
 
 const props = defineProps({

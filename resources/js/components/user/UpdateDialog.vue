@@ -12,12 +12,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import Checkbox from 'primevue/checkbox';
-import FloatLabel from 'primevue/floatlabel';
-import InputMask from 'primevue/inputmask';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
 

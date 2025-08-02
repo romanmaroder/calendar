@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import Icon from '@/components/Icon.vue';
 import axios from 'axios';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
 import { useToast } from 'primevue/usetoast';
 import { onMounted, onUpdated, ref } from 'vue';
 
