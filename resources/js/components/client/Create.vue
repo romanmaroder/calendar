@@ -115,6 +115,12 @@ const onUpdateAvatar = (data: any) => {
         :header="title"
         :blockScroll="true"
         :pt="{
+            root:{
+                class:'sm:hidden!'
+            },
+            mask:{
+                class:'sm:hidden!',
+            },
             header: {
                 class: '!py-[0.5rem]',
             },

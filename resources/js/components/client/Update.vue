@@ -5,7 +5,7 @@ import InputError from '@/components/InputError.vue';
 import { useForm } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import Checkbox from 'primevue/checkbox';
-import Drawer from 'primevue/drawer';
+import Drawer, { DrawerEmitsOptions } from 'primevue/drawer';
 import FloatLabel from 'primevue/floatlabel';
 import Inplace from 'primevue/inplace';
 import InputMask from 'primevue/inputmask';
@@ -67,7 +67,7 @@ const form = useForm({
 const submit = (e: Event) => {
     e.preventDefault();
 
-    form.put(route('clients.update', { client: form.data() }), {
+    form.put(route(props.route, { client: form.data() }), {
         preserveScroll: true,
         onSuccess: function () {
             wait().then(() => (open.value = false));
@@ -119,6 +119,12 @@ const onUpdateAvatar = (data: any) => {
         :blockScroll="true"
         position="right"
         :pt="{
+            root:{
+                class:'sm:hidden!'
+            },
+            mask:{
+                class:'sm:hidden!',
+            },
             header: {
                 class: '!py-[0.5rem]',
             },
