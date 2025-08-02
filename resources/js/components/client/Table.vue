@@ -163,7 +163,12 @@ const trimPhone = (phoneNumber: string) => {
                         />
                     </span>
                     <span class="hidden sm:table-cell">
-                        <CreateDialog v-if="tools.create" icon-name="UserRoundPlus" label="New" title="New client" :route="routes.create" />
+                        <CreateDialog v-if="tools.create"
+                                      icon-name="UserRoundPlus"
+                                      label="New" title="New client"
+                                      :route="routes.create"
+                                      @create-item="onLoadItem"
+                        />
                     </span>
                     <span class="hidden sm:table-cell">
                         <MultiRestore
