@@ -24,7 +24,7 @@ const props = defineProps({
     iconName: {
         type: String,
     },
-    urlToRestore: {
+    route: {
         type: String,
         default: 'multiRestore',
     },
@@ -44,7 +44,7 @@ onUpdated(() => {
 
 const restore = (ids: any) => {
     axios
-        .post(route(props.urlToRestore, { ids: ids.map((val: any) => val.id) }), { _method: 'put' })
+        .post(route(props.route, { ids: ids.map((val: any) => val.id) }), { _method: 'put' })
         .then((response) => {
             toast.add({
                 severity: 'info',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Table from '@/components/client/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
+import Table from '@/components/client/Table.vue';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
 import { ref } from 'vue';

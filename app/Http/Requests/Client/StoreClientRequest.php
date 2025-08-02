@@ -35,7 +35,7 @@ class StoreClientRequest extends FormRequest
             'records'=>'nullable|numeric',
             'total'=>'nullable|numeric',
             'source'=>'nullable|string',
-            'email' => 'nullable|string|lowercase|email|max:255|unique:'.Client::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:'.Client::class,
         ];
     }
 }

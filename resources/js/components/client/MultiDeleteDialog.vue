@@ -35,9 +35,9 @@ const props = defineProps({
     iconName: {
         type: String,
     },
-    urlToDelete: {
+    route: {
         type: String,
-        default: 'clients.destroy',
+        default: '#',
     },
     disabled: {
         type: Boolean,
@@ -54,7 +54,7 @@ onUpdated(()=>{
 
 function handleAction() {
     axios
-        .post(route(props.urlToDelete, { ids: props.entity.map((val: any) => val.id) }), { _method: 'delete' })
+        .post(route(props.route, { ids: props.entity.map((val: any) => val.id) }), { _method: 'delete' })
         .then((response) => {
             wait();
             toast.add({

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ClientTable from '@/components/client/ClientTable.vue';
+import Table from '@/components/client/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
@@ -41,7 +41,7 @@ const counter = (num: number) => {
                 {{ total || count }}
             </div>
             <div class="card">
-                <ClientTable
+                <Table
                     :entities="clients"
                     :tools="{
                         create: true,

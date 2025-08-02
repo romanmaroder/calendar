@@ -10,16 +10,16 @@ const props = defineProps({
         type: Number,
         required: true,
     },
-    text: {
+    route: {
         type: String,
-        default: 'Restore',
+        default: 'clients.restore',
     },
     iconName: {
         type: String,
     },
-    route: {
+    label: {
         type: String,
-        default: 'clients.restore',
+        default: 'Restore',
     },
 });
 
@@ -54,11 +54,10 @@ const restore = (id: any) => {
 <template>
     <Button
         variant="link"
-        severity="secondary"
+        size="small"
         @click.prevent="restore(props.id)"
-        class=" outline-none! hover:shadow-sm! focus:shadow-[0_0_0_1px]! focus:shadow-sky-500! dark:focus:shadow-sky-500!"
     >
-        <Icon v-if="iconName" :name="iconName" class="mr-1" />
-        <span v-else>{{ text }}</span>
+        <Icon v-if="iconName" :name="iconName" />
+        <span v-else>{{ label }}</span>
     </Button>
 </template>
