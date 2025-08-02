@@ -24,6 +24,13 @@ const props = defineProps({
             return {};
         },
     },
+    route: {
+        type: Object,
+        required: true,
+        default() {
+            return {};
+        },
+    },
     className: String,
 });
 
