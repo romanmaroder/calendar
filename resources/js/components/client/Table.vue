@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import CreateDialog from '@/components/client/CreateDialog.vue';
 import Create from '@/components/client/Create.vue';
+import CreateDialog from '@/components/client/CreateDialog.vue';
 import DeleteDialog from '@/components/client/DeleteDialog.vue';
 import MultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
 import MultiRestore from '@/components/client/MultiRestore.vue';
 import Restore from '@/components/client/Restore.vue';
-import UpdateDialog from '@/components/client/UpdateDialog.vue';
+import ShowDialog from '@/components/client/ShowDialog.vue';
 import Update from '@/components/client/Update.vue';
+import UpdateDialog from '@/components/client/UpdateDialog.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
@@ -153,11 +154,13 @@ const trimPhone = (phoneNumber: string) => {
                         />
                     </span>
                     <span class="hidden sm:table-cell">
-                        <CreateDialog v-if="tools.create"
-                                      icon-name="UserRoundPlus"
-                                      label="New" title="New client"
-                                      :route="routes.create"
-                                      @create-item="onLoadItem"
+                        <CreateDialog
+                            v-if="tools.create"
+                            icon-name="UserRoundPlus"
+                            label="New"
+                            title="New client"
+                            :route="routes.create"
+                            @create-item="onLoadItem"
                         />
                     </span>
                     <span class="hidden sm:table-cell">
@@ -196,7 +199,7 @@ const trimPhone = (phoneNumber: string) => {
                     }"
                 >
                     <p class="text-center text-gray-500">Фильтр для модели Client в разработке</p>
-                    <Filter :entities="entities"  class-name="grid items-end gap-5 mt-2 !hidden" />
+                    <Filter :entities="entities" class-name="grid items-end gap-5 mt-2 !hidden" />
                 </Drawer>
                 <Button icon="pi pi-search" @click="visible = true" size="small" />
             </template>
@@ -266,8 +269,7 @@ const trimPhone = (phoneNumber: string) => {
             </Column>
             <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
-                    <div
-                        class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
+                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
                         {{ slotProps.data.name }}
                         {{ slotProps.data.middleName }}
                         {{ slotProps.data.surname }}
@@ -432,7 +434,7 @@ const trimPhone = (phoneNumber: string) => {
                 header="Comment"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell max-w-[250px]',
+                        class: 'hidden lg:table-cell max-w-[250px] lg:truncate',
                     },
                 }"
             ></Column>
@@ -463,6 +465,14 @@ const trimPhone = (phoneNumber: string) => {
                             icon-name="UserPen"
                             label="Edit item"
                             :route="routes.update"
+                            @update-item="onLoadItem"
+                        />
+                        <ShowDialog
+                            :key="slotProps.data.id"
+                            :entity="slotProps.data"
+                            icon-name="UserSearch"
+                            label="Show item"
+                            :route="routes.show"
                             @update-item="onLoadItem"
                         />
                         <Restore

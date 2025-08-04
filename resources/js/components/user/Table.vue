@@ -386,7 +386,7 @@ const trimPhone = (phoneNumber: string) => {
                 header="Comment"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell max-w-[250px]',
+                        class: 'hidden lg:table-cell max-w-[250px] lg:truncate',
                     },
                 }"
             ></Column>
