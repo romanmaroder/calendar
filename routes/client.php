@@ -9,6 +9,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('clients/index', [ClientController::class, 'index'])->name('clients.index');
     Route::post('clients/index', [ClientController::class, 'store'])->name('clients.store');
     Route::get('clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
+    Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::put('clients/restore/{id}',[ClientController::class,'restore'])->name('clients.restore');
     Route::put('clients/multiRestore/{ids}',[ClientController::class,'multiRestore'])->name('multiRestore');

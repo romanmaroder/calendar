@@ -69,9 +69,9 @@ class ClientController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Client $client)
+    public function show(Client $client) //TODO доделать отображение информации на десктопе и мобильном
     {
-        //
+        return Inertia::render('client/Show', ['client' => $client]);
     }
 
     /**

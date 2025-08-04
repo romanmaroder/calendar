@@ -50,6 +50,7 @@ const counter = (num: number) => {
                     }"
                     :routes="{
                         create: 'clients.store',
+                        show: 'clients.show',
                         update: 'clients.update',
                         delete: 'clients.destroy',
                         multiDestroy: 'multiDestroy',
