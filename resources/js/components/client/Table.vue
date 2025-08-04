@@ -12,6 +12,7 @@ import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { onMounted, onUpdated, ref } from 'vue';
+import { usePhoneLink } from '@/composables/usePhoneLink';
 
 const props = defineProps({
     entities: {
@@ -92,7 +93,7 @@ const onDeleteSelectedItems = () => {
     operationWithSelectedItems();
 };
 
-const getStatusLabel = (status: any) => {
+const getStatusLabel = (status: boolean) => {
     switch (status) {
         case true:
             return 'success';
@@ -133,9 +134,9 @@ const operationWithSingleItem = (id: any) => {
     items.value = items.value.filter((val: any) => val.id !== id);
 };
 
-const trimPhone = (phoneNumber: string) => {
-    return phoneNumber.replace(/[- )(]/g, '');
-};
+
+
+const {getPhone}=usePhoneLink();
 </script>
 
 <template>
@@ -299,7 +300,7 @@ const trimPhone = (phoneNumber: string) => {
                             as="a"
                             variant="link"
                             :label="slotProps.data.phone"
-                            :href="'tel:' + trimPhone(slotProps.data.phone)"
+                            :href="'tel:' + getPhone(slotProps.data.phone)"
                             rel="noopener"
                         />
                     </div>
@@ -361,7 +362,7 @@ const trimPhone = (phoneNumber: string) => {
                         as="a"
                         variant="link"
                         :label="slotProps.data.phone"
-                        :href="'tel:' + trimPhone(slotProps.data.phone)"
+                        :href="'tel:' + getPhone(slotProps.data.phone)"
                         rel="noopener"
                     />
                     <p class="2xl:hidden">
