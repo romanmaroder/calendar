@@ -110,6 +110,7 @@ const onUpdateAvatar = (data: any) => {
         :header="form.surname"
         :blockScroll="true"
         position="right"
+        closeIcon="pi pi-chevron-right text-green-500"
         :pt="{
             root:{
                 class:'sm:hidden!'

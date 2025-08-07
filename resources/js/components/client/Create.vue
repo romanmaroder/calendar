@@ -106,6 +106,7 @@ const onUpdateAvatar = (data: any) => {
         v-model:visible="visible"
         :header="title"
         :blockScroll="true"
+        closeIcon="pi pi-chevron-left text-green-500"
         :pt="{
             root:{
                 class:'sm:hidden!'
