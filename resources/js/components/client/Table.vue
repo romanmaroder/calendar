@@ -13,6 +13,7 @@ import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { onMounted, onUpdated, ref } from 'vue';
 import { usePhoneLink } from '@/composables/usePhoneLink';
+import Show from '@/components/client/Show.vue';
 
 const props = defineProps({
     entities: {
@@ -137,6 +138,7 @@ const operationWithSingleItem = (id: any) => {
 
 
 const {getPhone}=usePhoneLink();
+
 </script>
 
 <template>
@@ -335,6 +337,12 @@ const {getPhone}=usePhoneLink();
                                     :route="routes.update"
                                     @update-item="onLoadItem"
                                 />
+                                <Show
+                                    :entity="slotProps.data"
+                                    icon-name="UserSearch"
+                                    label=""
+                                    :route="routes.show"
+                                />
                                 <DeleteDialog
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
@@ -474,7 +482,6 @@ const {getPhone}=usePhoneLink();
                             icon-name="UserSearch"
                             label="Show item"
                             :route="routes.show"
-                            @update-item="onLoadItem"
                         />
                         <Restore
                             v-if="tools.restore"
