@@ -4,8 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/composables/useInitials';
 import { usePhoneLink } from '@/composables/usePhoneLink';
 import { useFullname } from '@/composables/useFullname';
-import { computed, ref, watch } from 'vue';
-import { useMediaQuery } from '@/composables/useMediaQuery';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     entity: {
@@ -27,24 +26,23 @@ const props = defineProps({
     },
 });
 
-const open = ref(false);
 // Compute whether we should show the avatar image
 const showAvatar = computed(() => props.entity.avatar && props.entity.avatar !== '');
-
+const visible = ref(false);
 const {getFullname} = useFullname();
 const { getInitials } = useInitials();
 const { getPhone } = usePhoneLink();
+
 const resize =()=>{
 
     window.addEventListener('resize', () => {
-        if (window.innerWidth <= 640) {
-            open.value = false;
+        if (window.innerWidth >= 640) {
+            visible.value = false;
         }
     })
 
 };
 resize();
-
 
 const getStatusLabel = (status: any) => {
     switch (status) {
@@ -59,46 +57,42 @@ const getStatusLabel = (status: any) => {
 </script>
 
 <template>
-    <Button as="a" variant="link" @click="open = true">
-        <Icon v-if="iconName" :name="iconName" class="mr-1 text-sky-600 hover:text-sky-900 focus:text-sky-900" />
-    </Button>
-
-    <Dialog
-        v-model:visible="open"
-        modal
-        :header="entity.surname"
-        class="w-[90vw]! md:w-[50vw]! lg:w-[40vw]! xl:w-[30vw]! hidden! sm:block!"
+    <Drawer
+        v-model:visible="visible"
+        :header="getFullname(entity.name, entity.surname)"
+        :blockScroll="true"
+        position="bottom"
+        closeIcon="pi pi-chevron-down text-sky-500"
+        :pt="{
+            root:{
+                class:'sm:hidden! h-[100vh]!'
+            },
+            mask:{
+                class:'sm:hidden!',
+            },
+            header: {
+                class: '!py-[0.5rem]',
+            },
+            title: {
+                class: '!text-lg',
+            },
+        }"
     >
-        <template #header>
-            <div class="inline-flex items-center justify-center gap-2">
-                <Avatar class="h-8 w-8 overflow-hidden rounded-lg">
-                    <AvatarFallback class="rounded-lg text-black dark:text-white">
-                        {{ getInitials(getFullname(entity.name,entity.middleName,entity.surname)) }}
-                    </AvatarFallback>
-                </Avatar>
-                <span class="font-bold whitespace-nowrap">
-                    {{ getFullname(entity.name, entity.middleName,entity.surname )}}
-                    {{ resize() }}
-                </span>
-
-            </div>
-        </template>
-        <div class="relative">
-            <div class="relative flex w-full items-center justify-center gap-2">
+            <div class="flex flex-col w-full items-center justify-center gap-y-5">
                 <Avatar
-                    class="max-h-56 min-h-40 max-w-56 min-w-40 overflow-hidden rounded-[50%] transition-all hover:relative hover:z-1 hover:scale-120"
+                    class="h-[100%] w-[89vw] overflow-hidden rounded-sm"
                 >
                     <AvatarImage v-if="showAvatar" :src="entity.avatar" :alt="entity.name" />
-                    <AvatarFallback class="rounded-lg text-black dark:text-white">
+                    <AvatarFallback class="rounded-lg text-black dark:text-white min-h-[20vh]">
                         {{ getInitials(getFullname(entity.name, entity.surname)) }}
                     </AvatarFallback>
                 </Avatar>
                 <div
-                    class="absolute right-0 bottom-0 left-0 flex scale-80 flex-col items-center justify-center rounded-lg border border-2 bg-white p-2 transition-all hover:scale-100 dark:bg-[#18181B]"
+                    class="flex-col items-center justify-center w-full rounded-lg border border-1 bg-white p-2 transition-all dark:bg-[#18181B]"
                 >
                     <div class="flex flex-col items-center justify-center">
                         <Button
-                            class="text-md! p-0! font-bold! md:text-xl!"
+                            class="text-2xl! font-bold! text-gray-600! dark:text-gray-400! p-0!"
                             as="a"
                             variant="link"
                             :label="entity.phone"
@@ -106,7 +100,7 @@ const getStatusLabel = (status: any) => {
                             rel="noopener"
                         />
                         <Button
-                            class="md:text-md! p-0! text-xs! font-light!"
+                            class="text-xs! font-light! p-0!"
                             as="a"
                             variant="link"
                             :label="entity.email"
@@ -114,41 +108,42 @@ const getStatusLabel = (status: any) => {
                             rel="noopener"
                         />
                     </div>
-                    <!--                    <div class="flex hidden w-1/2 items-center justify-end gap-x-10">
+                    <Divider/>
+                                        <div class="flex items-center justify-between gap-x-10">
                         <div>
                             <Button
-                                class="!hover:text-sky-800 px-0 !text-gray-800"
+                                class="!hover:text-sky-800 px-0"
                                 as="a"
                                 variant="link"
                                 :label="entity.phone"
-                                :href="'tel:' + usePhoneLink(entity.phone)"
+                                :href="'tel:' + getPhone(entity.phone)"
                                 rel="noopener"
                             >
-                                <Icon name="PhoneOutgoing" class="h-5 w-5" />
+                                <Icon name="PhoneOutgoing" class="h-7 w-7" />
                             </Button>
                         </div>
+                                            <Divider layout="vertical"/>
                         <div>
-                            <Button class="px-0" as="a" variant="link" :label="entity.phone" :href="'sms:' + usePhoneLink(entity.phone)" rel="noopener">
-                                <Icon name="MessageSquareText" class="h-5 w-5" />
+                            <Button class="px-0" as="a" variant="link" :label="entity.phone" :href="'sms:' +
+                            getPhone(entity.phone)" rel="noopener">
+                                <Icon name="MessageSquareText" class="h-7 w-7" />
                             </Button>
                         </div>
-                    </div>-->
+                    </div>
                 </div>
-            </div>
             <Tabs value="0">
                 <TabList>
                     <Tab value="0">History</Tab>
                     <Tab value="1" v-if="entity.comment">Comment</Tab>
-                    <Tab value="2">Info</Tab>
+                    <Tab value="2" v-if="entity.discount || entity.blacklist || entity.prepayment">Info</Tab>
                 </TabList>
-                <TabPanels>
+                <TabPanels class="px-0! min-w-[85vw]!">
                     <TabPanel value="0">
                         <p class="m-0 flex flex-row items-center justify-between">
                             <span class="flex items-center justify-between gap-x-2">
                                 <Icon name="CalendarPlus2" />
-                                Registration
                             </span>
-                            {{ entity.created_at }}
+                           {{ entity.created_at }}
                         </p>
                         <Divider v-if="entity.source" />
 
@@ -163,9 +158,6 @@ const getStatusLabel = (status: any) => {
                     <TabPanel value="1">
                         <p class="m-0 flex flex-row items-center justify-between"
                            v-if="entity.comment">
-                            <!--                            <span class="flex">
-                                                            <Icon name="MessageSquareMore" />
-                                                        </span>-->
                             {{ entity.comment }}
                         </p>
                     </TabPanel>
@@ -200,9 +192,9 @@ const getStatusLabel = (status: any) => {
                 </TabPanels>
             </Tabs>
         </div>
-        <template #footer>
-            <Button label="Cancel" variant="outlined" size="small" severity="secondary" @click="open = false"
-                    autofocus />
-        </template>
-    </Dialog>
+    </Drawer>
+    <Button @click="visible = true" size="small" variant="link">
+        <Icon :name="iconName" />
+        {{ label }}
+    </Button>
 </template>
