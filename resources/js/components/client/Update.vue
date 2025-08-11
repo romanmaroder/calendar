@@ -59,7 +59,7 @@ const form = useForm({
 const submit = (e: Event) => {
     e.preventDefault();
 
-    form.put(route(props.route, { client: form.data() }), {
+    form.put(route(`${props.route}`, { client: form.data() }), {
         preserveScroll: true,
         onSuccess: function () {
             wait().then(() => (open.value = false));

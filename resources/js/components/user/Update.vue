@@ -59,7 +59,7 @@ const form = useForm({
 const submit = (e: Event) => {
     e.preventDefault();
 
-    form.put(route(props.route, { user: form.data() }), {
+    form.put(route(`${props.route}`, { user: form.data() }), {
         preserveScroll: true,
         onSuccess: function () {
             wait().then(() => (open.value = false));
@@ -102,6 +102,16 @@ const onUpdateAvatar = (data: any) => {
     form.avatar = data.url;
     toast.add({ severity: 'info', summary: 'Info', detail: data.message, life: 3000 });
 };
+
+const resize =()=>{
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 640) {
+            visible.value = false;
+        }
+    })
+};
+resize();
+
 </script>
 
 <template>
