@@ -38,6 +38,13 @@ class UserController extends Controller
         return to_route('users');
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(User $user)
+    {
+        return Inertia::render('user/Show', ['user' => $user]);
+    }
     public function edit(User $user)
     {
         return Inertia::render('user/Edit', [

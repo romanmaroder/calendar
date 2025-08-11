@@ -6,11 +6,14 @@ import MultiDeleteDialog from '@/components/user/MultiDeleteDialog.vue';
 import MultiRestore from '@/components/user/MultiRestore.vue';
 import Restore from '@/components/user/Restore.vue';
 import UpdateDialog from '@/components/user/UpdateDialog.vue';
+import ShowDialog from '@/components/user/ShowDialog.vue';
 import Update from '@/components/user/Update.vue';
+import Show from '@/components/user/Show.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { onMounted, onUpdated, ref } from 'vue';
+
 const props = defineProps({
     entities: {
         type: Object,
@@ -326,6 +329,12 @@ const trimPhone = (phoneNumber: string) => {
                                     :route="routes.update"
                                     @update-item="onLoadItem"
                                 />
+                                <Show
+                                    :entity="slotProps.data"
+                                    icon-name="UserSearch"
+                                    label=""
+                                    :route="routes.show"
+                                />
                                 <DeleteDialog
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
@@ -409,6 +418,13 @@ const trimPhone = (phoneNumber: string) => {
                             label="Edit item"
                             :route="routes.update"
                             @update-item="onLoadItem"
+                        />
+                        <ShowDialog
+                            :key="slotProps.data.id"
+                            :entity="slotProps.data"
+                            icon-name="UserSearch"
+                            label="Show item"
+                            :route="routes.show"
                         />
                         <Restore
                             v-if="tools.restore"
