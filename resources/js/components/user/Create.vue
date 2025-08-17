@@ -2,6 +2,7 @@
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import Icon from '@/components/Icon.vue';
 import InputError from '@/components/InputError.vue';
+import { useDate } from '@/composables/useDate';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
@@ -24,11 +25,11 @@ const props = defineProps({
         default: 'New',
     },
 });
+
 const emit = defineEmits(['CreateItem']);
 const wait = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 const open = ref(false);
 const visible = ref(false);
-
 const toast = useToast();
 
 const form = useForm({
@@ -39,14 +40,9 @@ const form = useForm({
     middleName: '',
     phone: '',
     email: '',
-    source: '',
+    birthday:'',
     comment: '',
-    discount: '',
-    blacklist: false,
-    prepayment: false,
     created_at: '',
-    total: '',
-    records: '',
 });
 
 const submit = (e: Event) => {
@@ -94,6 +90,12 @@ const closeModal = () => {
     visible.value = false;
 };
 
+const { getYyMmDd } = useDate();
+
+const setDate = (date: Date) => {
+    form.birthday = getYyMmDd(date);
+};
+
 const onUpdateAvatar = (data: any) => {
     form.avatar = data.url;
     toast.add({ severity: 'info', summary: 'Info', detail: data.message, life: 3000 });
@@ -117,30 +119,23 @@ const onUpdateAvatar = (data: any) => {
     >
         <form class="p-3.5 dark:bg-black">
             <div class="grid gap-5">
-                <Inplace class="flex justify-center" :pt="{display:{class:'!inline-flex !flex-col !items-center'}}">
-                    <template #display> Add Avatar
-                        <Icon name="Camera" class="w-[28px] h-[28px]" />
+                <Inplace class="flex justify-center" :pt="{ display: { class: '!inline-flex !flex-col !items-center' } }">
+                    <template #display>
+                        Add Avatar
+                        <Icon name="Camera" class="h-[28px] w-[28px]" />
                     </template>
                     <template #content="{ closeCallback }">
-                        <div class="inline-flex items-center gap-2 relative max-h-[200px] max-w-[180px] rounded-[4px] bg-[#83BCE1] p-4 shadow-md">
-                                    <AvatarUpload
-                                        text-add="Добавить фото"
-                                        text-delete="Удалить фото"
-                                        updateUrl="avatar"
-                                        @updateAvatar="onUpdateAvatar"
-                                    />
-                                <InputError :message="form.errors.avatar" class="my-2" />
-                            <Button icon="pi pi-times" text severity="danger" @click="closeCallback"
-                                    class="!absolute !top-[0px] !right-[0px]" />
+                        <div class="relative inline-flex max-h-[200px] max-w-[180px] items-center gap-2 rounded-[4px] bg-[#83BCE1] p-4 shadow-md">
+                            <AvatarUpload text-add="Добавить фото" text-delete="Удалить фото" updateUrl="avatar" @updateAvatar="onUpdateAvatar" />
+                            <InputError :message="form.errors.avatar" class="my-2" />
+                            <Button icon="pi pi-times" text severity="danger" @click="closeCallback" class="!absolute !top-[0px] !right-[0px]" />
                         </div>
                     </template>
                 </Inplace>
 
                 <div class="mt-2 space-y-4">
                     <FloatLabel variant="on" class="">
-                        <InputText id="name" v-model="form.name" autocomplete="off"
-                                   class="h-[28px] w-full"
-                                   aria-labelledby="name" size="small" />
+                        <InputText id="name" v-model="form.name" autocomplete="off" class="h-[28px] w-full" aria-labelledby="name" size="small" />
                         <label for="name" class="font-light!">{{ form.name || 'Имя:' }}</label>
                     </FloatLabel>
                     <InputError :message="form.errors.name" class="-mt-2 mb-2" />
@@ -194,59 +189,34 @@ const onUpdateAvatar = (data: any) => {
                             class="h-[28px] w-full"
                             aria-labelledby="email"
                             size="small"
-                            required
                         />
                         <label for="email" class="font-light!">Email:</label>
                     </FloatLabel>
                     <InputError :message="form.errors.email" class="-mt-2 mb-2" />
-
-                    <FloatLabel variant="on" class="">
-                        <InputText
-                            id="source"
-                            v-model="form.source"
-                            type="text"
-                            autocomplete="off"
-                            class="h-[28px] w-full"
-                            aria-labelledby="source"
+                    <FloatLabel variant="on">
+                        <DatePicker
+                            v-model="form.birthday"
+                            dateFormat="yy-mm-dd"
+                            id="birthday"
+                            name="birthday"
+                            showIcon
+                            showButtonBar
+                            iconDisplay="input"
                             size="small"
+                            class="h-[28px] w-full"
+                            aria-labelledby="birthday"
+                            @update:model-value="setDate"
                         />
-                        <label for="source" class="font-light!">Источник:</label>
+                        <label class="font-light!" for="birthday">ДР</label>
                     </FloatLabel>
-                    <InputError :message="form.errors.source" class="-mt-2 mb-2" />
+                    <InputError :message="form.errors.birthday" class="-mt-2 mb-2" />
                 </div>
                 <div class="mt-2">
                     <FloatLabel variant="on">
                         <Textarea id="comment" v-model="form.comment" rows="4" cols="15" autoResize size="small" class="w-full" />
-                        <label for="comment">Заметка</label>
+                        <label class="font-light!" for="comment">Заметка</label>
                     </FloatLabel>
                     <InputError :message="form.errors.comment" class="mt-1 mb-2" />
-                </div>
-                <div class="mt-2 mb-2">
-                    <FloatLabel variant="on" class="">
-                        <InputText
-                            id="discount"
-                            v-model="form.discount"
-                            type="text"
-                            autocomplete="off"
-                            class="h-[28px] w-full"
-                            aria-labelledby="discount"
-                            size="small"
-                        />
-                        <label for="discount" class="font-light!">Персональная скидка:</label>
-                    </FloatLabel>
-                    <InputError :message="form.errors.discount" class="mt-1 mb-2" />
-                </div>
-                <div class="grid gap-y-1.5">
-                    <div class="card flex flex-col flex-wrap gap-4 dark:text-white">
-                        <div class="flex items-center gap-2">
-                            <Checkbox v-model="form.blacklist" inputId="blackList" name="blackList" size="small" :tabindex="4" binary />
-                            <label for="blackList"> В черном списке </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <Checkbox v-model="form.prepayment" inputId="alwaysPrepayment" name="prepayment" size="small" :tabindex="4" binary />
-                            <label for="alwaysPrepayment">Всегда по предоплате</label>
-                        </div>
-                    </div>
                 </div>
                 <div class="">
                     <div class="mt-2 flex flex-col justify-end gap-2 sm:flex-row md:mt-0">
@@ -254,8 +224,7 @@ const onUpdateAvatar = (data: any) => {
                             <Icon name="Save" />
                             {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
                         </Button>
-                        <Button severity="secondary" @click="closeModal"
-                                class="h-[30px] cursor-pointer rounded-sm py-1.5 font-normal" raised>
+                        <Button severity="secondary" @click="closeModal" class="h-[30px] cursor-pointer rounded-sm py-1.5 font-normal" raised>
                             Отмена
                         </Button>
                     </div>
