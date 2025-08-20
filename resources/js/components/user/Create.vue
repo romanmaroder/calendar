@@ -207,7 +207,7 @@ const onUpdateAvatar = (data: any) => {
                             aria-labelledby="birthday"
                             @update:model-value="setDate"
                         />
-                        <label class="font-light!" for="birthday">ДР</label>
+                        <label class="font-light!" for="birthday">{{ form.birthday || 'ДР' }}</label>
                     </FloatLabel>
                     <InputError :message="form.errors.birthday" class="-mt-2 mb-2" />
                 </div>
