@@ -120,9 +120,9 @@ resize();
 </script>
 
 <template>
-    <Dialog v-model:open="open" disableOutsidePointerEvents="true">
+    <Dialog v-model:open="open">
         <DialogTrigger as-child>
-            <Button size="small" raised>
+            <Button  size="small" raised>
                 <Icon :name="iconName" />
                 {{ label }}
             </Button>
