@@ -14,6 +14,7 @@ import {
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 
+import { useDate } from '@/composables/useDate';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -48,14 +49,9 @@ const form = useForm({
     middleName: '',
     phone: '',
     email: '',
-    source: '',
+    birthday: '',
     comment: '',
-    discount: '',
-    blacklist: false,
-    prepayment: false,
     created_at: '',
-    total: '',
-    records: '',
 });
 
 const submit = (e: Event) => {
@@ -73,7 +69,7 @@ const submit = (e: Event) => {
             closeModal();
         },
         onFinish: function () {
-            form.reset()
+            form.reset();
         },
         onError: function (errors) {
             toast.add({
@@ -103,21 +99,48 @@ const close = () => {
     closeModal();
 };
 
+const { getYyMmDd } = useDate();
+
+const setDate = (date: Date) => {
+    form.birthday = getYyMmDd(date);
+};
+
+const xxx = (date: Date) => {
+    if (date) {
+        open.value = true;
+    }
+};
 const onUpdateAvatar = (data: any) => {
     form.avatar = data.url;
     toast.add({ severity: 'info', summary: 'Info', detail: data.message, life: 3000 });
 };
+const resize = () => {
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 640) {
+            open.value = false;
+        }
+    });
+};
+resize();
 </script>
 
 <template>
-    <Dialog v-model:open="open">
+    <Dialog v-model:open="open" disableOutsidePointerEvents="true">
         <DialogTrigger as-child>
-            <Button  size="small" raised>
+            <Button size="small" raised>
                 <Icon :name="iconName" />
                 {{ label }}
             </Button>
         </DialogTrigger>
-        <DialogContentWithoutBtnClose class="rounded-none lg:min-w-[640px] dark:bg-stone-50 dark:text-black">
+        <DialogContentWithoutBtnClose
+            class="rounded-none lg:min-w-[640px] dark:bg-stone-50 dark:text-black"
+            @interact-outside="
+                (event) => {
+                    const target = event.target as HTMLElement;
+                    if (target?.closest('.p-datepicker-panel')) return event.preventDefault();
+                }
+            "
+        >
             <DialogTitle className="sr-only">{{ label }}</DialogTitle>
             <DialogDescription aria-describedby="update client"></DialogDescription>
             <DialogHeader @close="close" class="h-[47px] bg-[#1b2133] px-4 text-white dark:bg-[#1b2133]/80">
@@ -194,19 +217,28 @@ const onUpdateAvatar = (data: any) => {
                         </FloatLabel>
                         <InputError :message="form.errors.email" class="-mt-2 mb-2" />
 
-                        <FloatLabel variant="on" class="">
-                            <InputText
-                                id="source"
-                                v-model="form.source"
-                                type="text"
-                                autocomplete="off"
-                                class="h-[28px] w-full"
-                                aria-labelledby="source"
+                        <FloatLabel variant="on">
+                            <DatePicker
+                                v-model="form.birthday"
+                                dateFormat="yy-mm-dd"
+                                id="birthday"
+                                name="birthday"
+                                showIcon
+                                showButtonBar
+                                iconDisplay="input"
                                 size="small"
+                                class="h-[28px] w-full"
+                                aria-labelledby="birthday"
+                                @update:model-value="setDate"
+                                :pt="{
+                                    day: {
+                                        class: 'pointer-events-auto',
+                                    },
+                                }"
                             />
-                            <label for="source" class="font-light!">Источник:</label>
+                            <label class="font-light!" for="birthday">{{ form.birthday || 'ДР' }}</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.source" class="-mt-2 mb-2" />
+                        <InputError :message="form.errors.birthday" class="-mt-2 mb-2" />
                     </div>
                     <div class="mt-2 md:[grid-area:2_/_1_/_3_/_4]">
                         <FloatLabel variant="on">
@@ -214,33 +246,6 @@ const onUpdateAvatar = (data: any) => {
                             <label for="comment">Заметка</label>
                         </FloatLabel>
                         <InputError :message="form.errors.comment" class="mt-1 mb-2" />
-                    </div>
-                    <div class="mt-2 mb-2 md:[grid-area:3_/_1_/_4_/_4]">
-                        <FloatLabel variant="on" class="">
-                            <InputText
-                                id="discount"
-                                v-model="form.discount"
-                                type="text"
-                                autocomplete="off"
-                                class="h-[28px] w-full"
-                                aria-labelledby="discount"
-                                size="small"
-                            />
-                            <label for="discount" class="font-light!">Персональная скидка:</label>
-                        </FloatLabel>
-                        <InputError :message="form.errors.discount" class="mt-1 mb-2" />
-                    </div>
-                    <div class="grid gap-y-1.5 md:[grid-area:4_/_1_/_5_/_4]">
-                        <div class="card flex flex-col flex-wrap gap-4 dark:text-white">
-                            <div class="flex items-center gap-2">
-                                <Checkbox v-model="form.blacklist" inputId="blackList" name="blackList" size="small" :tabindex="4" binary />
-                                <label for="blackList"> В черном списке </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <Checkbox v-model="form.prepayment" inputId="alwaysPrepayment" name="prepayment" size="small" :tabindex="4" binary />
-                                <label for="alwaysPrepayment">Всегда по предоплате</label>
-                            </div>
-                        </div>
                     </div>
                     <div class="md:[grid-area:5_/_2_/_6_/_4]">
                         <div class="mt-2 flex flex-col justify-end gap-2 sm:flex-row md:mt-0">
