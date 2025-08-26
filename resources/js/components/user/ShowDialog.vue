@@ -129,7 +129,7 @@ const getStatusLabel = (status: any) => {
                 <TabList>
                     <Tab value="0">History</Tab>
                     <Tab value="1" v-if="entity.comment">Comment</Tab>
-                    <Tab value="2">Info</Tab>
+                    <Tab value="2" v-if="entity.birthday">Info</Tab>
                 </TabList>
                 <TabPanels>
                     <TabPanel value="0">
@@ -139,15 +139,6 @@ const getStatusLabel = (status: any) => {
                                 Registration
                             </span>
                             {{ entity.created_at }}
-                        </p>
-                        <Divider v-if="entity.source" />
-
-                        <p class="m-0 flex flex-row items-center justify-between" v-if="entity.source">
-                            <span class="flex items-center justify-between gap-x-2">
-                                <Icon name="MessageSquareDot" />
-                                Source
-                            </span>
-                            {{ entity.source }}
                         </p>
                     </TabPanel>
                     <TabPanel value="1">
@@ -159,31 +150,11 @@ const getStatusLabel = (status: any) => {
                         </p>
                     </TabPanel>
                     <TabPanel value="2">
-                        <p class="m-0 flex flex-row items-center justify-between" v-if="entity.discount">
+                        <p class="m-0 flex flex-row items-center justify-between">
                             <span class="flex items-center justify-between gap-x-2">
-                                <Icon name="Percent" />
-                                Discount
+                                <Icon name="Cake" />
                             </span>
-
-                            {{ entity.discount }}
-                        </p>
-                        <Divider v-if="entity.blacklist" />
-
-                        <p class="m-0 flex flex-row items-center justify-between" v-if="entity.blacklist">
-                            <span class="flex items-center justify-between gap-x-2">
-                                <Icon name="FileX" />
-                                Blacklist
-                            </span>
-                            <Tag :value="entity.blacklist" :severity="getStatusLabel(entity.blacklist)" />
-                        </p>
-                        <Divider v-if="entity.prepayment" />
-
-                        <p class="m-0 flex flex-row items-center justify-between" v-if="entity.prepayment">
-                            <span class="flex items-center justify-between gap-x-2">
-                                <Icon name="HandCoins" />
-                                Prepayment
-                            </span>
-                            <Tag :value="entity.prepayment" :severity="getStatusLabel(entity.prepayment)" />
+                            {{ entity.birthday }}
                         </p>
                     </TabPanel>
                 </TabPanels>
