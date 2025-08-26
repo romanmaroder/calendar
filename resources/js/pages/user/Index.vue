@@ -46,7 +46,7 @@ const counter = (num: number) => {
                         remove: true,
                     }"
                     :routes="{
-                    create: 'users.create',
+                    create: 'users.store',
                     update: 'users.update',
                     delete: 'users.destroy',
                     multiDestroy: 'users.multiDestroy',

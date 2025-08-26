@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -27,12 +29,11 @@ class UserController extends Controller
         return Inertia::render('user/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
         $password = Hash::make(12345678);
         $data['password'] = $password;
-
         User::create($data);
 
         return to_route('users');

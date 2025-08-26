@@ -5,6 +5,7 @@ import InputError from '@/components/InputError.vue';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
+import { useDate } from '@/composables/useDate';
 
 const props = defineProps({
     entity: {
@@ -36,7 +37,7 @@ const visible = ref(false);
 const nameInput = ref();
 const phoneInput = ref<HTMLInputElement | null>(null);
 const emailInput = ref<HTMLInputElement | null>(null);
-const sourceInput = ref<HTMLInputElement | null>(null);
+const birthdayInput = ref<HTMLInputElement | null>(null);
 
 const form = useForm({
     id: props.entity.id,
@@ -46,14 +47,9 @@ const form = useForm({
     middleName: props.entity.middleName,
     phone: props.entity.phone,
     email: props.entity.email,
-    source: props.entity.source,
+    birthday: props.entity.birthday,
     comment: props.entity.comment,
-    discount: props.entity.discount,
-    blacklist: props.entity.blacklist,
-    prepayment: props.entity.prepayment,
     created_at: props.entity.created_at,
-    total: props.entity.total,
-    records: props.entity.records,
 });
 
 const submit = (e: Event) => {
@@ -112,6 +108,11 @@ const resize =()=>{
 };
 resize();
 
+const { getYyMmDd } = useDate();
+
+const setDate = (date: Date) => {
+    form.birthday = getYyMmDd(date);
+};
 </script>
 
 <template>
@@ -226,20 +227,24 @@ resize();
                     </FloatLabel>
                     <InputError :message="form.errors.email" class="-mt-2 mb-2" />
 
-                    <FloatLabel variant="on" class="">
-                        <InputText
-                            id="source"
-                            v-model="form.source"
-                            type="text"
-                            autocomplete="off"
-                            class="h-[28px] w-full"
-                            aria-labelledby="source"
+                    <FloatLabel variant="on">
+                        <DatePicker
+                            v-model="form.birthday"
+                            ref="birthdayInput"
+                            dateFormat="yy-mm-dd"
+                            id="birthday"
+                            name="birthday"
+                            showIcon
+                            showButtonBar
+                            iconDisplay="input"
                             size="small"
-                            ref="sourceInput"
+                            class="h-[28px] w-full"
+                            aria-labelledby="birthday"
+                            @update:model-value="setDate"
                         />
-                        <label for="source" class="font-light!">Источник:</label>
+                        <label class="font-light!" for="birthday">{{ form.birthday || 'ДР' }}</label>
                     </FloatLabel>
-                    <InputError :message="form.errors.source" class="-mt-2 mb-2" />
+                    <InputError :message="form.errors.birthday" class="-mt-2 mb-2" />
                 </div>
                 <div class="mt-2">
                     <FloatLabel variant="on">
@@ -247,33 +252,6 @@ resize();
                         <label for="comment">Заметка</label>
                     </FloatLabel>
                     <InputError :message="form.errors.comment" class="mt-2 mb-2" />
-                </div>
-                <div class="mt-2">
-                    <FloatLabel variant="on" class="">
-                        <InputText
-                            id="discount"
-                            v-model="form.discount"
-                            type="text"
-                            autocomplete="off"
-                            class="h-[28px] w-full"
-                            aria-labelledby="discount"
-                            size="small"
-                        />
-                        <label for="discount" class="font-light!">Персональная скидка:</label>
-                    </FloatLabel>
-                    <InputError :message="form.errors.discount" class="mt-1 mb-2" />
-                </div>
-                <div class="grid gap-y-1.5">
-                    <div class="card flex flex-col flex-wrap gap-4 dark:text-white">
-                        <div class="flex items-center gap-2">
-                            <Checkbox v-model="form.blacklist" inputId="blackList" name="blackList" size="small" :tabindex="4" binary />
-                            <label for="blackList"> В черном списке </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <Checkbox v-model="form.prepayment" inputId="alwaysPrepayment" name="prepayment" size="small" :tabindex="4" binary />
-                            <label for="alwaysPrepayment">Всегда по предоплате</label>
-                        </div>
-                    </div>
                 </div>
                 <div class="">
                     <div class="mt-2 flex flex-col justify-end gap-2 sm:flex-row md:mt-0">

@@ -55,6 +55,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'created_at' => 'datetime:Y/m/d H:i',
+            'birthday' => 'date:Y-m-d',
             'blacklist' => 'boolean',
             'prepayment' => 'boolean',
             'discount' => 'integer',

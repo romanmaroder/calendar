@@ -100,6 +100,15 @@ const onUpdateAvatar = (data: any) => {
     form.avatar = data.url;
     toast.add({ severity: 'info', summary: 'Info', detail: data.message, life: 3000 });
 };
+
+const resize =()=>{
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 640) {
+            visible.value = false;
+        }
+    })
+};
+resize();
 </script>
 
 <template>
