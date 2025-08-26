@@ -35,7 +35,7 @@ const props = defineProps({
         default: 'New',
     },
 });
-
+const emit = defineEmits(['CreateItem']);
 const wait = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 const open = ref(false);
 
@@ -67,6 +67,7 @@ const submit = (e: Event) => {
                 life: 3000,
             });
             closeModal();
+            emit('CreateItem');
         },
         onFinish: function () {
             form.reset();
