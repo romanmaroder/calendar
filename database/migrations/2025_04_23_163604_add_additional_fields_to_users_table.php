@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('middleName')->nullable()->after('surname');
             $table->string('phone')->nullable()->after('middleName');
             $table->string('comment',1000)->nullable()->after('phone');
-            $table->string('birthday')->nullable()->after('comment');
+            $table->date('birthday')->nullable()->after('comment');
             $table->string('avatar')->nullable()->after('birthday');
             $table->softDeletes();
         });
