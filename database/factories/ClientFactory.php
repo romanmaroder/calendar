@@ -24,10 +24,10 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'name' => fake()->firstName(),
             'surname' => fake()->lastName(),
-            'middleName' => fake()->word(1),
-            'phone' => fake()->numerify('#############'),
+            'middleName' => fake()->firstName('male'),
+            'phone' => fake()->unique()->phoneNumber(),
             'comment' => fake()->text(20),
             'blacklist' => fake()->boolean(),
             'prepayment' => fake()->boolean(),
