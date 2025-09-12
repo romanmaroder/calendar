@@ -1,16 +1,17 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
-import { definePreset } from '@primeuix/themes';
-import Aura from '@primeuix/themes/aura';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import PrimeVue from 'primevue/config';
-import ToastService from 'primevue/toastservice';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
-
+import { definePreset } from '@primeuix/themes';
+import Aura from '@primeuix/themes/aura';
+import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+import { en } from "primelocale/js/en.js";
+import { ru } from "primelocale/js/ru.js";
 import.meta.glob(['../img/**']);
 
 const MyPreset = definePreset(Aura, {
@@ -208,6 +209,13 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(ToastService)
             .use(PrimeVue, {
+                locale:
+                    Object.assign(
+                        {},
+                        en, // fallback, an object like { emptyFilterMessage: 'Empty', emptyMessage: 'empty...' }
+                        ru, // locale, an object like { emptyFilterMessage: 'Leer' }
+                    ),
+                    //...
                 ripple: true,
                 theme: {
                     preset: MyPreset,
