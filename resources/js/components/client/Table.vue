@@ -14,6 +14,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { onMounted, onUpdated, ref } from 'vue';
 import { usePhoneLink } from '@/composables/usePhoneLink';
 import Show from '@/components/client/Show.vue';
+import { workingWithTableItems } from '@/composables/workingWithTableItems';
 
 const props = defineProps({
     entities: {
@@ -60,6 +61,9 @@ const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
 
+const {getPhone}=usePhoneLink();
+const { useSingleElement, useMultipleElements } = workingWithTableItems();
+
 onMounted(() => {
     items.value = props.entities.data;
     if (items.value.length > 0) {
@@ -76,22 +80,22 @@ onUpdated(() => {
 });
 
 const onDeleteItem = (id: any) => {
-    operationWithSingleItem(id);
+    useSingleElement(items,id);
 };
 const onLoadItem = () => {
     items.value = props.entities.data;
 };
 
 const onRestoreItem = (id: any) => {
-    operationWithSingleItem(id);
+    useSingleElement(items,id);
 };
 
 const onRestoreSelectedItems = () => {
-    operationWithSelectedItems();
+    useMultipleElements(items, selectedItems);
 };
 
 const onDeleteSelectedItems = () => {
-    operationWithSelectedItems();
+    useMultipleElements(items, selectedItems);
 };
 
 const getStatusLabel = (status: boolean) => {
@@ -125,19 +129,6 @@ const filterFields = () => {
        });
    }
 };*/
-
-const operationWithSelectedItems = () => {
-    items.value = items.value.filter((val: any) => !selectedItems.value.includes(val));
-    selectedItems.value = null;
-};
-
-const operationWithSingleItem = (id: any) => {
-    items.value = items.value.filter((val: any) => val.id !== id);
-};
-
-
-
-const {getPhone}=usePhoneLink();
 
 </script>
 
@@ -218,7 +209,8 @@ const {getPhone}=usePhoneLink();
             :paginator="pagination"
             :rows="10"
             filterDisplay="menu"
-            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'created_at', 'total']"
+            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'source','created_at',
+            'total']"
             sortMode="multiple"
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
