@@ -48,7 +48,7 @@ const counter = (num: number) => {
                     }"
                     :routes="{
                         archive: 'archive',
-                        delete: 'trash',
+                        delete: 'clients.trash',
                         multiDestroy: 'trash',
                         restore: 'clients.restore',
                         multiRestore: 'multiRestore',
