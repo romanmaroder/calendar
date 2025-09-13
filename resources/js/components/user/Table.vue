@@ -397,7 +397,7 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <span class="flex flex-row items-start justify-start">
+                    <span class="flex flex-row items-start justify-start flex-wrap">
                         <UpdateDialog
                             :key="slotProps.data.id"
                             v-if="tools.update"
