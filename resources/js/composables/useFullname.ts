@@ -1,15 +1,15 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getFullname(name?: string, middlename?: string, surname?: string): string {
-    let fullname = '';
+interface Data {
+    name?: string;
+    middlename?: string;
+    surname?: string;
+}
 
-    for (let i = 0; i < arguments.length; i++) {
-        // eslint-disable-next-line prefer-rest-params
-        if (arguments[i] === undefined || arguments[i] === null) {break;}
-        // eslint-disable-next-line prefer-rest-params
-        fullname += `${arguments[i][0].toUpperCase() +  arguments[i].slice(1)} `;
-    }
+export function getFullname(data: Data): string {
+    const name = data.name ? data.name[0]?.toUpperCase() + data.name?.slice(1) : '';
+    const middlename = data.middlename ? data.middlename[0]?.toUpperCase() + data.middlename?.slice(1) : '';
+    const surname = data.surname ? data.surname[0]?.toUpperCase() + data.surname?.slice(1) : '';
 
-    return fullname;
+    return `${name} ${middlename} ${surname}`;
 }
 
 export function useFullname() {
