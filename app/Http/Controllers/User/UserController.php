@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client\AvatarUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Models\Branch\Branch;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -17,23 +20,32 @@ class UserController extends Controller
     public function index()
     {
         $count = User::count();
-
+        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
         return Inertia::render(
             'user/Index',
-            ['users' => User::paginate($count), 'count' => $count]
+            ['users' => User::with('branch')->paginate($count),
+                'count' => $count,
+                'branch' => $branch]
         );
     }
 
     public function create()
     {
-        return Inertia::render('user/Create');
+        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
+        return Inertia::render('user/Create',['branch' => $branch]);
     }
 
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
         $password = Hash::make(12345678);
+        $name = Str::of($data['name'])->ucfirst();
+        $middleName = Str::of($data['middleName'])->ucfirst();
+        $surname = Str::of($data['surname'])->ucfirst();
         $data['password'] = $password;
+        $data['name'] = $name;
+        $data['middleName'] = $middleName;
+        $data['surname'] = $surname;
         User::create($data);
 
         return to_route('users');
@@ -46,6 +58,7 @@ class UserController extends Controller
     {
         return Inertia::render('user/Show', ['user' => $user]);
     }
+
     public function edit(User $user)
     {
         return Inertia::render('user/Edit', [
@@ -58,7 +71,6 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-
         //dd($user,$request);
         //$user = user::findOrFail($id);
         $data = $request->validated();
@@ -66,6 +78,29 @@ class UserController extends Controller
 
         return to_route('users');
     }
+
+    public function avatar(AvatarUserRequest $request, User $user)
+    {
+        $request->validated();
+
+        if (isset($user->avatar)) {
+            $extension = explode('/', $user->avatar);
+            $avatar = end($extension);
+
+            $user->update(['avatar' => null]);
+            return [
+                'code' => 200,
+                'message' => 'Avatar updated successfully',
+                'url' => '',
+                'name' => $avatar,
+            ];
+        }
+        return [
+            'code' => 404,
+            'message' => 'Avatar not found',
+        ];
+    }
+
     public function destroy(User $user)
     {
         $user = User::findOrFail($user->id);

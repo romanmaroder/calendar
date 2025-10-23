@@ -12,6 +12,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/users/{user}',[UserController::class,'update'] )->name('users.update');
     Route::put('users/restore/{id}',[UserController::class,'restore'])->name('users.restore');
     Route::put('users/multiRestore/{ids}',[UserController::class,'multiRestore'])->name('users.multiRestore');
+    Route::put('/avatar/{user}', [UserController::class, 'avatar'])->name('avatar');
     Route::delete('users/trash/{ids}', [UserController::class, 'trash'])->name('trash');
     Route::delete('users/multiDestroy/{ids}', [UserController::class, 'multiDestroy'])->name('users.multiDestroy');
     Route::delete('/users/destroy/{user}',[UserController::class,'destroy'] )->name('users.destroy');

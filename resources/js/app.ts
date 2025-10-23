@@ -218,7 +218,7 @@ createInertiaApp({
                     //...
                 ripple: true,
                 theme: {
-                    preset: MyPreset,
+                    preset: Aura,
                     options: {
                         prefix: 'p',
                         //darkModeSelector: 'system',

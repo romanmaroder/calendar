@@ -29,6 +29,7 @@ class AvatarUploadController extends Controller
 
     public function delete(UploadAvatarRequest $request)
     {
+
         $request->validated();
         if ($request['name'] !=null) {
             Storage::disk('public')->delete('/avatars/' . $request['name']);

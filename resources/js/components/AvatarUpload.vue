@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import { ref } from 'vue';
 import { route } from 'ziggy-js';
@@ -38,14 +36,14 @@ const showUploadProgress = ref(false);
 const processingUpload = ref(false);
 const message = ref('');
 
-const uploadImage = (e: Event) => {
+const uploadImage = (event) => {
     if (avatar.value) {
         showUploadProgress.value = true;
         processingUpload.value = true;
         uploadPercent.value = 0;
 
         emit('updateAvatar', { url, message });
-        const file = e.target.files[0];
+        const file = event.files[0];
         const formData = new FormData();
         formData.append('avatar', file);
 
@@ -64,64 +62,116 @@ const uploadImage = (e: Event) => {
                 processingUpload.value = false;
             })
             .catch(function (error) {
-                message.value = error.message;
+                console.log(error);
+                message.value = error.response.data.message;
             });
     }
 };
 
 const deleteAvatar = () => {
-    emit('updateAvatar', {url,message});
+    emit('updateAvatar', { url, message });
     axios
         .put(route(props.updateUrl, props.entity.id), {
             avatar: props.entity.avatar,
             id: props.entity.id,
         })
         .then((res) => {
+            console.log(res);
             url.value = res.data.url;
             message.value = res.data.message;
             props.entity.avatar = res.data.url;
             names.value = res.data.name;
-            resetUpload()
+            resetUpload();
         });
-
 };
 
 const resetUpload = () => {
-    console.log(props.entity);
     axios.post('/api/delete', { name: names.value }).then((res) => {
         url.value = res.data.url;
         message.value = res.data.message;
     });
+    uploadPercent.value = 0;
 };
-
 
 </script>
 
 <template>
-    <Label for="avatar" class="flex cursor-pointer flex-col items-center gap-2">
-        <span
-            v-if="entity.avatar"
-            @click.prevent="deleteAvatar"
-            class="flex flex-col items-center font-medium text-gray-600 transition-colors hover:text-gray-500"
-        >
-            <img v-if="entity.avatar" :src="entity.avatar" :alt="names" class="max-h-[150px]" />
-            <img v-else :src="url" :alt="names" class="max-h-[150px]" />
-            <span class="mt-2">{{ textDelete }}</span>
-        </span>
+    <div class="card flex flex-col items-start gap-6">
+        <FileUpload
+            id="avatar"
+            ref="avatar"
+            name="avatar"
+            mode="basic"
+            auto
+            choose-label="Avatar"
+            chooseIcon="pi pi-camera"
+            customUpload
+            @select="uploadImage"
+            :pt="{
+                root: {
+                    class: '!w-full',
+                },
+                pcChooseButton: {
+                    root: {
+                        class:
+                        '!flex-col !w-full !p-1.5 !text-sm !font-light !gap-0 ',
+                    },
+                },
+            }"
+            v-if="!url && !props.entity.avatar"
+        />
+    </div>
 
-        <span
-            v-else-if="url"
-            @click.prevent="resetUpload"
-            class="flex flex-col items-center font-medium text-gray-600 transition-colors hover:text-gray-500"
-        >
-            <img :src="url" :alt="names" />
-            <span class="mt-2">{{ textDelete }}</span>
-        </span>
-        <span v-else class="flex flex-col items-center font-medium text-gray-600 transition-colors hover:text-gray-500">
-            <img src="../../../resources/img/no_avatar_big.png" alt="avatar" />
-            <span v-if="showUploadProgress">Uploading: {{ uploadPercent }} %</span>
-            <span v-else class="mt-2">{{ textAdd }}</span>
-        </span>
-    </Label>
-    <Input id="avatar" type="file" ref="avatar" name="avatar" @change="uploadImage" class="hidden" />
+    <p v-if="url" class="flex flex-row items-center gap-1">
+        <Avatar icon="pi pi-refresh"
+                class="mr-2 !w-full !bg-[#10B981] !text-base !text-white dark:!text-[#191F20] !font-light" size="large"
+                @click="resetUpload" :pt="{
+                    icon:{
+                        class:'!text-lg'
+                    }
+                }"/>
+        <Avatar :image="url" class="mr-2" size="large">
+            <div class="card flex justify-center">
+                <Image
+                    :src="url"
+                    :alt="names"
+                    preview
+                    :pt="{
+                        root: {
+                            class: '!max-h-[3rem] !max-w-[250px]',
+                        },
+                        image: {
+                            class: 'rounded-md',
+                        },
+                    }"
+                />
+            </div>
+        </Avatar>
+    </p>
+    <p v-else-if="entity.avatar" class="flex flex-row items-center gap-1">
+        <Avatar icon="pi pi-trash"
+                class="mr-2 !w-full !bg-[#10B981] !text-base !text-white dark:!text-[#191F20] !font-light"
+                size="large" @click="deleteAvatar" :pt="{
+                    icon:{
+                        class:'!text-lg'
+                    }
+                }"/>
+        <Avatar :image="props.entity.avatar" class="mr-2" size="large">
+            <div class="card flex justify-center">
+                <Image
+                    :src="props.entity.avatar"
+                    :alt="names"
+                    preview
+                    :pt="{
+                        root: {
+                            class: '!max-h-[3rem] !max-w-[250px]',
+                        },
+                        image: {
+                            class: 'rounded-md',
+                        },
+                    }"
+                />
+            </div>
+        </Avatar>
+    </p>
 </template>

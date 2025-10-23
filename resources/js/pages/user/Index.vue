@@ -3,20 +3,27 @@ import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { ref } from 'vue';
+import { provide, ref } from 'vue';
 import Table from '@/components/user/Table.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Users', href: '/users' }];
 
-defineProps({
+const props = defineProps({
     users: {
         type: Object,
         required: true,
     },
+    branch: {
+        type: Object,
+    },
     count: {
         type: Number,
-    }
+    },
 });
+
+// Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
+const listOfBranches: object = ref(props.branch);
+provide('listOfBranches', listOfBranches);
 
 const total = ref();
 const counter = (num: number) => {
@@ -27,11 +34,13 @@ const counter = (num: number) => {
 <template>
     <Head title="Users" />
     <Layout :breadcrumbs="breadcrumbs">
-        <Toast :pt="{
+        <Toast
+            :pt="{
                 root: {
                     class: '!max-w-max',
                 },
-            }"/>
+            }"
+        />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="client-cards-description">
                 Карточки клиентов на базе номеров мобильных телефонов. Всего карточек:
@@ -46,13 +55,13 @@ const counter = (num: number) => {
                         remove: true,
                     }"
                     :routes="{
-                    create: 'users.store',
-                    update: 'users.update',
-                    delete: 'users.destroy',
-                    multiDestroy: 'users.multiDestroy',
-                    restore: 'users.restore',
-                    multiRestore: 'multiRestore',
-                }"
+                        create: 'users.store',
+                        update: 'users.update',
+                        delete: 'users.destroy',
+                        multiDestroy: 'users.multiDestroy',
+                        restore: 'users.restore',
+                        multiRestore: 'multiRestore',
+                    }"
                     @count="counter"
                 />
             </div>

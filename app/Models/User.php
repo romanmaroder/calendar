@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Branch\Branch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -30,6 +32,7 @@ class User extends Authenticatable
         'comment',
         'birthday',
         'email',
+        'branch_id',
         'password',
     ];
 
@@ -43,6 +46,15 @@ class User extends Authenticatable
         'remember_token',
         'email_verified_at'
     ];
+
+    /**
+     * Получить филиал, которому принадлежит пользователь.
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
 
     /**
      * Get the attributes that should be cast.

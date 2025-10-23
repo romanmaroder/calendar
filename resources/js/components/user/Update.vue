@@ -2,10 +2,11 @@
 import AvatarUpload from '@/components/AvatarUpload.vue';
 import Icon from '@/components/Icon.vue';
 import InputError from '@/components/InputError.vue';
+import { useLabelName } from '@/composables/useLabelName';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { ref } from 'vue';
-import { useDate } from '@/composables/useDate';
+import { inject, ref } from 'vue';
+import { getFullname } from '@/composables/useFullname';
 
 const props = defineProps({
     entity: {
@@ -27,6 +28,10 @@ const props = defineProps({
     },
 });
 
+/*Поменять Label на title в пропсах*/
+
+const branches: any = inject('listOfBranches');
+
 const emit = defineEmits(['UpdateItem']);
 
 const wait = (time = 500) => new Promise((resolve) => setTimeout(resolve, time));
@@ -37,6 +42,7 @@ const visible = ref(false);
 const nameInput = ref();
 const phoneInput = ref<HTMLInputElement | null>(null);
 const emailInput = ref<HTMLInputElement | null>(null);
+const branchInput = ref<HTMLInputElement | null>(null);
 const birthdayInput = ref<HTMLInputElement | null>(null);
 
 const form = useForm({
@@ -47,6 +53,7 @@ const form = useForm({
     middleName: props.entity.middleName,
     phone: props.entity.phone,
     email: props.entity.email,
+    branch_id: props.entity.branch_id,
     birthday: props.entity.birthday,
     comment: props.entity.comment,
     created_at: props.entity.created_at,
@@ -99,19 +106,19 @@ const onUpdateAvatar = (data: any) => {
     toast.add({ severity: 'info', summary: 'Info', detail: data.message, life: 3000 });
 };
 
-const resize =()=>{
+const resize = () => {
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 640) {
             visible.value = false;
         }
-    })
+    });
 };
 resize();
 
-const { getYyMmDd } = useDate();
+const { dateLabelName, selectLabelName } = useLabelName();
 
-const setDate = (date: Date) => {
-    form.birthday = getYyMmDd(date);
+const setDate = (date: any): void => {
+    form.birthday = dateLabelName(date);
 };
 </script>
 
@@ -121,7 +128,7 @@ const setDate = (date: Date) => {
         :header="form.surname"
         :blockScroll="true"
         position="right"
-        closeIcon="pi pi-chevron-right text-green-500"
+        closeIcon="pi pi-chevron-right"
         :pt="{
             header: {
                 class: '!py-[0.5rem]',
@@ -131,9 +138,23 @@ const setDate = (date: Date) => {
             },
         }"
     >
-        <form class="p-3.5 dark:bg-black">
+        <template #header>
+            <div class="flex items-center gap-2">
+                <Avatar v-if="form.avatar" :image=form.avatar shape="circle" :pt="{
+                    image:{
+                        class: 'object-cover'
+                    }
+                }"/>
+                <Avatar v-else  icon="pi pi-user" shape="circle" />
+                <span v-if="form.name || form.surname" class="font-bold inline-block w-[150px] truncate">
+                    {{ getFullname({name: form.name,surname: form.surname}) }}
+                </span>
+                <span v-else class="font-bold inline-block w-[150px] line-clamp-1">{{ label}}</span>
+            </div>
+        </template>
+        <form class="p-3.5">
             <div class="grid gap-5">
-                <Inplace class="flex items-center justify-center" :pt="{ display: { class: '!inline-flex !flex-col !items-center' } }">
+<!--                <Inplace class="flex items-center justify-center" :pt="{ display: { class: '!inline-flex !flex-col !items-center' } }">
                     <template #display v-if="!form.avatar">
                         Add Avatar
                         <Icon name="Camera" class="h-[28px] w-[28px]" />
@@ -144,7 +165,7 @@ const setDate = (date: Date) => {
                     </template>
                     <template #content="{ closeCallback }">
                         <div class="relative inline-flex max-h-[200px] max-w-[180px] items-center gap-2 rounded-[4px] bg-[#83BCE1] p-4 shadow-md">
-                            <AvatarUpload
+                            <AvatarUploadOld
                                 text-add="Добавить фото"
                                 text-delete="Удалить фото"
                                 :entity="entity"
@@ -156,7 +177,7 @@ const setDate = (date: Date) => {
                             <Button icon="pi pi-times" text severity="danger" @click="closeCallback" class="!absolute !top-[0px] !right-[0px]" />
                         </div>
                     </template>
-                </Inplace>
+                </Inplace>-->
                 <div class="mt-2 space-y-4">
                     <FloatLabel variant="on" class="">
                         <InputText
@@ -226,7 +247,21 @@ const setDate = (date: Date) => {
                         <label for="email" class="font-light!">Email:</label>
                     </FloatLabel>
                     <InputError :message="form.errors.email" class="-mt-2 mb-2" />
-
+                    <FloatLabel variant="on" class="">
+                        <Select
+                            v-model="form.branch_id"
+                            id="branch"
+                            optionLabel="name"
+                            :options="branches"
+                            option-value="id"
+                            class="h-[28px] w-full"
+                            aria-labelledby="branch"
+                            size="small"
+                            fluid
+                            ref="branchInput"
+                        />
+                        <label for="branch" class="font-light!">{{ selectLabelName(branches, form.branch_id) || 'Филиал' }}</label>
+                    </FloatLabel>
                     <FloatLabel variant="on">
                         <DatePicker
                             v-model="form.birthday"
@@ -253,9 +288,13 @@ const setDate = (date: Date) => {
                     </FloatLabel>
                     <InputError :message="form.errors.comment" class="mt-2 mb-2" />
                 </div>
+                <div class="mt-2">
+                    <AvatarUpload :entity="entity" text-add="Добавить фото" text-delete="Удалить фото" updateUrl="avatar"
+                                   @updateAvatar="onUpdateAvatar" />
+                </div>
                 <div class="">
                     <div class="mt-2 flex flex-col justify-end gap-2 sm:flex-row md:mt-0">
-                        <Button severity="success" class="h-[30px] cursor-pointer" type="submit" @click="submit" raised>
+                        <Button class="h-[30px] cursor-pointer" type="submit" @click="submit" raised>
                             <Icon name="Save" />
                             {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
                         </Button>

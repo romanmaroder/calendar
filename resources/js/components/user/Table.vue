@@ -15,6 +15,8 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { onMounted, onUpdated, ref } from 'vue';
 import { usePhoneLink } from '@/composables/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
+import { route } from '../../../../vendor/tightenco/ziggy';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     entities: {
@@ -135,6 +137,7 @@ const filterFields = () => {
                             :route="routes.create"
                             @create-item="onLoadItem"
                         />
+                        <Button as="a" label="Create" variant="link" :href="route('users.create') " />
                     </span>
                     <span class="hidden sm:table-cell">
                         <CreateDialog v-if="tools.create"
@@ -260,6 +263,11 @@ const filterFields = () => {
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
                     </p>
+                    <p class="sm:hidden">
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.branch.name
+                            }}</small>
+                    </p>
                     <p class="hidden sm:table-cell">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
                     </p>
@@ -353,6 +361,11 @@ const filterFields = () => {
                         :href="'tel:' + getPhone(slotProps.data.phone)"
                         rel="noopener"
                     />
+                    <p class="">
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.branch.name
+                            }}</small>
+                    </p>
                     <p class="2xl:hidden">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.email }}</small>
                     </p>

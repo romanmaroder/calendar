@@ -59,10 +59,10 @@ const getStatusLabel = (status: any) => {
 <template>
     <Drawer
         v-model:visible="visible"
-        :header="getFullname(entity.name, entity.surname)"
+        :header="getFullname({name:entity.name, surname:entity.surname})"
         :blockScroll="true"
         position="bottom"
-        closeIcon="pi pi-chevron-down text-sky-500"
+        closeIcon="pi pi-chevron-down"
         :pt="{
             root:{
                 class:'sm:hidden! h-[100vh]!'
@@ -84,7 +84,7 @@ const getStatusLabel = (status: any) => {
                 >
                     <AvatarImage v-if="showAvatar" :src="entity.avatar" :alt="entity.name" />
                     <AvatarFallback class="rounded-lg text-black dark:text-white min-h-[20vh]">
-                        {{ getInitials(getFullname(entity.name, entity.surname)) }}
+                        {{ getInitials(getFullname({name:entity.name, surname:entity.surname})) }}
                     </AvatarFallback>
                 </Avatar>
                 <div

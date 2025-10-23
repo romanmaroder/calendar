@@ -31,6 +31,7 @@ class UpdateUserRequest extends FormRequest
             'phone' => 'required|string|max:255',
             'comment' => 'nullable|string|max:255',
             'birthday' => 'nullable|string|max:255',
+            'branch_id' => 'nullable|integer',
             'email' => ['string','lowercase','email','max:255',
                 Rule::unique('clients')->ignore($this->user)
             ],

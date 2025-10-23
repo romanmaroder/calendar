@@ -31,6 +31,7 @@ class StoreUserRequest extends FormRequest
             'comment' => 'nullable|string|max:255',
             'birthday'=>'nullable|string',
             'email' => 'nullable|string|lowercase|email|max:255|unique:'.User::class,
+            'branch_id' => 'nullable|integer',
         ];
     }
 }
