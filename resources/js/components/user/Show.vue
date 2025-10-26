@@ -80,7 +80,7 @@ const getStatusLabel = (status: any) => {
     >
             <div class="flex flex-col w-full items-center justify-center gap-y-5">
                 <Avatar
-                    class="h-[100%] w-[89vw] overflow-hidden rounded-sm"
+                    class="h-[100%] w-[65vw] overflow-hidden rounded-sm"
                 >
                     <AvatarImage v-if="showAvatar" :src="entity.avatar" :alt="entity.name" />
                     <AvatarFallback class="rounded-lg text-black dark:text-white min-h-[20vh]">

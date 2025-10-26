@@ -44,6 +44,7 @@ const phoneInput = ref<HTMLInputElement | null>(null);
 const emailInput = ref<HTMLInputElement | null>(null);
 const branchInput = ref<HTMLInputElement | null>(null);
 const birthdayInput = ref<HTMLInputElement | null>(null);
+const av = ref<HTMLInputElement | null>(null);
 
 const form = useForm({
     id: props.entity.id,
@@ -102,7 +103,7 @@ const closeModal = () => {
     visible.value = false;
 };
 const onUpdateAvatar = (data: any) => {
-    form.avatar = data.url;
+    form.avatar = data.src;
     toast.add({ severity: 'info', summary: 'Info', detail: data.message, life: 3000 });
 };
 
@@ -154,30 +155,6 @@ const setDate = (date: any): void => {
         </template>
         <form class="p-3.5">
             <div class="grid gap-5">
-<!--                <Inplace class="flex items-center justify-center" :pt="{ display: { class: '!inline-flex !flex-col !items-center' } }">
-                    <template #display v-if="!form.avatar">
-                        Add Avatar
-                        <Icon name="Camera" class="h-[28px] w-[28px]" />
-                    </template>
-                    <template #display v-else>
-                        Update Avatar
-                        <Icon name="Camera" class="h-[28px] w-[28px]" />
-                    </template>
-                    <template #content="{ closeCallback }">
-                        <div class="relative inline-flex max-h-[200px] max-w-[180px] items-center gap-2 rounded-[4px] bg-[#83BCE1] p-4 shadow-md">
-                            <AvatarUploadOld
-                                text-add="Добавить фото"
-                                text-delete="Удалить фото"
-                                :entity="entity"
-                                updateUrl="avatar"
-                                @updateAvatar="onUpdateAvatar"
-                            />
-
-                            <InputError :message="form.errors.avatar" class="my-2" />
-                            <Button icon="pi pi-times" text severity="danger" @click="closeCallback" class="!absolute !top-[0px] !right-[0px]" />
-                        </div>
-                    </template>
-                </Inplace>-->
                 <div class="mt-2 space-y-4">
                     <FloatLabel variant="on" class="">
                         <InputText
@@ -289,8 +266,13 @@ const setDate = (date: any): void => {
                     <InputError :message="form.errors.comment" class="mt-2 mb-2" />
                 </div>
                 <div class="mt-2">
-                    <AvatarUpload :entity="entity" text-add="Добавить фото" text-delete="Удалить фото" updateUrl="avatar"
-                                   @updateAvatar="onUpdateAvatar" />
+                    <AvatarUpload :entity="form"
+                                  url="avatar"
+                                  preview
+                                  orientation="portrait"
+                                  size="small"
+                                  ref="av"
+                                  @updateAvatar="onUpdateAvatar" />
                 </div>
                 <div class="">
                     <div class="mt-2 flex flex-col justify-end gap-2 sm:flex-row md:mt-0">

@@ -263,7 +263,7 @@ resize();
                     <InputError :message="form.errors.comment" class="mt-1 mb-2" />
                 </div>
                 <div class="mt-2">
-                    <AvatarUpload text-add="Добавить фото" text-delete="Удалить фото" updateUrl="avatar" @updateAvatar="onUpdateAvatar" />
+                    <AvatarUpload updateUrl="avatar" @updateAvatar="onUpdateAvatar" />
                 </div>
                 <div class="">
                     <div class="mt-2 flex flex-col justify-end gap-2 sm:flex-row md:mt-0">

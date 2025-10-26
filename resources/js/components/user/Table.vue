@@ -16,7 +16,8 @@ import { onMounted, onUpdated, ref } from 'vue';
 import { usePhoneLink } from '@/composables/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { route } from '../../../../vendor/tightenco/ziggy';
-import { router } from '@inertiajs/vue3';
+import { getInitials, useInitials } from '@/composables/useInitials';
+import { getFullname } from '@/composables/useFullname';
 
 const props = defineProps({
     entities: {
@@ -61,8 +62,6 @@ const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
 
-
-
 const { getPhone } = usePhoneLink();
 const { useSingleElement, useMultipleElements } = workingWithTableItems();
 
@@ -82,14 +81,14 @@ onUpdated(() => {
 });
 
 const onDeleteItem = (id: any) => {
-    useSingleElement(items,id);
+    useSingleElement(items, id);
 };
 const onLoadItem = () => {
     items.value = props.entities.data;
 };
 
 const onRestoreItem = (id: any) => {
-    useSingleElement(items,id);
+    useSingleElement(items, id);
 };
 
 const onRestoreSelectedItems = () => {
@@ -120,7 +119,6 @@ const filterFields = () => {
        });
    }
 };*/
-
 </script>
 
 <template>
@@ -137,17 +135,20 @@ const filterFields = () => {
                             :route="routes.create"
                             @create-item="onLoadItem"
                         />
-                        <Button as="a" label="Create" variant="link" :href="route('users.create') " />
+                        <Button as="a" label="Create" :href="route('users.create')" size="small" class="mx-2" />
                     </span>
-                    <span class="hidden sm:table-cell">
-                        <CreateDialog v-if="tools.create"
-                                      icon-name="UserRoundPlus"
-                                      label="New"
-                                      title="New user"
-                                      :route="routes.create"
-                                      @create-item="onLoadItem"/>
+                    <span class="hidden sm:flex">
+                        <CreateDialog
+                            v-if="tools.create"
+                            icon-name="UserRoundPlus"
+                            label="New"
+                            title="New user"
+                            :route="routes.create"
+                            @create-item="onLoadItem"
+                        />
+                        <Button as="a" label="Create" :href="route('users.create')" size="small" class="mx-2" />
                     </span>
-                    <span class="hidden sm:table-cell">
+                    <span class="hidden sm:flex">
                         <MultiRestore
                             v-if="tools.restore"
                             :entity="selectedItems"
@@ -158,7 +159,7 @@ const filterFields = () => {
                             :disabled="!selectedItems || !selectedItems.length"
                         />
                     </span>
-                    <span class="hidden sm:table-cell">
+                    <span class="hidden sm:flex">
                         <MultiDeleteDialog
                             :entity="selectedItems"
                             icon-name=""
@@ -183,7 +184,7 @@ const filterFields = () => {
                     }"
                 >
                     <p class="text-center text-gray-500">Фильтр для модели User в разработке</p>
-                    <Filter :entities="entities"  class-name="grid items-end gap-5 mt-2 !hidden" />
+                    <Filter :entities="entities" class-name="grid items-end gap-5 mt-2 !hidden" />
                 </Drawer>
                 <Button icon="pi pi-search" @click="visible = true" size="small" />
             </template>
@@ -199,8 +200,7 @@ const filterFields = () => {
             :paginator="pagination"
             :rows="10"
             filterDisplay="menu"
-            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'created_at',
-            'birthday']"
+            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'created_at', 'birthday']"
             sortMode="multiple"
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -248,14 +248,31 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <img v-if="slotProps.data.avatar" :src="slotProps.data.avatar" :alt="slotProps.data.avatar" class="max-w-[48px] rounded" />
-                    <img v-else class="max-w-[48px] rounded" src="../../../../public/no_avatar_big.png" alt="" />
+                    <Avatar v-if="!slotProps.data.avatar"
+                        size="large"
+                            :label="slotProps.data.avatar ? slotProps.data.avatar :
+                             getInitials(getFullname({name:slotProps.data.name, surname:slotProps.data.surname}))"
+                    />
+                    <Image v-else
+                        :src="slotProps.data.avatar "
+                        :alt="slotProps.data.avatar"
+                        preview
+                        :pt="{
+                        image: {
+                            class: 'max-w-[48px] max-h-[48px] rounded-md',
+                        },
+                    }"
+                    />
+
+<!--                    <img v-if="slotProps.data.avatar"
+                         :src="slotProps.data.avatar"
+                         :alt="slotProps.data.avatar" class="max-w-[48px] rounded" />
+                    <img v-else class="max-w-[48px] rounded" src="/no_avatar_big.png" alt="" />-->
                 </template>
             </Column>
             <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
-                    <div
-                        class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
+                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
                         {{ slotProps.data.name }}
                         {{ slotProps.data.middleName }}
                         {{ slotProps.data.surname }}
@@ -264,9 +281,7 @@ const filterFields = () => {
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
                     </p>
                     <p class="sm:hidden">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
-                                slotProps.data.branch.name
-                            }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.branch.name }}</small>
                     </p>
                     <p class="hidden sm:table-cell">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
@@ -325,12 +340,7 @@ const filterFields = () => {
                                     :route="routes.update"
                                     @update-item="onLoadItem"
                                 />
-                                <Show
-                                    :entity="slotProps.data"
-                                    icon-name="UserSearch"
-                                    label=""
-                                    :route="routes.show"
-                                />
+                                <Show :entity="slotProps.data" icon-name="UserSearch" label="" :route="routes.show" />
                                 <DeleteDialog
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
@@ -362,9 +372,7 @@ const filterFields = () => {
                         rel="noopener"
                     />
                     <p class="">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
-                                slotProps.data.branch.name
-                            }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.branch.name }}</small>
                     </p>
                     <p class="2xl:hidden">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.email }}</small>
@@ -410,7 +418,7 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <span class="flex flex-row items-start justify-start flex-wrap">
+                    <span class="flex flex-row flex-wrap items-start justify-start">
                         <UpdateDialog
                             :key="slotProps.data.id"
                             v-if="tools.update"
@@ -420,13 +428,7 @@ const filterFields = () => {
                             :route="routes.update"
                             @update-item="onLoadItem"
                         />
-                        <ShowDialog
-                            :key="slotProps.data.id"
-                            :entity="slotProps.data"
-                            icon-name="UserSearch"
-                            label="Show item"
-                            :route="routes.show"
-                        />
+                        <ShowDialog :key="slotProps.data.id" :entity="slotProps.data" icon-name="UserSearch" label="Show item" :route="routes.show" />
                         <Restore
                             v-if="tools.restore"
                             :id="slotProps.data.id"
