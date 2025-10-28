@@ -20,6 +20,13 @@ const props = defineProps({
     preview: {
         type: Boolean,
     },
+    imgPosition: {
+        type: String,
+        validator(value: string) {
+            return ['top', 'bottom', 'left', 'right'].includes(value);
+        },
+        default: 'bottom left',
+    },
     size: {
         type: String,
         validator(value: string) {
@@ -53,6 +60,7 @@ const uploadImage = (event: any) => {
     uploadPercent.value = 0;
 
     emit('updateAvatar', { src, message });
+
     const file = event.files[0];
     const formData = new FormData();
     formData.append('avatar', file);
@@ -67,7 +75,6 @@ const uploadImage = (event: any) => {
             src.value = res.data.url;
             names.value = res.data.name;
             message.value = res.data.message;
-
             showUploadProgress.value = false;
         })
         .catch(function (error) {
@@ -129,7 +136,8 @@ const resetUpload = () => {
                 },
                 pcChooseButton: {
                     root: {
-                        class: '!flex-col !w-full !p-1.5 !text-sm !font-light !gap-0 ',
+                        class:
+                        '!w-full !text-sm !shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),0_2px_2px_0_rgba(0,0,0,0.14),0_1px_5px_0_rgba(0,0,0,0.12)]',
                     },
                 },
             }"
@@ -162,43 +170,52 @@ const resetUpload = () => {
                     'max-w-3xs': props.size == 'small',
                     'max-w-xs': props.size == 'medium',
                     'max-w-md': props.size == 'large',
+                    'gap-1':props.imgPosition == 'left' || 'right'
                 },
             ],
         ]"
     >
         <Avatar
             :icon="src ? 'pi pi-refresh' : 'pi pi-trash'"
-            class="mr-2 !w-full cursor-pointer !bg-[#10B981] !text-base !font-light !text-white hover:!bg-[#059669] dark:!text-[#191F20]"
-            size="large"
+            :class="['!w-full !h-[2.35rem] cursor-pointer !bg-[#10B981] !text-sm !text-white !shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),0_2px_2px_0_rgba(0,0,0,0.14),0_1px_5px_0_rgba(0,0,0,0.12)] hover:!bg-[#059669]  dark:!text-[#191F20] ']"
+            size="normal"
             @click="src ? resetUpload() : deleteAvatar()"
             :pt="{
                 icon: {
-                    class: '!text-lg',
+                    class: '',
                 },
             }"
         />
         <div
             v-if="props.preview && props.orientation == 'portrait'"
             :class="[
-                cn('mt-2 overflow-hidden rounded-sm', props.class),
+                'overflow-hidden rounded-sm',
                 {
                     'max-w-full': props.size == 'full',
                     'max-w-3xs': props.size == 'small',
-                    'max-w-xs': props.size == 'xs',
+                    'max-w-xs': props.size == 'medium',
                     'max-w-md': props.size == 'large',
+                    'order-first': props.imgPosition == 'top',
+                    'order-last': props.imgPosition == 'bottom',
                 },
             ]"
         >
-            <Image :src="src ? src : props.entity.avatar" :alt="names" preview
-                   :pt="{
-                        image: {
-                            class: 'rounded-md',
-                        },
-                    }"/>
+            <Image
+                :src="src ? src : props.entity.avatar"
+                :alt="names"
+                preview
+                :pt="{
+                    image: {
+                        class: 'rounded-md',
+                    },
+                }"
+            />
         </div>
 
         <Avatar
-            v-if="props.preview && props.orientation == 'landscape'" >
+            v-if="props.preview && props.orientation == 'landscape'"
+            :class="{ 'order-first': props.imgPosition == 'left', 'order-last': props.imgPosition == 'right' }"
+        >
             <div class="grid">
                 <Image
                     :src="src ? src : props.entity.avatar"
