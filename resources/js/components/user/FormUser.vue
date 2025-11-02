@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import AvatarUpload from '@/components/AvatarUpload.vue';
 import InputError from '@/components/InputError.vue';
+import { getFullname } from '@/composables/useFullname';
 import { useLabelName } from '@/composables/useLabelName';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, ref, watch } from 'vue';
-import AvatarUpload from '@/components/AvatarUpload.vue';
-import { getFullname } from '@/composables/useFullname';
 
 const branches: any = inject('listOfBranches');
 const routes: any = inject('formRoutesProps');
@@ -36,6 +36,7 @@ const form = useForm({
     birthday: props.user.birthday ?? '',
     comment: props.user.comment ?? '',
     created_at: props.user.created_at ?? '',
+    password: props.user.password ?? '',
 });
 
 const submit = (e: Event) => {
@@ -128,7 +129,12 @@ watch(form, () => {
 <template>
     <form class="flex h-full flex-1 flex-col gap-4 rounded-xl sm:flex-row sm:p-4 dark:bg-[#18181B]">
         <div class="md:border-sidebar-border/70 dark:sm:border-sidebar-border relative hidden flex-none rounded-xl sm:block sm:w-56">
-            <AvatarUpload :url="routes.upload" orientation="landscape" @updateAvatar="onUpdateAvatar" preview img-position="top" />
+            <div v-if="$slots.avatarColumn">
+                <slot name="avatarColumn" />
+            </div>
+            <div v-else>
+                <AvatarUpload :url="routes?.upload" orientation="portrait" @updateAvatar="onUpdateAvatar" preview img-position="bottom" />
+            </div>
         </div>
         <div class="grid flex-1 gap-4 sm:grid-cols-2 md:grid-flow-row-dense md:grid-cols-2 md:grid-rows-3">
             <div
@@ -190,7 +196,7 @@ watch(form, () => {
                 <InputError :message="form.errors.branch_id" class="-mt-2 mb-2" />
             </div>
             <div
-                class="sm:border-sidebar-border/70 dark:sm:border-sidebar-border relative grid content-start gap-3 overflow-hidden rounded-xl p-2 md:col-span-1 md:row-span-1 md:border"
+                class="sm:border-sidebar-border/70 dark:sm:border-sidebar-border relative grid content-start gap-3 overflow-hidden rounded-xl p-2 sm:border md:col-span-1 md:row-span-1"
             >
                 <FloatLabel variant="on">
                     <InputMask
@@ -237,11 +243,30 @@ watch(form, () => {
                     <label class="font-light!" for="comment">Заметка</label>
                 </FloatLabel>
                 <InputError :message="form.errors.comment" class="mt-1 mb-2" />
+                <FloatLabel variant="on" class="hidden">
+                    <Password
+                        id="password"
+                        v-model="form.password"
+                        size="small"
+                        class="hidden"
+                        toggleMask
+                        :pt="{
+                            root:'!w-full !hidden',
+                            pcInputText: { root: { class: '!w-full !hidden' } }
+                        }"
+                    />
+                    <label for="password" class="hidden">Password</label>
+                </FloatLabel>
             </div>
             <div
                 class="md:border-sidebar-border/70 dark:sm:border-sidebar-border relative grid content-start gap-2 overflow-hidden rounded-xl p-2 sm:col-span-2 sm:hidden md:col-span-2 md:row-span-1 md:border"
             >
-                <AvatarUpload :url="routes.upload" orientation="landscape" @updateAvatar="onUpdateAvatar" preview img-position="top" />
+                <div v-if="$slots.avatarRow">
+                    <slot name="avatarRow" />
+                </div>
+                <div v-else>
+                    <AvatarUpload :url="routes?.upload" orientation="landscape" @updateAvatar="onUpdateAvatar" img-position="left" preview />
+                </div>
             </div>
             <div
                 class="relative grid grid-flow-row content-evenly gap-2 overflow-hidden rounded-xl p-2 sm:col-span-2 sm:row-span-1 sm:grid-flow-col sm:self-start md:justify-self-end"

@@ -8,7 +8,10 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\Branch\Branch;
 use App\Models\User;
+use App\Traits\HasControllerRoutes;
 use Illuminate\Http\Request;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -17,37 +20,32 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    use HasControllerRoutes;
+
     public function index()
     {
         $count = User::count();
         $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
         return Inertia::render(
             'user/Index',
-            ['users' => User::with('branch')->paginate($count),
+            [
+                'users' => User::with('branch')->paginate($count),
                 'count' => $count,
-                'branch' => $branch]
+                'branch' => $branch
+            ]
         );
     }
 
     public function create()
     {
         $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
-        return Inertia::render('user/Create',['branch' => $branch]);
+        return Inertia::render('user/Create', ['branch' => $branch, 'routing' => $this->getControllerRoutes()]);
     }
 
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-        $password = Hash::make(12345678);
-        $name = Str::of($data['name'])->ucfirst();
-        $middleName = Str::of($data['middleName'])->ucfirst();
-        $surname = Str::of($data['surname'])->ucfirst();
-        $data['password'] = $password;
-        $data['name'] = $name;
-        $data['middleName'] = $middleName;
-        $data['surname'] = $surname;
         User::create($data);
-
         return to_route('users');
     }
 
@@ -71,8 +69,6 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //dd($user,$request);
-        //$user = user::findOrFail($id);
         $data = $request->validated();
         $user->update($data);
 
@@ -138,7 +134,7 @@ class UserController extends Controller
     {
         $count = User::onlyTrashed()->count();
         return Inertia::render('user/Archive', [
-            'users' => User::onlyTrashed()->latest('created_at')->paginate($count),
+            'users' => User::onlyTrashed()->with('branch')->latest('created_at')->paginate($count),
             'count' => $count,
         ]);
     }

@@ -3,17 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Casts\Ucfirst;
 use App\Models\Branch\Branch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable,SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected string $field = 'field';
     protected string $header = 'header';
@@ -35,6 +37,7 @@ class User extends Authenticatable
         'branch_id',
         'password',
     ];
+    protected  $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -55,6 +58,18 @@ class User extends Authenticatable
         return $this->belongsTo(Branch::class);
     }
 
+    /**
+     * Если значение не передано или пусто — используем дефолтное
+     * @param $value
+     */
+    public function setPasswordAttribute($value): void
+    {
+        $default = config('auth.defaults.password', 'password1');
+        $hashed = Hash::make(empty($value) ? $default : $value);
+
+        $this->attributes['password'] = $hashed;
+        $this->syncOriginal('password'); // важно для сохранения
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -71,6 +86,9 @@ class User extends Authenticatable
             'blacklist' => 'boolean',
             'prepayment' => 'boolean',
             'discount' => 'integer',
+            'name' => Ucfirst::class,
+            'middleName' => Ucfirst::class,
+            'surname' => Ucfirst::class
         ];
     }
 
