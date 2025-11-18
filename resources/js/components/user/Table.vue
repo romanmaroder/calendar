@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import CreateDialog from '@/components/user/CreateDialog.vue';
-import Create from '@/components/user/Create.vue';
+import Filter from '@/components/filters/user/Filter.vue';
+import Icon from '@/components/Icon.vue';
 import DeleteDialog from '@/components/user/DeleteDialog.vue';
 import MultiDeleteDialog from '@/components/user/MultiDeleteDialog.vue';
 import MultiRestore from '@/components/user/MultiRestore.vue';
 import Restore from '@/components/user/Restore.vue';
-import UpdateDialog from '@/components/user/UpdateDialog.vue';
-import ShowDialog from '@/components/user/ShowDialog.vue';
-import Update from '@/components/user/Update.vue';
 import Show from '@/components/user/Show.vue';
-import Filter from '@/components/filters/user/Filter.vue';
-import Icon from '@/components/Icon.vue';
-import { FilterMatchMode } from '@primevue/core/api';
-import { onMounted, onUpdated, ref } from 'vue';
+import ShowDialog from '@/components/user/ShowDialog.vue';
+import UpdateDialog from '@/components/user/UpdateDialog.vue';
+import { getFullname } from '@/composables/useFullname';
+import { getInitials } from '@/composables/useInitials';
 import { usePhoneLink } from '@/composables/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
-import { route } from '../../../../vendor/tightenco/ziggy';
-import { getInitials, useInitials } from '@/composables/useInitials';
-import { getFullname } from '@/composables/useFullname';
+import { FilterMatchMode } from '@primevue/core/api';
+import { onMounted, onUpdated, provide, readonly, ref, watch } from 'vue';
+import { route } from 'ziggy-js';
+import FormDrawer from '@/components/user/FormDrawer.vue';
+import { width } from '@/composables/useVisible';
 
 const props = defineProps({
     entities: {
@@ -50,6 +49,9 @@ const props = defineProps({
 
 const emit = defineEmits(['count']);
 
+const formRoutesProps: object = ref(props.routes);
+provide('formRoutesProps', readonly(formRoutesProps));
+
 const dt = ref();
 const items = ref();
 const count = ref(0);
@@ -61,6 +63,7 @@ const filters = ref({
 const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
+const { size } = width(640);
 
 const { getPhone } = usePhoneLink();
 const { useSingleElement, useMultipleElements } = workingWithTableItems();
@@ -71,13 +74,19 @@ onMounted(() => {
         pagination.value = true;
     }
     loading.value = false;
+    console.log(props.routes)
 });
 
-onUpdated(() => {
-    emit('count', (count.value = items.value.length));
+watch(items,()=>{
     if (items.value.length == 0) {
         pagination.value = false;
     }
+});
+onUpdated(() => {
+    emit('count', (count.value = items.value.length));
+    /*if (items.value.length == 0) {
+        pagination.value = false;
+    }*/
 });
 
 const onDeleteItem = (id: any) => {
@@ -126,44 +135,37 @@ const filterFields = () => {
         <Toolbar class="mb-6">
             <template #start>
                 <div class="flex flex-row items-start space-x-2">
-                    <span class="sm:hidden">
-                        <Create
-                            v-if="tools.create"
-                            icon-name="UserRoundPlus"
+                    <span class="">
+                        <form-drawer v-if="tools.create && size"
+                                     @new-user="onLoadItem"
+                                     icon-name="pi pi-user-plus"
+                                     label="New" title="New user" />
+                        <Button
+                            v-if="tools.create && !size"
+                            as="a"
+                            icon="pi pi-user-plus"
                             label="New"
-                            title="New user"
-                            :route="routes.create"
-                            @create-item="onLoadItem"
+                            :href="route('users.create')"
+                            size="small"
+                            class="mx-2"
                         />
-                        <Button as="a" label="Create" :href="route('users.create')" size="small" class="mx-2" />
                     </span>
                     <span class="hidden sm:flex">
-                        <CreateDialog
-                            v-if="tools.create"
-                            icon-name="UserRoundPlus"
-                            label="New"
-                            title="New user"
-                            :route="routes.create"
-                            @create-item="onLoadItem"
-                        />
-                        <Button as="a" label="Create" :href="route('users.create')" size="small" class="mx-2" />
-                    </span>
-                    <span class="hidden sm:flex">
-                        <MultiRestore
+                        <multi-restore
                             v-if="tools.restore"
                             :entity="selectedItems"
                             label="Восстановить"
                             icon-name="Undo2"
-                            :route="routes.multiRestore"
+                            :route="routes.user.uri.multiRestore"
                             @restore-items="onRestoreSelectedItems"
                             :disabled="!selectedItems || !selectedItems.length"
                         />
                     </span>
                     <span class="hidden sm:flex">
-                        <MultiDeleteDialog
+                        <multi-delete-dialog
                             :entity="selectedItems"
                             icon-name=""
-                            :route="routes.multiDestroy"
+                            :route="routes.user.uri.multiDestroy"
                             :disabled="!selectedItems || !selectedItems.length"
                             @delete-items="onDeleteSelectedItems"
                         />
@@ -248,34 +250,34 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <Avatar v-if="!slotProps.data.avatar"
+                    <Avatar
+                        v-if="!slotProps.data.avatar"
                         size="large"
-                            :label="slotProps.data.avatar ? slotProps.data.avatar :
-                             getInitials(getFullname({name:slotProps.data.name, surname:slotProps.data.surname}))"
+                        :label="
+                            slotProps.data.avatar
+                                ? slotProps.data.avatar
+                                : getInitials(getFullname({ name: slotProps.data.name, surname:
+                                slotProps.data.surname }))
+                        "
                     />
-                    <Image v-else
-                        :src="slotProps.data.avatar "
+                    <Image
+                        v-else
+                        :src="slotProps.data.avatar"
                         :alt="slotProps.data.avatar"
                         preview
                         :pt="{
-                        image: {
-                            class: 'max-w-[48px] max-h-[48px] rounded-md',
-                        },
-                    }"
+                            image: {
+                                class: 'max-w-[48px] max-h-[48px] rounded-md',
+                            },
+                        }"
                     />
-
-<!--                    <img v-if="slotProps.data.avatar"
-                         :src="slotProps.data.avatar"
-                         :alt="slotProps.data.avatar" class="max-w-[48px] rounded" />
-                    <img v-else class="max-w-[48px] rounded" src="/no_avatar_big.png" alt="" />-->
                 </template>
             </Column>
             <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
                     <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
-                        {{ slotProps.data.name }}
-                        {{ slotProps.data.middleName }}
-                        {{ slotProps.data.surname }}
+                         {{ getFullname({name: slotProps.data.name,middlename:slotProps.data.middleName,
+                        surname:slotProps.data.surname }) }}
                     </div>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
@@ -325,27 +327,27 @@ const filterFields = () => {
                                 <Icon name="Settings" />
                             </template>
                             <template #item>
-                                <Restore
+                                <restore
                                     v-if="tools.restore"
                                     :id="slotProps.data.id"
                                     icon-name="Undo2"
-                                    :route="routes.restore"
+                                    :route="routes.user.uri.restore"
                                     @restore-customer="onRestoreItem"
                                 />
-                                <Update
+                                <form-drawer
                                     v-if="tools.update"
-                                    :entity="slotProps.data"
-                                    icon-name="UserPen"
+                                    icon-name="pi pi-user-edit"
                                     label=""
-                                    :route="routes.update"
-                                    @update-item="onLoadItem"
+                                    :entity="slotProps.data"
+                                    @update-user="onLoadItem"
+                                    variant="link"
                                 />
-                                <Show :entity="slotProps.data" icon-name="UserSearch" label="" :route="routes.show" />
-                                <DeleteDialog
+                                <Show :entity="slotProps.data" icon-name="pi pi-user" label="" route="" />
+                                <delete-dialog
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
-                                    icon-name="UserMinus"
-                                    :route="routes.delete"
+                                    icon-name="pi pi-user-minus"
+                                    :route="routes.user.uri.destroy"
                                     @delete-item="onDeleteItem"
                                 />
                             </template>
@@ -419,28 +421,29 @@ const filterFields = () => {
             >
                 <template #body="slotProps">
                     <span class="flex flex-row flex-wrap items-start justify-start">
-                        <UpdateDialog
+
+                        <update-dialog
                             :key="slotProps.data.id"
                             v-if="tools.update"
                             :entity="slotProps.data"
                             icon-name="UserPen"
                             label="Edit item"
-                            :route="routes.update"
+                            :route="routes.user.uri.update"
                             @update-item="onLoadItem"
                         />
-                        <ShowDialog :key="slotProps.data.id" :entity="slotProps.data" icon-name="UserSearch" label="Show item" :route="routes.show" />
-                        <Restore
+                        <ShowDialog :key="slotProps.data.id" :entity="slotProps.data" icon-name="UserSearch" label="Show item" route="" />
+                        <restore
                             v-if="tools.restore"
                             :id="slotProps.data.id"
                             icon-name="Undo2"
-                            :route="routes.restore"
+                            :route="routes.user.uri.restore"
                             @restore-customer="onRestoreItem"
                         />
-                        <DeleteDialog
+                        <delete-dialog
                             v-if="tools.remove"
                             :entity="slotProps.data"
                             icon-name="UserMinus"
-                            :route="routes.delete"
+                            :route="routes.user.uri.destroy"
                             @delete-item="onDeleteItem"
                         />
                     </span>

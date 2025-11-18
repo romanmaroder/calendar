@@ -1,18 +1,30 @@
-interface Data {
+interface FullnameData {
     name?: string;
     middlename?: string;
     surname?: string;
 }
 
-export function getFullname(data: Data): string {
-    const name = data.name ? data.name[0]?.toUpperCase() + data.name?.slice(1).toLowerCase() : '';
-    const middlename = data.middlename ? data.middlename[0]?.toUpperCase() + data.middlename?.slice(1).toLowerCase() : '';
-    const surname = data.surname ? data.surname[0]?.toUpperCase() + data.surname?.slice(1).toLowerCase() : '';
+interface GetFullnameOptions {
+    separator?: string;
+    skipEmpty?: boolean;
+}
 
-    if (name.length !== 0 || middlename.length !== 0 || surname.length !== 0) {
-        return `${name} ${middlename} ${surname}`;
-    }
-    return '';
+function capitalize(str: string | undefined): string {
+    return str?.length ? str[0].toUpperCase() + str.slice(1).toLowerCase() : '';
+}
+
+export function getFullname( data: FullnameData, options: GetFullnameOptions = {}): string {
+    const { separator = ' ', skipEmpty = true } = options;
+
+    const parts = [
+        capitalize(data.name),
+        capitalize(data.middlename),
+        capitalize(data.surname)
+    ];
+
+    const filteredParts = skipEmpty ? parts.filter(part => part.length > 0): parts;
+
+    return filteredParts.join(separator);
 }
 
 export function useFullname() {
