@@ -34,11 +34,7 @@ const props = defineProps({
 });
 
 onUpdated(() => {
-    if (props.entity == null) {
-        count.value = 0;
-    } else {
-        count.value = props.entity.length;
-    }
+    count.value = props.entity.length ?? 0;
 });
 
 function handleAction() {
@@ -53,6 +49,7 @@ function handleAction() {
                 life: 3000,
             });
             emit('deleteItems', props.entity, response.data.message);
+            visible.value = false;
         })
         .catch(function (error) {
             wait();
