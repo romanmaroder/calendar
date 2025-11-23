@@ -66,46 +66,6 @@ function handleAction() {
 }
 </script>
 
-<!--<template>
-
-    <AlertDialogRoot>
-        <AlertDialogTrigger as-child>
-            <Button label="Корзина"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    raised
-                    :disabled="disabled" >
-                <i class="pi pi-trash"></i>
-                <Badge severity="secondary">{{count}}</Badge>
-            </Button>
-        </AlertDialogTrigger>
-        <AlertDialogPortal>
-            <AlertDialogOverlay class="dark:bg-black-900 data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-zinc-900/70" />
-            <AlertDialogContent
-                class="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] z-[100] max-h-[85vh] w-[90vw] max-w-[500px] translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-[25px] text-sm shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none"
-            >
-                <AlertDialogTitle class="m-0 text-[17px] font-semibold text-black"> Are you absolutely sure? </AlertDialogTitle>
-                <AlertDialogDescription class="mt-4 mb-5 text-sm leading-normal text-black">
-                    <span v-for="item in entity" :key="item.id"> {{ item.name }} {{item.surname}}<br /> </span>
-                    <span class="text-red-500"><b> will be moved to the basket.</b></span>
-                </AlertDialogDescription>
-                <div class="flex justify-end gap-4">
-                    <AlertDialogCancel
-                        class="inline-flex h-[35px] cursor-pointer items-center justify-center rounded-md bg-stone-500 px-[15px] leading-none font-semibold text-white transition-all outline-none hover:bg-stone-400 focus:shadow-[0_0_0_2px] focus:shadow-stone-700"
-                    >
-                        Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                        class="inline-flex h-[35px] cursor-pointer items-center justify-center rounded-md bg-red-500 px-[15px] leading-none font-semibold text-red-100 outline-none hover:bg-red-400 focus:shadow-[0_0_0_2px] focus:shadow-red-700"
-                        @click="handleAction"
-                    >
-                        Yes, delete
-                    </AlertDialogAction>
-                </div>
-            </AlertDialogContent>
-        </AlertDialogPortal>
-    </AlertDialogRoot>
-</template>-->
 <template>
     <Button label="Корзина" icon="pi pi-trash" severity="danger" raised :disabled="disabled" @click="visible = true">
         <i class="pi pi-trash"></i>
@@ -131,8 +91,8 @@ function handleAction() {
         <span class="text-red-500"><b> will be moved to the basket.</b></span>
 
         <div class="mt-2 flex justify-end gap-2">
-            <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-            <Button type="button" label="Yes, delete account" severity="danger" @click="handleAction" />
+            <Button type="button" size="small" label="Cancel" severity="secondary" @click="visible = false"></Button>
+            <Button type="button" size="small" label="Yes, delete account" severity="danger" @click="handleAction" />
         </div>
     </Dialog>
 </template>

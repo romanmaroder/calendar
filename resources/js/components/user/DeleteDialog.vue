@@ -76,8 +76,8 @@ function handleAction() {
         <span class="text-red-500"><b>will be moved to the basket.</b></span>
 
         <div class="flex justify-end gap-2 mt-2">
-            <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-            <Button type="button" label="Yes, delete account" severity="danger" @click="handleAction" />
+            <Button type="button" size="small" label="Cancel" severity="secondary" @click="visible = false"></Button>
+            <Button type="button" size="small" label="Yes, delete account" severity="danger" @click="handleAction" />
         </div>
     </Dialog>
 </template>
