@@ -2,6 +2,7 @@
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import DeleteDialog from '@/components/user/DeleteDialog.vue';
+import FormDrawer from '@/components/user/FormDrawer.vue';
 import MultiDeleteDialog from '@/components/user/MultiDeleteDialog.vue';
 import MultiRestore from '@/components/user/MultiRestore.vue';
 import Restore from '@/components/user/Restore.vue';
@@ -11,12 +12,12 @@ import UpdateDialog from '@/components/user/UpdateDialog.vue';
 import { getFullname } from '@/composables/useFullname';
 import { getInitials } from '@/composables/useInitials';
 import { usePhoneLink } from '@/composables/usePhoneLink';
+import { width } from '@/composables/useVisible';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { FilterMatchMode } from '@primevue/core/api';
-import { onMounted, onUpdated, provide, readonly, ref, watch } from 'vue';
+import {  onMounted, provide, readonly, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
-import FormDrawer from '@/components/user/FormDrawer.vue';
-import { width } from '@/composables/useVisible';
+import { User } from '@/types';
 
 const props = defineProps({
     entities: {
@@ -54,7 +55,7 @@ provide('formRoutesProps', readonly(formRoutesProps));
 
 const dt = ref();
 const items = ref();
-const count = ref(0);
+const count = ref();
 const selectedItems = ref();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -66,46 +67,41 @@ const visible = ref(false);
 const { size } = width(640);
 
 const { getPhone } = usePhoneLink();
-const { useSingleElement, useMultipleElements } = workingWithTableItems();
+const {useRows } = workingWithTableItems();
+
 
 onMounted(() => {
     items.value = props.entities.data;
-    if (items.value.length > 0) {
-        pagination.value = true;
-    }
     loading.value = false;
-    console.log(props.routes)
 });
 
-watch(items,()=>{
-    if (items.value.length == 0) {
-        pagination.value = false;
-    }
-});
-onUpdated(() => {
-    emit('count', (count.value = items.value.length));
-    /*if (items.value.length == 0) {
-        pagination.value = false;
-    }*/
+watch(items, () => {
+    pagination.value = items.value.length > 0;
+    count.value = items.value.length;
 });
 
-const onDeleteItem = (id: any) => {
-    useSingleElement(items, id);
+watch(count, () => {
+    emit('count', count);
+});
+
+
+const onDeleteItem = (id: User) => {
+    useRows(items, ref([id]));
 };
 const onLoadItem = () => {
     items.value = props.entities.data;
 };
 
-const onRestoreItem = (id: any) => {
-    useSingleElement(items, id);
+const onRestoreItem = (id: User) => {
+    useRows(items, ref([id]));
 };
 
 const onRestoreSelectedItems = () => {
-    useMultipleElements(items, selectedItems);
+    useRows(items, selectedItems);
 };
 
 const onDeleteSelectedItems = () => {
-    useMultipleElements(items, selectedItems);
+    useRows(items, selectedItems);
 };
 
 /*Для динамических таблиц
@@ -136,10 +132,7 @@ const filterFields = () => {
             <template #start>
                 <div class="flex flex-row items-start space-x-2">
                     <span class="">
-                        <form-drawer v-if="tools.create && size"
-                                     @new-user="onLoadItem"
-                                     icon-name="pi pi-user-plus"
-                                     label="New" title="New user" />
+                        <form-drawer v-if="tools.create && size" @new-user="onLoadItem" icon-name="pi pi-user-plus" label="New" title="New user" />
                         <Button
                             v-if="tools.create && !size"
                             as="a"
@@ -256,8 +249,7 @@ const filterFields = () => {
                         :label="
                             slotProps.data.avatar
                                 ? slotProps.data.avatar
-                                : getInitials(getFullname({ name: slotProps.data.name, surname:
-                                slotProps.data.surname }))
+                                : getInitials(getFullname({ name: slotProps.data.name, surname: slotProps.data.surname }))
                         "
                     />
                     <Image
@@ -276,8 +268,13 @@ const filterFields = () => {
             <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
                     <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
-                         {{ getFullname({name: slotProps.data.name,middlename:slotProps.data.middleName,
-                        surname:slotProps.data.surname }) }}
+                        {{
+                            getFullname({
+                                name: slotProps.data.name,
+                                middlename: slotProps.data.middleName,
+                                surname: slotProps.data.surname,
+                            })
+                        }}
                     </div>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
@@ -329,7 +326,7 @@ const filterFields = () => {
                             <template #item>
                                 <restore
                                     v-if="tools.restore"
-                                    :id="slotProps.data.id"
+                                    :id="slotProps.data"
                                     icon-name="Undo2"
                                     :route="routes.user.uri.restore"
                                     @restore-customer="onRestoreItem"
@@ -421,7 +418,6 @@ const filterFields = () => {
             >
                 <template #body="slotProps">
                     <span class="flex flex-row flex-wrap items-start justify-start">
-
                         <update-dialog
                             :key="slotProps.data.id"
                             v-if="tools.update"
