@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FormUser from '@/components/user/FormUser.vue';
 import { getFullname } from '@/composables/useFullname';
-import { ref } from 'vue';
+import { PropType, ref } from 'vue';
 
 interface Data {
     name?: string;
@@ -30,11 +30,11 @@ defineProps({
         }
     },
     variant: {
-        type: String,
+        type: String as PropType<'outlined'|'text' |'link'>,
         validator(value:string) {
             return [ "outlined", "text" , "link" ].includes(value)
         },
-        default:''
+        default:null
     },
 });
 
