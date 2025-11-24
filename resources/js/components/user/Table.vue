@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
-import DeleteDialog from '@/components/user/DeleteDialog.vue';
 import FormDrawer from '@/components/user/FormDrawer.vue';
-import MultiDeleteDialog from '@/components/user/MultiDeleteDialog.vue';
 import MultiRestore from '@/components/user/MultiRestore.vue';
 import Restore from '@/components/user/Restore.vue';
 import Show from '@/components/user/Show.vue';
@@ -15,9 +13,10 @@ import { usePhoneLink } from '@/composables/usePhoneLink';
 import { width } from '@/composables/useVisible';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { FilterMatchMode } from '@primevue/core/api';
-import {  onMounted, provide, readonly, ref, watch } from 'vue';
+import { onMounted, provide, readonly, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import { User } from '@/types';
+import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 
 const props = defineProps({
     entities: {
@@ -67,8 +66,7 @@ const visible = ref(false);
 const { size } = width(640);
 
 const { getPhone } = usePhoneLink();
-const {useRows } = workingWithTableItems();
-
+const { useRows } = workingWithTableItems();
 
 onMounted(() => {
     items.value = props.entities.data;
@@ -83,7 +81,6 @@ watch(items, () => {
 watch(count, () => {
     emit('count', count);
 });
-
 
 const onDeleteItem = (id: User) => {
     useRows(items, ref([id]));
@@ -130,7 +127,7 @@ const filterFields = () => {
     <div class="grid auto-cols-fr">
         <Toolbar class="mb-6">
             <template #start>
-                <div class="flex flex-row items-start space-x-2">
+                <div class="flex flex-row items-start space-x-1">
                     <span class="">
                         <form-drawer v-if="tools.create && size" @new-user="onLoadItem" icon-name="pi pi-user-plus" label="New" title="New user" />
                         <Button
@@ -155,9 +152,10 @@ const filterFields = () => {
                         />
                     </span>
                     <span class="hidden sm:flex">
-                        <multi-delete-dialog
+                        <delete-confirmation
                             :entity="selectedItems"
-                            icon-name=""
+                            icon-name="pi pi-trash"
+                            type="multi"
                             :route="routes.user.uri.multiDestroy"
                             :disabled="!selectedItems || !selectedItems.length"
                             @delete-items="onDeleteSelectedItems"
@@ -340,7 +338,7 @@ const filterFields = () => {
                                     variant="link"
                                 />
                                 <Show :entity="slotProps.data" icon-name="pi pi-user" label="" route="" />
-                                <delete-dialog
+                                <delete-confirmation
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-user-minus"
@@ -435,10 +433,10 @@ const filterFields = () => {
                             :route="routes.user.uri.restore"
                             @restore-customer="onRestoreItem"
                         />
-                        <delete-dialog
+                        <delete-confirmation
                             v-if="tools.remove"
                             :entity="slotProps.data"
-                            icon-name="UserMinus"
+                            icon-name="pi pi-user-minus"
                             :route="routes.user.uri.destroy"
                             @delete-item="onDeleteItem"
                         />
