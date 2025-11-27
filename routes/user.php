@@ -9,12 +9,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/create',[UserController::class,'create'] )->name('users.create');
     Route::post('/users',[UserController::class,'store'] )->name('users.store');
     Route::get('/users/{user}/edit',[UserController::class,'edit'] )->name('users.edit');
-    Route::put('/users/{user}',[UserController::class,'update'] )->name('users.update');
-    Route::put('users/restore/{id}',[UserController::class,'restore'])->name('users.restore');
-    Route::put('users/multiRestore/{ids}',[UserController::class,'multiRestore'])->name('users.multiRestore');
-    Route::put('/avatar/{user}', [UserController::class, 'avatar'])->name('avatar');
-    Route::delete('users/trash/{ids}', [UserController::class, 'trash'])->name('trash');
-    Route::delete('users/multiDestroy/{ids}', [UserController::class, 'multiDestroy'])->name('users.multiDestroy');
-    Route::delete('/users/destroy/{user}',[UserController::class,'destroy'] )->name('users.destroy');
+    Route::put('/users/{id}',[UserController::class,'update'] )->name('users.update');
+    Route::put('/avatar/{user}', [UserController::class, 'avatar'])->name('users.avatar');
+
+    // Soft delete (один/несколько)
+    Route::delete('/users/bulk/soft', [UserController::class, 'bulkSoftDelete'])->name('users.bulk.soft');
+    Route::delete('/users/{id}', [UserController::class, 'softDelete'])->name('users.soft.delete');
+
+// Force delete (один/несколько)
+    Route::delete('/users/bulk/force', [UserController::class, 'bulkForceDelete'])->name('users.bulk.force');
+    Route::delete('/users/{id}/force', [UserController::class, 'forceDelete'])->name('users.force');
+
+// Restore (один/несколько)
+    Route::post('/users/bulk/restore', [UserController::class, 'bulkRestore'])->name('users.bulk.restore');
+    Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
 });
 
