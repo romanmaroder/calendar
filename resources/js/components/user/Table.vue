@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 import Filter from '@/components/filters/user/Filter.vue';
 import Icon from '@/components/Icon.vue';
 import FormDrawer from '@/components/user/FormDrawer.vue';
-import MultiRestore from '@/components/user/MultiRestore.vue';
-import Restore from '@/components/user/Restore.vue';
+import Restore from '@/components/common/Restore.vue';
 import Show from '@/components/user/Show.vue';
 import ShowDialog from '@/components/user/ShowDialog.vue';
 import UpdateDialog from '@/components/user/UpdateDialog.vue';
@@ -12,11 +12,10 @@ import { getInitials } from '@/composables/useInitials';
 import { usePhoneLink } from '@/composables/usePhoneLink';
 import { width } from '@/composables/useVisible';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
-import { FilterMatchMode } from '@primevue/core/api';
-import { onMounted, provide, readonly, ref, watch } from 'vue';
-import { route } from 'ziggy-js';
 import { User } from '@/types';
-import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
+import { FilterMatchMode } from '@primevue/core/api';
+import { computed, onBeforeMount, provide, readonly, ref, watch } from 'vue';
+import { route } from 'ziggy-js';
 
 const props = defineProps({
     entities: {
@@ -68,9 +67,10 @@ const { size } = width(640);
 const { getPhone } = usePhoneLink();
 const { useRows } = workingWithTableItems();
 
-onMounted(() => {
+onBeforeMount(() => {
     items.value = props.entities.data;
     loading.value = false;
+    //console.log(props.entities.data,items.value);
 });
 
 watch(items, () => {
@@ -80,6 +80,10 @@ watch(items, () => {
 
 watch(count, () => {
     emit('count', count);
+});
+
+const isDeleted = computed(() => {
+    return items.value.every((item: User) => !!item.deleted_at);
 });
 
 const onDeleteItem = (id: User) => {
@@ -141,14 +145,15 @@ const filterFields = () => {
                         />
                     </span>
                     <span class="hidden sm:flex">
-                        <multi-restore
+                        <restore
                             v-if="tools.restore"
                             :entity="selectedItems"
                             label="Восстановить"
-                            icon-name="Undo2"
-                            :route="routes.user.uri.multiRestore"
-                            @restore-items="onRestoreSelectedItems"
+                            icon-name="pi pi-replay"
+                            type="multi"
+                            :route="routes.user.uri.bulkRestore"
                             :disabled="!selectedItems || !selectedItems.length"
+                            @restore-items="onRestoreSelectedItems"
                         />
                     </span>
                     <span class="hidden sm:flex">
@@ -156,7 +161,7 @@ const filterFields = () => {
                             :entity="selectedItems"
                             icon-name="pi pi-trash"
                             type="multi"
-                            :route="routes.user.uri.multiDestroy"
+                            :route="isDeleted ? routes.user.uri.bulkForceDelete : routes.user.uri.bulkSoftDelete"
                             :disabled="!selectedItems || !selectedItems.length"
                             @delete-items="onDeleteSelectedItems"
                         />
@@ -278,7 +283,8 @@ const filterFields = () => {
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
                     </p>
                     <p class="sm:hidden">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.branch.name }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.branch?.name }}</small>
                     </p>
                     <p class="hidden sm:table-cell">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
@@ -324,10 +330,10 @@ const filterFields = () => {
                             <template #item>
                                 <restore
                                     v-if="tools.restore"
-                                    :id="slotProps.data"
-                                    icon-name="Undo2"
+                                    :entity="slotProps.data"
+                                    icon-name="pi pi-replay"
                                     :route="routes.user.uri.restore"
-                                    @restore-customer="onRestoreItem"
+                                    @restore-item="onRestoreItem"
                                 />
                                 <form-drawer
                                     v-if="tools.update"
@@ -342,7 +348,7 @@ const filterFields = () => {
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-user-minus"
-                                    :route="routes.user.uri.destroy"
+                                    :route="isDeleted ? routes.user.uri.forceDelete : routes.user.uri.softDelete"
                                     @delete-item="onDeleteItem"
                                 />
                             </template>
@@ -369,7 +375,8 @@ const filterFields = () => {
                         rel="noopener"
                     />
                     <p class="">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.branch.name }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.branch?.name }}</small>
                     </p>
                     <p class="2xl:hidden">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.email }}</small>
@@ -428,16 +435,16 @@ const filterFields = () => {
                         <ShowDialog :key="slotProps.data.id" :entity="slotProps.data" icon-name="UserSearch" label="Show item" route="" />
                         <restore
                             v-if="tools.restore"
-                            :id="slotProps.data.id"
-                            icon-name="Undo2"
+                            :entity="slotProps.data"
+                            icon-name="pi pi-replay"
                             :route="routes.user.uri.restore"
-                            @restore-customer="onRestoreItem"
+                            @restore-item="onRestoreItem"
                         />
                         <delete-confirmation
                             v-if="tools.remove"
                             :entity="slotProps.data"
                             icon-name="pi pi-user-minus"
-                            :route="routes.user.uri.destroy"
+                            :route="isDeleted ? routes.user.uri.forceDelete : routes.user.uri.softDelete"
                             @delete-item="onDeleteItem"
                         />
                     </span>

@@ -15,7 +15,11 @@ defineProps({
     },
     count: {
         type: Number,
-    }
+    },
+    routes: {
+        type: Object,
+        required: true,
+    },
 });
 
 const total = ref();
@@ -27,15 +31,17 @@ const counter = (num: number) => {
 <template>
     <Head title="Archive" />
     <Layout :breadcrumbs="breadcrumbs">
-        <Toast :pt="{
+        <Toast
+            :pt="{
                 root: {
                     class: '!max-w-max',
                 },
-            }"/>
+            }"
+        />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="client-cards-description">
                 Всего карточек в корзине:
-                {{ total || count}}
+                {{ total || count }}
             </div>
             <div class="card">
                 <Table
@@ -44,13 +50,7 @@ const counter = (num: number) => {
                         restore: true,
                         remove: true,
                     }"
-                    :routes="{
-                        archive: 'archive',
-                        delete: 'trash',
-                        multiDestroy: 'trash',
-                        restore: 'users.restore',
-                        multiRestore: 'users.multiRestore',
-                    }"
+                    :routes="routes"
                     @count="counter"
                 />
             </div>

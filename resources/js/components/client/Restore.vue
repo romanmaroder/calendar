@@ -3,7 +3,7 @@ import Icon from '@/components/Icon.vue';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
 
-const emit = defineEmits(['restoreCustomer']);
+const emit = defineEmits(['restoreItem']);
 const props = defineProps({
     id: {
         type: Number,
@@ -35,7 +35,7 @@ const restore = (id: any) => {
                     detail: response.data.message,
                     life: 3000,
                 });
-                emit('restoreCustomer', id, response.data.message);
+                emit('restoreItem', id, response.data.message);
             })
             .catch(function (error) {
                 toast.add({
