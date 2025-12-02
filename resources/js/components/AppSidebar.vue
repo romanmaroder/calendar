@@ -5,22 +5,9 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import {
-    BookOpen,
-    Folder,
-    LayoutGrid, UserRoundXIcon,
-    Users2,
-    UsersIcon, UserX
-} from 'lucide-vue-next';
+import { BookOpen, Folder, UserRoundXIcon, Users2, UsersIcon, UserX } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
 const mainNavItemsUser: NavItem[] = [
     {
         title: 'Users',
@@ -61,7 +48,7 @@ const footerNavItems: NavItem[] = [
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset" >
+    <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
@@ -73,11 +60,9 @@ const footerNavItems: NavItem[] = [
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarHeader>
-
         <SidebarContent>
-            <NavMain :items="mainNavItems" group-label="Main" />
             <NavMain :items="mainNavItemsUser" group-label="Users" />
-            <NavMain :items="mainNavItemsClient" group-label="Clients"/>
+            <NavMain :items="mainNavItemsClient" group-label="Clients" />
         </SidebarContent>
 
         <SidebarFooter>
