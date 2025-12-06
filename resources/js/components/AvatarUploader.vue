@@ -1,10 +1,6 @@
-<!--Загрузка аватарки с контекстным меню
-    На десктопе клик правой кнопкой мыши
-    На мобильном удержать и отпустить
-    Компонент загружает файл в папку public/avatars с уникальным именем
-    На бэкенде создайте Контроллер с методами для добавления и удаления файла
-    Создайте маршруты
-
+<!--loading an avatar with a context menu on the desktop right-click on mobile hold and release the component uploads
+ a file to the public/avatars folder with a unique name
+ on the backend create a controller with methods for adding and deleting a file create routes
 -->
 
 <template>
@@ -28,7 +24,7 @@
         <input ref="fileInput" name="fileInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
 
         <div v-show="previewImage" class="flex w-[200px] flex-col gap-4 sm:max-w-[150px]">
-            <div @contextmenu.prevent="showMenu" class="mobile-area max-w-[]">
+            <div @contextmenu.prevent="showMenu" class="mobile-area">
                 <AvatarCropper
                     ref="cropper"
                     :output-size="512"
@@ -165,27 +161,26 @@ const menuItems = ref([
     { label: 'Reset', icon: 'pi pi-trash', command: () => removeAvatar() },
 ]);
 
-// Функция преобразовывает base64 в File-объект
-// Если на сервере нет преобразования base64_decode
-const dataURLtoFile= (dataUrl: string, filename = 'image.png')=> {
-    // 1. Разделяем строку на части
-    const arr = dataUrl.split(',');
-
-    // 2. Извлекаем MIME-тип (например, 'image/png')
-
-    const mime = arr[0].match(/:(.*?);/)[1];
-
-    // 3. Декодируем base64-часть
-    const bstr = atob(arr[1]);
-    // 4. Создаём Uint8Array для бинарных данных
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-
-    // 5. Возвращаем File-объект
-    return new File([u8arr], filename, { type: mime });
-}
+//The function converts base64 to a File object If the server does not have base64_decode conversion
+// const dataURLtoFile= (dataUrl: string, filename = 'image.png')=> {
+//     // 1. Разделяем строку на части
+//     const arr = dataUrl.split(',');
+//
+//     // 2. Извлекаем MIME-тип (например, 'image/png')
+//
+//     const mime = arr[0].match(/:(.*?);/)[1];
+//
+//     // 3. Декодируем base64-часть
+//     const bstr = atob(arr[1]);
+//     // 4. Создаём Uint8Array для бинарных данных
+//     let n = bstr.length;
+//     const u8arr = new Uint8Array(n);
+//
+//     while (n--) {
+//         u8arr[n] = bstr.charCodeAt(n);
+//     }
+//
+//     // 5. Возвращаем File-объект
+//     return new File([u8arr], filename, { type: mime });
+// }
 </script>
