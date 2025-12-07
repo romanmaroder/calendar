@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Upload\AvatarUploadController;
 use App\Http\Requests\Client\AvatarUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
@@ -10,12 +11,7 @@ use App\Models\Branch\Branch;
 use App\Models\User;
 use App\Traits\HasControllerRoutes;
 use Illuminate\Http\Request;
-use Illuminate\Routing\RouteCollection;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -26,12 +22,17 @@ class UserController extends Controller
     {
         $count = User::count();
         $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
+        $routes = $this->routeMerge(
+            $this->getRoutesByController(AvatarUploadController::class),
+            $this->getControllerRoutes()
+        );
         return Inertia::render(
             'user/Index',
             [
-                'users' => User::with('branch')->paginate($count),
+                'users' => User::with('branch')->paginate($count)->collect(),
                 'count' => $count,
-                'branch' => $branch
+                'branch' => $branch,
+                'routes' => $routes
             ]
         );
     }
@@ -39,7 +40,11 @@ class UserController extends Controller
     public function create()
     {
         $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
-        return Inertia::render('user/Create', ['branch' => $branch, 'routing' => $this->getControllerRoutes()]);
+        $routes = $this->routeMerge(
+            $this->getRoutesByController(AvatarUploadController::class),
+            $this->getControllerRoutes()
+        );
+        return Inertia::render('user/Create', ['branch' => $branch, 'routing' => $routes]);
     }
 
     public function store(StoreUserRequest $request)
@@ -54,22 +59,38 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return Inertia::render('user/Show', ['user' => $user]);
+        $user->load('branch');
+        if ($user->trashed()) {
+            return Inertia::render('user/Show', [
+                'user' => $user,
+                'isDeleted' => true
+            ]);
+        }
+
+        // Обычная модель (не удалена)
+        return Inertia::render('user/Show', [
+            'user' => $user,
+            'isDeleted' => false
+        ]);
     }
 
     public function edit(User $user)
     {
+        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
         return Inertia::render('user/Edit', [
             'user' => $user,
+            'branch' => $branch,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, $id)
     {
+        $user = User::find($id);
         $data = $request->validated();
+        //dd($data);
         $user->update($data);
 
         return to_route('users');
@@ -97,114 +118,91 @@ class UserController extends Controller
         ];
     }
 
-    public function destroy(User $user)
-    {
-        $user = User::findOrFail($user->id);
-        if ($user->delete()) {
-            return [
-                'code' => 200,
-                'message' => 'ID:' . $user->id . ' ' . $user->surname . ' deleted'
-            ];
-        }
-
-        return [
-            'code' => 404,
-            'message' => 'user not found'
-        ];
-    }
-
-    public function multiDestroy($ids)
-    {
-        $ids = explode(',', $ids);
-
-        if (User::destroy($ids)) {
-            return [
-                'code' => 200,
-                'message' => 'Move to the basket.'
-            ];
-        }
-
-        return [
-            'code' => 404,
-            'message' => 'user not found'
-        ];
-    }
-
     public function archive()
     {
         $count = User::onlyTrashed()->count();
+        $routes = $this->routeMerge(
+            $this->getRoutesByController(AvatarUploadController::class),
+            $this->getControllerRoutes()
+        );
         return Inertia::render('user/Archive', [
-            'users' => User::onlyTrashed()->with('branch')->latest('created_at')->paginate($count),
+            'users' => User::onlyTrashed()->with('branch')->latest('created_at')->paginate($count)->collect(),
             'count' => $count,
+            'routes' => $routes
         ]);
+    }
+
+    public function softDelete(string $id)
+    {
+        $resource = User::findOrFail($id);
+        $resource->delete();
+        return response()->json(['success' => true, 'message' => 'User has been deleted', 'code' => 200]);
+    }
+
+    public function bulkSoftDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        User::whereIn('id', $ids)->delete();
+        return response()->json(
+            ['success' => true, 'count' => count($ids), 'message' => 'Move to the basket.', 'code' => 200]
+        );
+    }
+
+    public function forceDelete(string $id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $extension = explode('/', $user->avatar);
+        $avatar = end($extension);
+        Storage::disk('public')->delete('/avatars/' . $avatar);
+        $user->forceDelete();
+        return response()->json([
+                                    'success' => true,
+                                    'message' => 'ID:' . $user->id . ' ' . $user->surname . ' deleted',
+                                    'code' => 200
+                                ]);
+    }
+
+    public function bulkForceDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        $users = User::withTrashed()->whereIn('id', $ids)->get();
+
+        foreach ($users as $user) {
+            $extension = explode('/', $user->avatar);
+            $avatar = end($extension);
+            Storage::disk('public')->delete('/avatars/' . $avatar);
+        }
+
+
+        User::withTrashed()->whereIn('id', $ids)->forceDelete();
+        return response()->json([
+                                    'success' => true,
+                                    'message' => 'Users have been deleted',
+                                    'count' => count($ids)
+                                ]);
     }
 
     public function restore($id)
     {
-        $user = User::where('id', $id)->onlyTrashed()->firstOrFail();
-        if ($user->restore()) {
-            return [
-                'code' => 200,
-                'message' => 'ID:' . $user->id . ' ' . $user->surname . ' restored.'
-            ];
-        }
-        return [
-            'code' => 404,
-            'message' => 'user not found'
-        ];
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+        return response()->json([
+                                    'success' => true,
+                                    'message' => 'ID:' . $user->id . ' ' . $user->surname . ' restored.',
+                                    'code' => 200
+                                ]);
     }
 
-    public function multiRestore($ids)
+    public function bulkRestore(Request $request)
     {
-        $ids = explode(',', $ids);
-        $users = User::whereIn('id', $ids)->onlyTrashed()->get();
-        $response = [];
-        foreach ($users as $user) {
-            if ($user->restore()) {
-                $response = [
-                    'code' => 200,
-                    'message' => 'User restored'
-                ];
-            } else {
-                $response = [
-                    'code' => 404,
-                    'message' => 'User already restored'
-                ];
-            }
-        }
-        return $response;
+        $ids = $request->input('ids', []);
+        User::onlyTrashed()->whereIn('id', $ids)->restore();
+        return response()->json([
+                                    'success' => true,
+                                    'code' => 200,
+                                    'message' => 'Users restored'
+                                ]);
     }
 
-    public function trash($ids)
-    {
-        $ids = explode(',', $ids);
-        $users = User::whereIn('id', $ids)->withTrashed()->get();
-
-        $response = [];
-
-        foreach ($users as $user) {
-            if (!$user) {
-                $response = [
-                    'code' => 404,
-                    'message' => 'The user is already deleted'
-                ];
-            }
-            if ($user->trashed()) {
-                $user->forceDelete();
-
-                if ($user->id) {
-                    $extension = explode('/', $user->avatar);
-                    $avatar = end($extension);
-                    Storage::disk('public')->delete('/avatars/' . $avatar);
-                }
-
-
-                $response = [
-                    'code' => 200,
-                    'message' => 'User has been deleted'
-                ];
-            }
-        }
-        return $response;
-    }
 }
