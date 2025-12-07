@@ -12,10 +12,11 @@
                     :image="croppedImage ? croppedImage : loadImage"
                     :icon="(!croppedImage && !loadImage) ? 'pi pi-camera' : undefined"
                     size="xlarge"
-                    :class="{ 'h-[100px]! w-[100px]! !shadow-none': croppedImage || loadImage }"
+                    :class="{ 'h-full! w-full! !shadow-none': croppedImage || loadImage }"
                     class="border-4 border-transparent shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)] transition-all duration-300 group-hover:border-blue-500"
                     :pt="{
-                        image: 'rounded-md shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]',
+                        image:
+                        'max-w-[64px] max-h-[64px] rounded-md shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]',
                     }"
                 />
             </div>
