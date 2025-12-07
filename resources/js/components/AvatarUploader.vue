@@ -9,10 +9,10 @@
             <div ref="triggerEl" class="group cursor-pointer" @click="openFileDialog">
                 <Avatar
                     v-if="!previewImage"
-                    :image="croppedImage ? croppedImage : undefined"
-                    :icon="!croppedImage ? 'pi pi-camera' : undefined"
+                    :image="croppedImage ? croppedImage : loadImage"
+                    :icon="(!croppedImage && !loadImage) ? 'pi pi-camera' : undefined"
                     size="xlarge"
-                    :class="{ 'h-[100px]! w-[100px]! !shadow-none': croppedImage }"
+                    :class="{ 'h-[100px]! w-[100px]! !shadow-none': croppedImage || loadImage }"
                     class="border-4 border-transparent shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)] transition-all duration-300 group-hover:border-blue-500"
                     :pt="{
                         image: 'rounded-md shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]',
@@ -47,7 +47,14 @@ import AvatarCropper from '@sakhnovkrg/vue-avatar-cropper';
 import '@sakhnovkrg/vue-avatar-cropper/dist/index.css';
 import axios from 'axios';
 import Avatar from 'primevue/avatar';
-import { ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+
+const props =defineProps({
+    avatar:{
+        type:String,
+        default:null,
+    }
+});
 
 const emit = defineEmits<{
     (e: 'cropped', value: string): void;
@@ -57,13 +64,25 @@ const emit = defineEmits<{
 
 const croppedImage = ref('');
 const previewImage = ref('');
-const path = ref('');
+const loadImage = ref('');
+const url = ref('');
+const path = ref(props.avatar ||'');
 
 const cropper = ref<InstanceType<typeof AvatarCropper>>();
 const fileInput = ref();
 const zoomValue = ref(0);
 
 const ctxMenu = ref();
+
+// Загрузка аватара при mount, если props.avatar задан
+onMounted(() => {
+    if (props.avatar) {
+        loadImage.value = props.avatar;
+        //previewImage.value = props.avatar;
+        // Если нужен предварительный crop — можно вызвать loadImage
+         //cropper.value?.loadImage(props.avatar);
+    }
+});
 
 const showMenu = (event: Event) => {
     ctxMenu.value.show(event);
@@ -79,13 +98,19 @@ watch(zoomValue, (newValue, oldValue) => {
     }
 });
 
+const encodedPath = computed(() => {
+    return encodeURIComponent(
+        path.value.replace(/^\/storage/, '')
+    );
+});
+
 const crop = (cropped: string) => {
     croppedImage.value = cropped;
     previewImage.value = '';
 };
 
 const openFileDialog = () => {
-    if (path.value) {
+    if (path.value || url.value ) {
         deleteCropper();
         fileInput.value.click();
         return;
@@ -112,8 +137,9 @@ const uploadCropper = () => {
     axios
         .post('/api/upload', formData)
         .then((res) => {
-            path.value = res.data.file_path;
-            emit('cropped', path.value);
+            path.value = res.data.path;
+            url.value = res.data.url;
+            emit('cropped', url.value);
         })
         .catch(function (error) {
             console.log(error.response.data.message);
@@ -121,9 +147,9 @@ const uploadCropper = () => {
 };
 
 const deleteCropper = () => {
-    const encodedPath = encodeURIComponent(path.value);
+    console.log(encodedPath.value);
     axios
-        .delete(`/api/destroy?path=${encodedPath}`)
+        .delete(`/api/destroy?path=${encodedPath.value}`)
         .then((res) => {
             console.log(res.data);
             emit('delete', res.data.message); // Отправляем новое значение,

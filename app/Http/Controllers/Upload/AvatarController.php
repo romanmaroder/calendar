@@ -45,8 +45,8 @@ class AvatarController extends Controller
             // 5. Возвращаем URL
             return response()->json([
                                         'success' => true,
-                                        'url' => Storage::disk('public')->url($filePath),
-                                        'file_path' => $filePath
+                                        'url' => Storage::url($filePath),
+                                        'path' => $filePath
                                     ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -60,16 +60,23 @@ class AvatarController extends Controller
                                         ]);
 
         try {
-            $path = $request->input('path');
+            $path = $validated['path'];
+
+            if (!$path) {
+                return response()->json(['message' => 'Path is required'], 400);
+            }
 
             // 4. Удаляем файл
-            Storage::disk('public')->delete($path);
-
-            return response()->json([
-                                        'success' => true,
-                                        'code' => 200,
-                                        'message' => 'Avatar deleted successfully'
-                                    ]);
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+                return response()->json([
+                                            'success' => true,
+                                            'code' => 200,
+                                            'message' => 'Avatar deleted successfully'
+                                        ]);
+            } else {
+                return response()->json(['message' => 'File not found'], 404);
+            }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
