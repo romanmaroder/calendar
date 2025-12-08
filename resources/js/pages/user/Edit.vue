@@ -49,10 +49,10 @@ const avatarUrl = (url: string) => {
     console.log(form.avatar);
 };
 
-const submit = (e: Event) => {
-    e.preventDefault();
+const submit = () => {
+    console.log(form);
     if (form.id) {
-        form.put(route('users.edit', { id: form.id }), {
+        form.put(route('users.update', { id: form.id }), {
             preserveScroll: true,
             onSuccess: function () {
                 toast.add({
@@ -61,6 +61,31 @@ const submit = (e: Event) => {
                     detail: form.name + ' - update successfully.',
                     life: 3000,
                 });
+                emit('UpdateUser');
+            },
+            onError: function (errors) {
+                toast.add({
+                    severity: 'error',
+                    summary: 'Validation Error' + errors,
+                    life: 2000,
+                });
+            },
+        });
+    }
+};
+const onDeleteAvatar = () => {
+    console.log(form);
+    if (form.id) {
+        form.put(route('users.avatar', { id: form.id }), {
+            preserveScroll: true,
+            onSuccess: function () {
+                toast.add({
+                    severity: 'info',
+                    summary: 'Info',
+                    detail: form.name + ' - update successfully.',
+                    life: 3000,
+                })
+                avatarUrl('') ;
                 emit('UpdateUser');
             },
             onError: function (errors) {
@@ -92,7 +117,7 @@ const setDate = (date: any): void => {
                 <template #left-center-column>
                     <ProfileCard :user="null">
                         <div class="mb-2 space-y-4">
-                            <AvatarUploader :avatar="form.avatar" @cropped="avatarUrl" @delete="(value) => console.log(value)" />
+                            <AvatarUploader :avatar="form.avatar" @cropped="avatarUrl" @delete="onDeleteAvatar"/>
                             <FloatLabel variant="on" class="">
                                 <InputText
                                     id="name"
@@ -229,7 +254,7 @@ const setDate = (date: any): void => {
                                     size="small"
                                     class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 />
-                                <label class="font-light!" for="comment">Заметка</label>
+                                <label class="font-light! bg-transparent!" for="comment">Заметка</label>
                             </FloatLabel>
                             <InputError :message="form.errors.comment" class="mt-1 mb-2" />
                         </div>
@@ -238,7 +263,7 @@ const setDate = (date: any): void => {
                 <template #right-column>
                     <ProfileCard :user="null">
                         <div class="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end md:justify-center">
-                            <Button :disabled="form.processing" class="cursor-pointer" @click="submit" raised>
+                            <Button :disabled="form.processing" class="cursor-pointer" @click.prevent="submit" raised>
                                 {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
                             </Button>
                             <Button severity="secondary" @click="cancel" class="cursor-pointer" raised> Отмена</Button>

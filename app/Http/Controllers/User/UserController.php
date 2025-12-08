@@ -99,23 +99,9 @@ class UserController extends Controller
     public function avatar(AvatarUserRequest $request, User $user)
     {
         $request->validated();
-
         if (isset($user->avatar)) {
-            $extension = explode('/', $user->avatar);
-            $avatar = end($extension);
-
             $user->update(['avatar' => null]);
-            return [
-                'code' => 200,
-                'message' => 'Avatar updated successfully',
-                'url' => '',
-                'name' => $avatar,
-            ];
         }
-        return [
-            'code' => 404,
-            'message' => 'Avatar not found',
-        ];
     }
 
     public function archive()
