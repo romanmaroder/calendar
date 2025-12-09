@@ -98,6 +98,7 @@ const deleteCropper = () => {
         .delete(`/api/destroy?path=${encodedPath.value}`)
         .then(() => {
             removeAvatar();
+            emit('cropped', '');
         })
         .catch(function (error) {
             console.log(error.response.data.message);
@@ -211,6 +212,10 @@ const menuAvatar = ref([
                     class="shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]"
                 />
                 <ContextMenu ref="ctxCropper" :model="menuCropper" />
+                <Message class="mt-2" severity="secondary" variant="simple" :pt="{
+                    text:'text-center w-full'
+                }">Hold for
+                    2sec</Message>
             </div>
             <div class="zoom-control mb-2">
                 <Slider v-model="zoomValue" :min="0" :max="10" :step="1" class="zoom-slider" />
