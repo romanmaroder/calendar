@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { getFullname } from '@/composables/useFullname';
-import { computed, PropType, ref } from 'vue';
+import { computed, PropType, ref, watch } from 'vue';
 import FormUser from '@/components/user/FormUser.vue';
 import { User } from '@/types';
+import { useMediaQuery } from '@/composables/useMediaQuery';
 
 interface Data {
     name?: string;
@@ -25,7 +26,7 @@ const props = defineProps({
         default: 'New',
     },
     entity: {
-        type: Object as PropType<User | undefined>,
+        type: Object as PropType<User | null>,
         default() {
             return {};
         },
@@ -44,6 +45,11 @@ const props = defineProps({
 });
 
 const visible = ref(false);
+const isLargeScreen = useMediaQuery(640);
+
+watch(isLargeScreen, () => {
+    visible.value = false;
+});
 const form = ref<Data>({});
 
 const previewOfUserData = (data: Data) => {
