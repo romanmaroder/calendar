@@ -23,7 +23,6 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>'required|exists:users,id',
             'avatar'=>'nullable|string',
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
@@ -35,7 +34,6 @@ class UpdateUserRequest extends FormRequest
             'email' => ['string','lowercase','email','max:255',
                 Rule::unique('clients')->ignore($this->user)
             ],
-            'password' => 'nullable|string|min:6|confirmed',
         ];
     }
 }
