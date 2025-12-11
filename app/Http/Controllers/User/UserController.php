@@ -39,6 +39,9 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
+        // Гарантируем наличие ключа 'password' (даже если он пустой)
+        // Если поле не установлено в форме, мутатор не сработает
+        $data['password'] = $data['password'] ?? '';
         User::create($data);
         return to_route('users');
     }
