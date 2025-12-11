@@ -22,7 +22,7 @@ class AvatarUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>'required|exists:clients,id',
+            'id'=>'required|exists:users,id',
             'avatar'=>'nullable|string',
         ];
     }
