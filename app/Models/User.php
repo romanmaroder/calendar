@@ -83,9 +83,6 @@ class User extends Authenticatable
             'password' => 'hashed',
             'created_at' => 'datetime:Y/m/d H:i',
             'birthday' => 'date:Y-m-d',
-            'blacklist' => 'boolean',
-            'prepayment' => 'boolean',
-            'discount' => 'integer',
             'name' => Ucfirst::class,
             'middleName' => Ucfirst::class,
             'surname' => Ucfirst::class
