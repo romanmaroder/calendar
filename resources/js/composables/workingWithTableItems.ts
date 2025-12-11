@@ -16,7 +16,6 @@ export function useRows<T extends User>(rows?: Ref<T[]>, selectedRows?: Ref<T[]>
     if (!rows || !selectedRows) {
         return;
     }
-
     // Фильтруем rows: оставляем только те, которых нет в selectedRows
     rows.value = rows.value.filter((row: T) => {
         return !selectedRows.value.some((selectedRow: T) => {
