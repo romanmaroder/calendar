@@ -31,8 +31,6 @@ const props = defineProps({
                 restore: false,
                 remove: false,
                 show: false,
-                multiRestore: false,
-                multiDelete: false,
             };
         },
     }
