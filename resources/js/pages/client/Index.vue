@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import Table from '@/components/client/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, Client } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { ref } from 'vue';
+import { PropType, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
 
  defineProps({
     clients: {
-        type: Object,
+        type: Object as PropType<Client>,
         required: true,
     },
     count: {
@@ -46,16 +46,8 @@ const counter = (num: number) => {
                     :tools="{
                         create: true,
                         update: true,
+                        show: true,
                         remove: true,
-                    }"
-                    :routes="{
-                        create: 'clients.store',
-                        show: 'clients.show',
-                        update: 'clients.update',
-                        delete: 'clients.destroy',
-                        multiDestroy: 'multiDestroy',
-                        restore: 'clients.restore',
-                        multiRestore: 'multiRestore',
                     }"
                     @count="counter"
                 />

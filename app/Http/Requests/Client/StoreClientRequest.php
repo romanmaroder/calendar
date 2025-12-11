@@ -36,6 +36,7 @@ class StoreClientRequest extends FormRequest
             'total'=>'nullable|numeric',
             'source'=>'nullable|string',
             'email' => 'required|string|lowercase|email|max:255|unique:'.Client::class,
+            'password' => 'required|string|min:8',
         ];
     }
 }

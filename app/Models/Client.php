@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class Client extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
     protected string $field = 'field';
@@ -48,6 +50,19 @@ class Client extends Model
         'updated_at',
         'email_verified_at'
     ];
+
+    /**
+     * Если значение не передано или пусто — используем дефолтное
+     * @param $value
+    */
+    public function setPasswordAttribute($value): void
+    {
+        $default = config('auth.defaults.password', 'user_password');
+        $hashed = Hash::make(empty($value) ? $default : $value);
+
+        $this->attributes['password'] = $hashed;
+        $this->syncOriginal('password'); // важно для сохранения
+    }
 
     /**
      * Get the attributes that should be cast.

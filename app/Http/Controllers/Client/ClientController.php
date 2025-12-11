@@ -3,20 +3,11 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\Pipeline\Client\Email;
-use App\Http\Filters\Pipeline\Client\Id;
-use App\Http\Filters\Pipeline\Client\MiddleName;
-use App\Http\Filters\Pipeline\Client\Name;
-use App\Http\Filters\Pipeline\Client\Phone;
-use App\Http\Filters\Pipeline\Client\Surname;
 use App\Http\Requests\Client\AvatarClientRequest;
-use App\Http\Requests\Client\FilterClientRequest;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Models\Client;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -26,23 +17,12 @@ class ClientController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(FilterClientRequest $request)
+    public function index()
     {
-        $data = $request->validated();
-        $clients = app()->make(Pipeline::class)->send(Client::query())->through([
-                                                                                    Id::class,
-                                                                                    Name::class,
-                                                                                    Surname::class,
-                                                                                    MiddleName::class,
-                                                                                    Phone::class,
-                                                                                    Email::class,
-                                                                                ])->thenReturn();
-        $count = $clients->count();
-        $clients = $clients->paginate($count);
-
+        $clients = Client::paginate(20);
         return Inertia::render('client/Index', [
             'clients' => $clients,
-            'count' => $count,
+            'count' => $clients->total(),
         ]);
     }
 
@@ -60,8 +40,9 @@ class ClientController extends Controller
     public function store(StoreClientRequest $request)
     {
         $data = $request->validated();
-        $password = Hash::make(12345678);
-        $data['password'] = $password;
+        // Гарантируем наличие ключа 'password' (даже если он пустой)
+        // Если поле не установлено в форме, мутатор не сработает
+        $data['password'] = $data['password'] ?? '';
         Client::create($data);
         return to_route('clients.index');
     }
@@ -71,7 +52,13 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
-        return Inertia::render('client/Show', ['client' => $client]);
+        if ($client->trashed()) {
+            return Inertia::render('client/Show', [
+                'client' => $client,
+                'isDeleted' => true,
+            ]);
+        }
+        return Inertia::render('client/Show', ['client' => $client, 'isDeleted' => false]);
     }
 
     /**
@@ -80,15 +67,16 @@ class ClientController extends Controller
     public function edit(Client $client)
     {
         return Inertia::render('client/Edit', [
-            'entity' => $client,
+            'client' => $client,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientRequest $request, Client $client): RedirectResponse
+    public function update(UpdateClientRequest $request, $id)
     {
+        $client = Client::find($id);
         $data = $request->validated();
 
         $client->update($data);
@@ -99,145 +87,91 @@ class ClientController extends Controller
     public function avatar(AvatarClientRequest $request, Client $client)
     {
         $request->validated();
-
         if (isset($client->avatar)) {
-            $extension = explode('/', $client->avatar);
-            $avatar = end($extension);
-
             $client->update(['avatar' => null]);
-            return [
-                'code' => 200,
-                'message' => 'Avatar updated successfully',
-                'url' => '',
-                'name' => $avatar,
-            ];
         }
-        return [
-            'code' => 404,
-            'message' => 'Avatar not found',
-        ];
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Client $client)
-    {
-        $client = Client::findOrFail($client->id);
-        if ($client->delete()) {
-            return [
-                'code' => 200,
-                'message' => 'ID:' . $client->id . ' ' . $client->surname . ' deleted'
-            ];
-        }
-
-        return [
-            'code' => 404,
-            'message' => 'client not found'
-        ];
-    }
-
-    public function multiDestroy($ids)
-    {
-        $ids = explode(',', $ids);
-
-        if (Client::destroy($ids)) {
-            return [
-                'code' => 200,
-                'message' => 'Move to the basket.'
-            ];
-        }
-
-        return [
-            'code' => 404,
-            'message' => 'client not found'
-        ];
     }
 
     public function archive()
     {
-        $count = Client::onlyTrashed()->count();
-
-        $clients = app()->make(Pipeline::class)->send(Client::query())->through([
-                                                                                    Id::class,
-                                                                                    Name::class,
-                                                                                    Surname::class,
-                                                                                    MiddleName::class,
-                                                                                    Phone::class,
-                                                                                    Email::class,
-                                                                                ])->thenReturn();
+        $Clients = Client::onlyTrashed()->latest('created_at')->paginate(20);
         return Inertia::render('client/Archive', [
-            'clients' => $clients->onlyTrashed()->latest('created_at')->paginate($count),
-            'count' => $count,
+            'clients' => $Clients->collect(),
+            'count' => $Clients->total(),
         ]);
+    }
+
+    public function softDelete(string $id)
+    {
+        $resource = Client::findOrFail($id);
+        $resource->delete();
+        return response()->json(['success' => true, 'message' => 'Client has been deleted', 'code' => 200]);
+    }
+
+    public function bulkSoftDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        Client::whereIn('id', $ids)->delete();
+        return response()->json(
+            ['success' => true, 'count' => count($ids), 'message' => 'Move to the basket.', 'code' => 200]
+        );
+    }
+
+    public function forceDelete(string $id)
+    {
+        $client = Client::withTrashed()->findOrFail($id);
+        $extension = explode('/', $client->avatar);
+        $avatar = end($extension);
+        Storage::disk('public')->delete('/avatars/' . $avatar);
+        $client->forceDelete();
+        return response()->json([
+                                    'success' => true,
+                                    'message' => 'ID:' . $client->id . ' ' . $client->surname . ' deleted',
+                                    'code' => 200
+                                ]);
+    }
+
+    public function bulkForceDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        $clients = Client::withTrashed()->whereIn('id', $ids)->get();
+
+        foreach ($clients as $client) {
+            $extension = explode('/', $client->avatar);
+            $avatar = end($extension);
+            Storage::disk('public')->delete('/avatars/' . $avatar);
+        }
+
+
+        Client::withTrashed()->whereIn('id', $ids)->forceDelete();
+        return response()->json([
+                                    'success' => true,
+                                    'message' => 'Clients have been deleted',
+                                    'count' => count($ids)
+                                ]);
     }
 
     public function restore($id)
     {
-        $client = Client::where('id', $id)->onlyTrashed()->firstOrFail();
-        if ($client->restore()) {
-            return [
-                'code' => 200,
-                'message' => 'ID:' . $client->id . ' ' . $client->surname . ' restored.'
-            ];
-        }
-        return [
-            'code' => 404,
-            'message' => 'client not found'
-        ];
+        $client = Client::onlyTrashed()->findOrFail($id);
+        $client->restore();
+        return response()->json([
+                                    'success' => true,
+                                    'message' => 'ID:' . $client->id . ' ' . $client->surname . ' restored.',
+                                    'code' => 200
+                                ]);
     }
 
-    public function multiRestore($ids)
+    public function bulkRestore(Request $request)
     {
-        $ids = explode(',', $ids);
-        $clients = Client::whereIn('id', $ids)->onlyTrashed()->get();
-        $response = [];
-        foreach ($clients as $client) {
-            if ($client->restore()) {
-                $response = [
-                    'code' => 200,
-                    'message' => 'client restored'
-                ];
-            } else {
-                $response = [
-                    'code' => 404,
-                    'message' => 'client already restored'
-                ];
-            }
-        }
-        return $response;
+        $ids = $request->input('ids', []);
+        Client::onlyTrashed()->whereIn('id', $ids)->restore();
+        return response()->json([
+                                    'success' => true,
+                                    'code' => 200,
+                                    'message' => 'Clients restored'
+                                ]);
     }
 
-    public function trash($ids)
-    {
-        $ids = explode(',', $ids);
-        $clients = Client::whereIn('id', $ids)->withTrashed()->get();
-
-        $response = [];
-
-        foreach ($clients as $client) {
-            if (!$client) {
-                $response = [
-                    'code' => 404,
-                    'message' => 'The client is already deleted'
-                ];
-            }
-            if ($client->trashed()) {
-                $client->forceDelete();
-
-                if ($client->id) {
-                    $extension = explode('/', $client->avatar);
-                    $avatar = end($extension);
-                    Storage::disk('public')->delete('/avatars/' . $avatar);
-                }
-
-
-                $response = [
-                    'code' => 200,
-                    'message' => 'Clients has been deleted'
-                ];
-            };
-        }
-        return $response;
-    }
 }
