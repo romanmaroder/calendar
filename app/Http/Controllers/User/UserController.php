@@ -20,12 +20,12 @@ class UserController extends Controller
 
     public function index()
     {
-        $count = User::count();
+        $users = User::with('branch')->paginate(20);
         return Inertia::render(
             'user/Index',
             [
-                'users' => User::with('branch')->paginate($count)->collect(),
-                'count' => $count,
+                'users' => $users->collect(),
+                'count' => $users->total(),
                 'branch' => $this->getBranches(),
             ]
         );
@@ -97,10 +97,10 @@ class UserController extends Controller
 
     public function archive()
     {
-        $count = User::onlyTrashed()->count();
+        $users = User::onlyTrashed()->with('branch')->latest('created_at')->paginate(20);
         return Inertia::render('user/Archive', [
-            'users' => User::onlyTrashed()->with('branch')->latest('created_at')->paginate($count)->collect(),
-            'count' => $count,
+            'users' => $users->collect(),
+            'count' => $users->total(),
             'branch' => $this->getBranches(),
         ]);
     }
