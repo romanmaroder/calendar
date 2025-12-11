@@ -1,4 +1,4 @@
-export function dateLabelName(date?: Date): string {
+export function dateLabelName(date?: Date | null): string {
     if (!date) return '';
 
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
