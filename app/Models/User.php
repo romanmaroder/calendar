@@ -68,7 +68,7 @@ class User extends Authenticatable
         $hashed = Hash::make(empty($value) ? $default : $value);
 
         $this->attributes['password'] = $hashed;
-        $this->syncOriginal(); // важно для сохранения
+        $this->syncOriginal('password'); // важно для сохранения
     }
 
     /**
