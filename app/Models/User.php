@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Casts\Ucfirst;
 use App\Models\Branch\Branch;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
     protected string $field = 'field';
@@ -64,11 +64,11 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($value): void
     {
-        $default = config('auth.defaults.password', 'password1');
+        $default = config('auth.defaults.password', 'password');
         $hashed = Hash::make(empty($value) ? $default : $value);
 
         $this->attributes['password'] = $hashed;
-        $this->syncOriginal('password'); // важно для сохранения
+        $this->syncOriginal(); // важно для сохранения
     }
 
     /**
