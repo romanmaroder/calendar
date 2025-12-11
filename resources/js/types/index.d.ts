@@ -27,11 +27,49 @@ export interface SharedData extends PageProps {
 }
 
 export interface User {
-    id: number;
+    id: string | number;
     name: string;
+    surname?: string;
+    middleName?: string;
+    phone?: string;
+    comment?:  string;
+    birthday?: string;
     email: string;
     avatar?: string;
-    email_verified_at: string | null;
+    branch_id?: string | number;
+    branch?: Branch;
+    email_verified_at?: string | null;
+    created_at?: string;
+    updated_at?: string;
+    deleted_at?: string;
+    [key: string]: any;
+}
+export interface Client {
+    id: number;
+    name: string;
+    surname?: string;
+    middleName?: string;
+    phone?: string;
+    comment?:  string;
+    email: string;
+    avatar?: string;
+    blacklist?: boolean;
+    prepayment?: boolean;
+    discount?: number;
+    records?: number;
+    source?: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string;
+}
+
+export interface Branch {
+    id: number;
+    name: string;
+    description: string;
+    contact: string;
+    logo: null | string;
+    active: number; // или boolean, если возможно
     created_at: string;
     updated_at: string;
 }
