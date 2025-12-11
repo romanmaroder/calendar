@@ -9,6 +9,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\Branch\Branch;
 use App\Models\User;
 use App\Traits\HasControllerRoutes;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -20,21 +21,19 @@ class UserController extends Controller
     public function index()
     {
         $count = User::count();
-        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
         return Inertia::render(
             'user/Index',
             [
                 'users' => User::with('branch')->paginate($count)->collect(),
                 'count' => $count,
-                'branch' => $branch,
+                'branch' => $this->getBranches(),
             ]
         );
     }
 
     public function create()
     {
-        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
-        return Inertia::render('user/Create', ['branch' => $branch,]);
+        return Inertia::render('user/Create', ['branch' => $this->getBranches(),]);
     }
 
     public function store(StoreUserRequest $request)
@@ -66,10 +65,9 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
         return Inertia::render('user/Edit', [
             'user' => $user,
-            'branch' => $branch,
+            'branch' => $this->getBranches(),
         ]);
     }
 
@@ -96,12 +94,11 @@ class UserController extends Controller
 
     public function archive()
     {
-        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
         $count = User::onlyTrashed()->count();
         return Inertia::render('user/Archive', [
             'users' => User::onlyTrashed()->with('branch')->latest('created_at')->paginate($count)->collect(),
             'count' => $count,
-            'branch' => $branch,
+            'branch' => $this->getBranches(),
         ]);
     }
 
@@ -176,6 +173,11 @@ class UserController extends Controller
                                     'code' => 200,
                                     'message' => 'Users restored'
                                 ]);
+    }
+
+    private function getBranches(): Collection
+    {
+        return Branch::all(['id', 'name']);
     }
 
 }
