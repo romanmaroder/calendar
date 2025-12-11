@@ -19,7 +19,6 @@ const props = defineProps({
 const emit = defineEmits<{
     (e: 'cropped', value: string): void;
     (e: 'delete'): void;
-    (e: 'error', message: string): void;
 }>();
 
 const croppedImage = ref('');
@@ -98,7 +97,6 @@ const deleteCropper = () => {
         .delete(`/api/destroy?path=${encodedPath.value}`)
         .then(() => {
             removeAvatar();
-            emit('cropped', '');
         })
         .catch(function (error) {
             console.log(error.response.data.message);
@@ -118,6 +116,8 @@ const resetZoom = () => {
 const removeAvatar = () => {
     croppedImage.value = '';
     previewImage.value = '';
+    url.value = '';
+    path.value = '';
     fileInput.value = null;
 };
 
@@ -156,27 +156,27 @@ const menuAvatar = ref([
 ]);
 
 //The function converts base64 to a File object If the server does not have base64_decode conversion
-// const dataURLtoFile= (dataUrl: string, filename = 'image.png')=> {
-//     // 1. Разделяем строку на части
-//     const arr = dataUrl.split(',');
-//
-//     // 2. Извлекаем MIME-тип (например, 'image/png')
-//
-//     const mime = arr[0].match(/:(.*?);/)[1];
-//
-//     // 3. Декодируем base64-часть
-//     const bstr = atob(arr[1]);
-//     // 4. Создаём Uint8Array для бинарных данных
-//     let n = bstr.length;
-//     const u8arr = new Uint8Array(n);
-//
-//     while (n--) {
-//         u8arr[n] = bstr.charCodeAt(n);
-//     }
-//
-//     // 5. Возвращаем File-объект
-//     return new File([u8arr], filename, { type: mime });
-// }
+/*const dataURLtoFile= (dataUrl: string, filename = 'image.png')=> {
+    // 1. Разделяем строку на части
+    const arr = dataUrl.split(',');
+
+    // 2. Извлекаем MIME-тип (например, 'image/png')
+
+    const mime = arr[0].match(/:(.*?);/)[1];
+
+    // 3. Декодируем base64-часть
+    const bstr = atob(arr[1]);
+    // 4. Создаём Uint8Array для бинарных данных
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    // 5. Возвращаем File-объект
+    return new File([u8arr], filename, { type: mime });
+}*/
 </script>
 <template>
     <div class="max-w-md justify-self-center">
