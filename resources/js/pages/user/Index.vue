@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import Layout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { provide, ref } from 'vue';
+import { PropType, provide, ref } from 'vue';
 import Table from '@/components/user/Table.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Users', href: '/users' }];
 
 const props = defineProps({
     users: {
-        type: Object,
+        type: Object as PropType<User>,
         required: true,
     },
     branch: {
-        type: Object,
+        type: Array,
     },
     count: {
         type: Number,
-    },
+    }
 });
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
@@ -52,15 +52,8 @@ const counter = (num: number) => {
                     :tools="{
                         create: true,
                         update: true,
+                        show: true,
                         remove: true,
-                    }"
-                    :routes="{
-                        create: 'users.store',
-                        update: 'users.update',
-                        delete: 'users.destroy',
-                        multiDestroy: 'users.multiDestroy',
-                        restore: 'users.restore',
-                        multiRestore: 'multiRestore',
                     }"
                     @count="counter"
                 />
