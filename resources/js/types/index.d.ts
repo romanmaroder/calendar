@@ -57,6 +57,7 @@ export interface Client {
     prepayment?: boolean;
     discount?: number;
     records?: number;
+    total?: number;
     source?: string;
     created_at: string;
     updated_at: string;
