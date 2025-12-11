@@ -100,15 +100,6 @@ return [
 //            // 'timeout' => 30,
 //            // 'useAgent' => true,
 //        ],
-
-        'avatars' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public/avatar'),
-            'url' => env('APP_URL').'/storage/avatar',
-            'visibility' => 'public',
-            'throw' => false,
-        ],
-
     ],
 
     /*
