@@ -126,7 +126,7 @@ const filterFields = () => {
                             @new-user="onLoadItem"
                             icon-name="pi pi-user-plus"
                             raised
-                            label="New Mobile"
+                            label="New"
                             title="New user"
                         />
                         <Button
