@@ -1,25 +1,21 @@
 <script setup lang="ts">
 import Layout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, User } from '@/types';
 import Table from '@/components/user/Table.vue';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { ref } from 'vue';
+import { PropType, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Archive', href: 'users/archive' }];
 
 defineProps({
     users: {
-        type: Object,
+        type: Object as PropType<User>,
         required: true,
     },
     count: {
         type: Number,
-    },
-    routes: {
-        type: Object,
-        required: true,
-    },
+    }
 });
 
 const total = ref();
@@ -49,8 +45,8 @@ const counter = (num: number) => {
                     :tools="{
                         restore: true,
                         remove: true,
+                        show: true,
                     }"
-                    :routes="routes"
                     @count="counter"
                 />
             </div>
