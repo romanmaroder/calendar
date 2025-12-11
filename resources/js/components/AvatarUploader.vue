@@ -33,9 +33,6 @@ const zoomValue = ref(0);
 const ctxCropper = ref();
 const ctxAvatar = ref();
 
-const loadImages = computed(() => {
-    return props.avatar ? props.avatar : undefined;
-});
 
 watch(zoomValue, (newValue, oldValue) => {
     if (!cropper.value) return;
@@ -58,6 +55,8 @@ const crop = (cropped: string) => {
 
 const openFileDialog = () => {
     if (path.value || url.value) {
+        console.log(path.value);
+        console.log(url.value);
         deleteCropper();
         emit('delete');
     }
@@ -139,7 +138,7 @@ const menuCropper = ref([
 ]);
 
 const showMenuAvatar = (event: Event) => {
-    if (croppedImage.value || loadImages.value) {
+    if (croppedImage.value || path.value) {
         ctxAvatar.value.show(event);
     }
 };
@@ -185,10 +184,10 @@ const menuAvatar = ref([
                 <div @contextmenu.prevent="showMenuAvatar" class="mobile-area">
                     <Avatar
                         v-if="!previewImage"
-                        :image="croppedImage ? croppedImage : loadImages"
-                        :icon="!croppedImage && !loadImages ? 'pi pi-camera' : undefined"
+                        :image="croppedImage ? croppedImage : path"
+                        :icon="!croppedImage && !path ? 'pi pi-camera' : undefined"
                         size="xlarge"
-                        :class="{ 'h-full! w-full! !shadow-none': croppedImage || loadImages }"
+                        :class="{ 'h-full! w-full! !shadow-none': croppedImage || path }"
                         class="border-4 border-transparent shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)] transition-all duration-300 group-hover:border-blue-500"
                         :pt="{
                             image: 'max-w-[64px] max-h-[64px] rounded-md shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]',
@@ -212,10 +211,15 @@ const menuAvatar = ref([
                     class="shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]"
                 />
                 <ContextMenu ref="ctxCropper" :model="menuCropper" />
-                <Message class="mt-2" severity="secondary" variant="simple" :pt="{
-                    text:'text-center w-full'
-                }">Hold for
-                    2sec</Message>
+                <Message
+                    class="mt-2"
+                    severity="secondary"
+                    variant="simple"
+                    :pt="{
+                        text: 'text-center w-full',
+                    }"
+                    >Hold for 2sec</Message
+                >
             </div>
             <div class="zoom-control mb-2">
                 <Slider v-model="zoomValue" :min="0" :max="10" :step="1" class="zoom-slider" />
