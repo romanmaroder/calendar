@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import Icon from '@/components/Icon.vue';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useInitials } from '@/composables/useInitials';
-import { usePhoneLink } from '@/composables/usePhoneLink';
+import FinanceCard from '@/components/user/profile/FinanceCard.vue';
+import InfoCard from '@/components/user/profile/InfoCard.vue';
+import ProfileCard from '@/components/user/profile/ProfileCard.vue';
 import { useFullname } from '@/composables/useFullname';
-import { computed, ref } from 'vue';
+import { useMediaQuery } from '@/composables/useMediaQuery';
+import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
+import { User } from '@/types';
+import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     entity: {
-        type: Object,
+        type: Object as PropType<User>,
         default() {
             return {};
         },
@@ -24,148 +26,59 @@ const props = defineProps({
         type: String,
         default: 'Edit',
     },
+    variant: {
+        type: String,
+        validator(value: string) {
+            return ['outlined', 'text', 'link'].includes(value);
+        },
+        default: 'link',
+    },
 });
 
-// Compute whether we should show the avatar image
-const showAvatar = computed(() => props.entity.avatar && props.entity.avatar !== '');
+const { getFullname } = useFullname();
+
 const visible = ref(false);
-const {getFullname} = useFullname();
-const { getInitials } = useInitials();
-const { getPhone } = usePhoneLink();
 
-const resize =()=>{
+const isLargeScreen = useMediaQuery(640);
 
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 640) {
-            visible.value = false;
-        }
-    })
+watch(isLargeScreen, () => {
+    visible.value = false;
+});
 
-};
-resize();
-
-const getStatusLabel = (status: any) => {
-    switch (status) {
-        case true:
-            return 'success';
-        case false:
-            return 'warn';
-        default:
-            return undefined;
-    }
-};
 </script>
 
 <template>
     <Drawer
         v-model:visible="visible"
-        :header="getFullname({name:entity.name, surname:entity.surname})"
+        :header="getFullname({ name: props.entity.name, surname: props.entity.surname })"
         :blockScroll="true"
         position="bottom"
         closeIcon="pi pi-chevron-down"
         :pt="{
-            root:{
-                class:'sm:hidden! h-[100vh]!'
+            root: {
+                class: 'sm:hidden! h-[100vh]! dark:bg-black!',
             },
-            mask:{
-                class:'sm:hidden!',
+            content: {
+                class: 'p-0!',
+            },
+            mask: {
+                class: 'sm:hidden!',
             },
             header: {
-                class: '!py-[0.5rem]',
+                class: '!py-[0.5rem] ![text-shadow:_0.5px_0.5px_2px_rgba(0,0,0,0.5)]',
             },
             title: {
                 class: '!text-lg',
             },
         }"
     >
-            <div class="flex flex-col w-full items-center justify-center gap-y-5">
-                <Avatar
-                    class="h-[100%] w-[65vw] overflow-hidden rounded-sm"
-                >
-                    <AvatarImage v-if="showAvatar" :src="entity.avatar" :alt="entity.name" />
-                    <AvatarFallback class="rounded-lg text-black dark:text-white min-h-[20vh]">
-                        {{ getInitials(getFullname({name:entity.name, surname:entity.surname})) }}
-                    </AvatarFallback>
-                </Avatar>
-                <div
-                    class="flex-col items-center justify-center w-full rounded-lg border border-1 bg-white p-2 transition-all dark:bg-[#18181B]"
-                >
-                    <div class="flex flex-col items-center justify-center">
-                        <Button
-                            class="text-2xl! font-bold! text-gray-600! dark:text-gray-400! p-0!"
-                            as="a"
-                            variant="link"
-                            :label="entity.phone"
-                            :href="'tel:' + getPhone(entity.phone)"
-                            rel="noopener"
-                        />
-                        <Button
-                            class="text-xs! font-light! p-0!"
-                            as="a"
-                            variant="link"
-                            :label="entity.email"
-                            :href="'mailto:' + entity.email"
-                            rel="noopener"
-                        />
-                    </div>
-                    <Divider/>
-                                        <div class="flex items-center justify-between gap-x-10">
-                        <div>
-                            <Button
-                                class="!hover:text-sky-800 px-0"
-                                as="a"
-                                variant="link"
-                                :label="entity.phone"
-                                :href="'tel:' + getPhone(entity.phone)"
-                                rel="noopener"
-                            >
-                                <Icon name="PhoneOutgoing" class="h-7 w-7" />
-                            </Button>
-                        </div>
-                                            <Divider layout="vertical"/>
-                        <div>
-                            <Button class="px-0" as="a" variant="link" :label="entity.phone" :href="'sms:' +
-                            getPhone(entity.phone)" rel="noopener">
-                                <Icon name="MessageSquareText" class="h-7 w-7" />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            <Tabs value="0">
-                <TabList>
-                    <Tab value="0">History</Tab>
-                    <Tab value="1" v-if="entity.comment">Comment</Tab>
-                    <Tab value="2" v-if="entity.birthday">Info</Tab>
-                </TabList>
-                <TabPanels class="px-0! min-w-[85vw]!">
-                    <TabPanel value="0">
-                        <p class="m-0 flex flex-row items-center justify-between">
-                            <span class="flex items-center justify-between gap-x-2">
-                                <Icon name="CalendarPlus2" />
-                            </span>
-                           {{ entity.created_at }}
-                        </p>
-                    </TabPanel>
-                    <TabPanel value="1">
-                        <p class="m-0 flex flex-row items-center justify-between"
-                           v-if="entity.comment">
-                            {{ entity.comment }}
-                        </p>
-                    </TabPanel>
-                    <TabPanel value="2">
-                        <p class="m-0 flex flex-row items-center justify-between">
-                            <span class="flex items-center justify-between gap-x-2">
-                                <Icon name="Cake" />
-                            </span>
-                            {{ entity.birthday }}
-                        </p>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
-        </div>
+        <ProfileLayout>
+            <template #center-column>
+                <ProfileCard :user="entity" />
+                <InfoCard :user="entity" class="mt-2" />
+                <FinanceCard :data="{ month: '80000', currentDay: '4250' }" class="mt-2" />
+            </template>
+        </ProfileLayout>
     </Drawer>
-    <Button @click="visible = true" size="small" variant="link">
-        <Icon :name="iconName" />
-        {{ label }}
-    </Button>
+    <Button @click="visible = true" :icon="iconName" :label="label" size="small" variant="link" />
 </template>
