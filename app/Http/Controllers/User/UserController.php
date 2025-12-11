@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Client\AvatarUserRequest;
+use App\Http\Requests\User\AvatarUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\Branch\Branch;
@@ -117,7 +117,8 @@ class UserController extends Controller
         $ids = $request->input('ids', []);
         User::whereIn('id', $ids)->delete();
         return response()->json(
-            ['success' => true, 'count' => count($ids), 'message' => 'Move to the basket.', 'code' => 200]
+            ['success' => true,
+                'count' => count($ids), 'message' => 'Move to the basket.', 'code' => 200]
         );
     }
 
