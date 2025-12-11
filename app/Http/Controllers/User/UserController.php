@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Upload\AvatarUploadController;
 use App\Http\Requests\Client\AvatarUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
@@ -22,17 +21,12 @@ class UserController extends Controller
     {
         $count = User::count();
         $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
-        $routes = $this->routeMerge(
-            $this->getRoutesByController(AvatarUploadController::class),
-            $this->getControllerRoutes()
-        );
         return Inertia::render(
             'user/Index',
             [
                 'users' => User::with('branch')->paginate($count)->collect(),
                 'count' => $count,
                 'branch' => $branch,
-                'routes' => $routes
             ]
         );
     }
@@ -40,11 +34,7 @@ class UserController extends Controller
     public function create()
     {
         $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
-        $routes = $this->routeMerge(
-            $this->getRoutesByController(AvatarUploadController::class),
-            $this->getControllerRoutes()
-        );
-        return Inertia::render('user/Create', ['branch' => $branch, 'routing' => $routes]);
+        return Inertia::render('user/Create', ['branch' => $branch,]);
     }
 
     public function store(StoreUserRequest $request)
@@ -106,15 +96,12 @@ class UserController extends Controller
 
     public function archive()
     {
+        $branch = Branch::all(['id', 'name']); //TODO добавление филиалов
         $count = User::onlyTrashed()->count();
-        $routes = $this->routeMerge(
-            $this->getRoutesByController(AvatarUploadController::class),
-            $this->getControllerRoutes()
-        );
         return Inertia::render('user/Archive', [
             'users' => User::onlyTrashed()->with('branch')->latest('created_at')->paginate($count)->collect(),
             'count' => $count,
-            'routes' => $routes
+            'branch' => $branch,
         ]);
     }
 
