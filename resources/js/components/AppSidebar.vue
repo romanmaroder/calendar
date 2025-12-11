@@ -23,12 +23,12 @@ const mainNavItemsUser: NavItem[] = [
 const mainNavItemsClient: NavItem[] = [
     {
         title: 'Clients',
-        href: '/clients/index',
+        href: '/clients',
         icon: Users2,
     },
     {
         title: 'Clients trash ',
-        href: '/archive',
+        href: '/clients/archive',
         icon: UserRoundXIcon,
     },
 ];
