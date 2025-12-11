@@ -136,8 +136,8 @@ function handleAction() {
         <span v-else class="text-red-500"><b>will be deleted forever.</b></span>
 
         <div class="mt-2 flex justify-end gap-2">
-            <Button type="button" size="small" label="Cancel" severity="secondary" @click="visible = false" />
-            <Button type="button" size="small" label="Yes, delete account" severity="danger" @click="handleAction" />
+            <Button type="button" size="small" label="Cancel" severity="secondary" raised @click="visible = false" />
+            <Button type="button" size="small" label="Yes, delete account" severity="danger" raised @click="handleAction" />
         </div>
     </Dialog>
 </template>

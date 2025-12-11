@@ -89,8 +89,8 @@ function restore() {
         :label="Array.isArray(props.entity) ? `(${count})` : '0'"
         :icon="iconName"
         severity="success"
-        raised
         :disabled="disabled"
+        raised
         @click.prevent="restore()"
     >
         <i :class="iconName"></i>
