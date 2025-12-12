@@ -5,7 +5,7 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, UserRoundXIcon, Users2, UsersIcon, UserX } from 'lucide-vue-next';
+import { BookOpen, Folder, MapPinHouse, UserRoundXIcon, Users2, UsersIcon, UserX } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItemsUser: NavItem[] = [
@@ -18,6 +18,10 @@ const mainNavItemsUser: NavItem[] = [
         title: 'Users trash ',
         href: '/users/archive',
         icon: UserX,
+    },{
+        title: 'Branches ',
+        href: '/branch',
+        icon: MapPinHouse,
     },
 ];
 const mainNavItemsClient: NavItem[] = [
