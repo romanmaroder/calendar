@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\User\UserController;
 
-
 Route::middleware(['auth'])->group(function () {
     Route::redirect('users', '/users/index');
+
     Route::get('users/archive', [UserController::class, 'archive'])->name('users.archive');
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');

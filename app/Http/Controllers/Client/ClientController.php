@@ -21,7 +21,7 @@ class ClientController extends Controller
     {
         $clients = Client::paginate(20);
         return Inertia::render('client/Index', [
-            'clients' => $clients,
+            'clients' => $clients->collect(),
             'count' => $clients->total(),
         ]);
     }

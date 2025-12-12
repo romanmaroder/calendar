@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import Create from '@/components/client/Create.vue';
-import CreateDialog from '@/components/client/CreateDialog.vue';
-import DeleteDialog from '@/components/client/DeleteDialog.vue';
-import MultiDeleteDialog from '@/components/client/MultiDeleteDialog.vue';
-import MultiRestore from '@/components/client/MultiRestore.vue';
-import Restore from '@/components/client/Restore.vue';
-import ShowDialog from '@/components/client/ShowDialog.vue';
-import Update from '@/components/client/Update.vue';
-import UpdateDialog from '@/components/client/UpdateDialog.vue';
-import Filter from '@/components/filters/user/Filter.vue';
-import Icon from '@/components/Icon.vue';
-import { FilterMatchMode } from '@primevue/core/api';
-import { onMounted, onUpdated, ref } from 'vue';
-import { usePhoneLink } from '@/composables/usePhoneLink';
+import FormDrawer from '@/components/client/FormDrawer.vue';
 import Show from '@/components/client/Show.vue';
+import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
+import Restore from '@/components/common/Restore.vue';
+import Filter from '@/components/filters/user/Filter.vue';
+import { getFullname } from '@/composables/useFullname';
+import { getInitials } from '@/composables/useInitials';
+import { useMediaQuery } from '@/composables/useMediaQuery';
+import { usePhoneLink } from '@/composables/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
+import { Client } from '@/types';
+import { FilterMatchMode } from '@primevue/core/api';
+import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
+import { route } from 'ziggy-js';
+
+//Типизация клиента
 
 const props = defineProps({
     entities: {
-        type: Object,
+        type: Object as PropType<Client>,
         required: true,
         default() {
             return {};
@@ -32,15 +32,8 @@ const props = defineProps({
                 update: false,
                 restore: false,
                 remove: false,
-                multiRestore: false,
-                multiDelete: false,
+                show: false,
             };
-        },
-    },
-    routes: {
-        type: Object,
-        default() {
-            return {};
         },
     },
 });
@@ -61,41 +54,47 @@ const loading = ref(true);
 const pagination = ref(false);
 const visible = ref(false);
 
-const {getPhone}=usePhoneLink();
-const { useSingleElement, useMultipleElements } = workingWithTableItems();
+const { getPhone } = usePhoneLink();
+const { useRows } = workingWithTableItems();
 
-onMounted(() => {
-    items.value = props.entities.data;
-    if (items.value.length > 0) {
-        pagination.value = true;
-    }
+onBeforeMount(() => {
+    items.value = props.entities;
     loading.value = false;
 });
 
-onUpdated(() => {
-    emit('count', (count.value = items.value.length));
-    if (items.value.length == 0) {
-        pagination.value = false;
-    }
+const isLargeScreen = useMediaQuery(640);
+
+watch(items, () => {
+    pagination.value = items.value.length > 0;
+    count.value = items.value.length;
 });
 
-const onDeleteItem = (id: any) => {
-    useSingleElement(items,id);
-};
-const onLoadItem = () => {
-    items.value = props.entities.data;
+watch(count, () => {
+    emit('count', count);
+});
+
+const isDeleted = computed(() => {
+    return items.value.every((item: Client) => !!item.deleted_at);
+});
+
+const onDeleteItem = (id: Client) => {
+    useRows(items, ref([id]));
 };
 
-const onRestoreItem = (id: any) => {
-    useSingleElement(items,id);
+const onLoadItem = () => {
+    items.value = props.entities;
+};
+
+const onRestoreItem = (id: Client) => {
+    useRows(items, ref([id]));
 };
 
 const onRestoreSelectedItems = () => {
-    useMultipleElements(items, selectedItems);
+    useRows(items, selectedItems);
 };
 
 const onDeleteSelectedItems = () => {
-    useMultipleElements(items, selectedItems);
+    useRows(items, selectedItems);
 };
 
 const getStatusLabel = (status: boolean) => {
@@ -129,50 +128,49 @@ const filterFields = () => {
        });
    }
 };*/
-
 </script>
 
 <template>
     <div class="grid auto-cols-fr">
         <Toolbar class="mb-6">
             <template #start>
-                <div class="flex flex-row items-start space-x-2">
-                    <span class="sm:hidden">
-                        <Create
-                            v-if="tools.create"
-                            icon-name="UserRoundPlus"
+                <div class="flex flex-row items-start">
+                    <span class="">
+                        <form-drawer
+                            v-if="tools.create && !isLargeScreen"
+                            @new-user="onLoadItem"
+                            icon-name="pi pi-user-plus"
+                            raised
                             label="New"
                             title="New client"
-                            :route="routes.create"
-                            @create-item="onLoadItem"
                         />
-                    </span>
-                    <span class="hidden sm:table-cell">
-                        <CreateDialog
-                            v-if="tools.create"
-                            icon-name="UserRoundPlus"
+                        <Button
+                            v-if="tools.create && isLargeScreen"
+                            as="a"
+                            icon="pi pi-user-plus"
                             label="New"
-                            title="New client"
-                            :route="routes.create"
-                            @create-item="onLoadItem"
+                            raised
+                            :href="route('clients.create')"
+                            size="small"
+                            class="mx-2"
                         />
                     </span>
-                    <span class="hidden sm:table-cell">
-                        <MultiRestore
+                    <span class="hidden space-x-2 sm:flex">
+                        <restore
                             v-if="tools.restore"
                             :entity="selectedItems"
                             label="Восстановить"
-                            icon-name="Undo2"
-                            :route="routes.multiRestore"
-                            @restore-items="onRestoreSelectedItems"
+                            icon-name="pi pi-replay"
+                            type="multi"
+                            route="clients.bulk.restore"
                             :disabled="!selectedItems || !selectedItems.length"
+                            @restore-items="onRestoreSelectedItems"
                         />
-                    </span>
-                    <span class="hidden sm:table-cell">
-                        <MultiDeleteDialog
+                        <delete-confirmation
                             :entity="selectedItems"
-                            icon-name=""
-                            :route="routes.multiDestroy"
+                            icon-name="pi pi-trash"
+                            type="multi"
+                            :route="isDeleted ? 'clients.bulk.force' : 'clients.bulk.soft'"
                             :disabled="!selectedItems || !selectedItems.length"
                             @delete-items="onDeleteSelectedItems"
                         />
@@ -195,7 +193,7 @@ const filterFields = () => {
                     <p class="text-center text-gray-500">Фильтр для модели Client в разработке</p>
                     <Filter :entities="entities" class-name="grid items-end gap-5 mt-2 !hidden" />
                 </Drawer>
-                <Button icon="pi pi-search" @click="visible = true" size="small" />
+                <Button icon="pi pi-search" raised @click="visible = true" size="small" />
             </template>
         </Toolbar>
 
@@ -209,8 +207,7 @@ const filterFields = () => {
             :paginator="pagination"
             :rows="10"
             filterDisplay="menu"
-            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'source','created_at',
-            'total']"
+            :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'source', 'created_at', 'total']"
             sortMode="multiple"
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -220,16 +217,22 @@ const filterFields = () => {
         >
             <template #header>
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h4 class="m-0">Manage clients</h4>
-                    <IconField>
+                    <h4 class="m-0 hidden sm:block">Manage clients</h4>
+                    <IconField class="w-full shadow-md sm:w-auto">
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" name="search" class="h-[28px]" placeholder="Search..." size="small" />
+                        <InputText
+                            v-model="filters['global'].value"
+                            name="search"
+                            class="h-[28px] w-full sm:w-auto"
+                            placeholder="Search..."
+                            size="small"
+                        />
                     </IconField>
                 </div>
             </template>
-            <template #empty><p class="text-center text-xl font-bold">No entities</p></template>
+            <template #empty><p class="text-center text-xl font-bold">Add clients</p></template>
             <template #loading> Loading items data. Please wait.</template>
             <Column
                 selectionMode="multiple"
@@ -239,11 +242,11 @@ const filterFields = () => {
                         class: 'hidden sm:table-cell',
                     },
                     pcRowCheckbox: {
-                        input: {
-                            name: 'selectedItem',
-                        },
+                        root: { class: 'shadow-md' },
+                        input: { name: 'selectedItem' },
                     },
                     pcHeaderCheckbox: {
+                        root: { class: 'shadow-md' },
                         input: { name: 'allSelected' },
                     },
                 }"
@@ -258,16 +261,40 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <img v-if="slotProps.data.avatar" :src="slotProps.data.avatar" :alt="slotProps.data.avatar" class="max-w-[48px] rounded" />
-                    <img v-else class="max-w-[48px] rounded" src="../../../../public/no_avatar_big.png" alt="" />
+                    <Avatar
+                        v-if="!slotProps.data.avatar"
+                        size="large"
+                        class="shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]"
+                        :label="
+                            slotProps.data.avatar
+                                ? slotProps.data.avatar
+                                : getInitials(getFullname({ name: slotProps.data.name, surname: slotProps.data.surname }))
+                        "
+                    />
+
+                    <Image
+                        v-else
+                        :src="slotProps.data.avatar"
+                        :alt="slotProps.data.avatar"
+                        preview
+                        :pt="{
+                            image: {
+                                class: 'max-w-[48px] max-h-[48px] rounded-md shadow-[0_3px_1px_-2px_rgba(0,_0,_0,_0.2),_0_2px_2px_0_rgba(0,_0,_0,_0.14),_0_1px_5px_0_rgba(0,_0,_0,_0.12)]',
+                            },
+                        }"
+                    />
                 </template>
             </Column>
             <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
                     <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
-                        {{ slotProps.data.name }}
-                        {{ slotProps.data.middleName }}
-                        {{ slotProps.data.surname }}
+                        {{
+                            getFullname({
+                                name: slotProps.data.name,
+                                middlename: slotProps.data.middleName,
+                                surname: slotProps.data.surname,
+                            })
+                        }}
                     </div>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
@@ -311,35 +338,30 @@ const filterFields = () => {
                             buttonClass="!max-w-[1.5rem] !max-h-[1.5rem]"
                         >
                             <template #icon>
-                                <Icon name="Settings" />
+                                <i class="pi pi-cog"></i>
                             </template>
                             <template #item>
-                                <Restore
+                                <restore
                                     v-if="tools.restore"
-                                    :id="slotProps.data.id"
-                                    icon-name="Undo2"
-                                    :route="routes.restore"
-                                    @restore-customer="onRestoreItem"
+                                    :entity="slotProps.data"
+                                    icon-name="pi pi-replay"
+                                    route="users.restore"
+                                    @restore-item="onRestoreItem"
                                 />
-                                <Update
+                                <form-drawer
                                     v-if="tools.update"
-                                    :entity="slotProps.data"
-                                    icon-name="UserPen"
+                                    icon-name="pi pi-user-edit"
                                     label=""
-                                    :route="routes.update"
-                                    @update-item="onLoadItem"
-                                />
-                                <Show
                                     :entity="slotProps.data"
-                                    icon-name="UserSearch"
-                                    label=""
-                                    :route="routes.show"
+                                    @update-user="onLoadItem"
+                                    variant="link"
                                 />
-                                <DeleteDialog
+                                <show :entity="slotProps.data" icon-name="pi pi-user" label="" route="" />
+                                <delete-confirmation
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
-                                    icon-name="UserMinus"
-                                    :route="routes.delete"
+                                    icon-name="pi pi-user-minus"
+                                    :route="isDeleted ? 'clients.bulk.force' : 'clients.bulk.soft'"
                                     @delete-item="onDeleteItem"
                                 />
                             </template>
@@ -458,35 +480,47 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <span class="flex flex-row items-start justify-start flex-wrap">
-                        <UpdateDialog
-                            :key="slotProps.data.id"
+                    <span class="flex flex-row flex-wrap items-start justify-start">
+                        <Button
                             v-if="tools.update"
-                            :entity="slotProps.data"
-                            icon-name="UserPen"
-                            label="Edit item"
-                            :route="routes.update"
-                            @update-item="onLoadItem"
+                            as="a"
+                            variant="link"
+                            icon="pi pi-user-edit"
+                            label=""
+                            :href="route('clients.edit', slotProps.data)"
+                            size="small"
+                            :pt="{
+                                icon: {
+                                    class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
+                                },
+                            }"
                         />
-                        <ShowDialog
-                            :key="slotProps.data.id"
-                            :entity="slotProps.data"
-                            icon-name="UserSearch"
-                            label="Show item"
-                            :route="routes.show"
+                        <Button
+                            as="a"
+                            variant="link"
+                            icon="pi pi-user"
+                            label=""
+                            :href="route('clients.show', slotProps.data)"
+                            size="small"
+                            :pt="{
+                                icon: {
+                                    class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
+                                },
+                            }"
                         />
-                        <Restore
+
+                        <restore
                             v-if="tools.restore"
-                            :id="slotProps.data.id"
-                            icon-name="Undo2"
-                            :route="routes.restore"
-                            @restore-customer="onRestoreItem"
+                            :entity="slotProps.data"
+                            icon-name="pi pi-replay"
+                            route="clients.restore"
+                            @restore-item="onRestoreItem"
                         />
-                        <DeleteDialog
+                        <delete-confirmation
                             v-if="tools.remove"
                             :entity="slotProps.data"
-                            icon-name="UserMinus"
-                            :route="routes.delete"
+                            icon-name="pi pi-user-minus"
+                            :route="isDeleted ? 'clients.force' : 'clients.soft.delete'"
                             @delete-item="onDeleteItem"
                         />
                     </span>
