@@ -30,7 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head title="Show" />
+        <Head :title="props.user.surname" />
         <UserProfile :user="user" />
     </Layout>
 </template>
