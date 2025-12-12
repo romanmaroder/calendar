@@ -102,8 +102,7 @@ const onDeleteAvatar = () => {
                     detail: form.name + ' - update successfully.',
                     life: 3000,
                 });
-                form.avatar='';
-
+                form.avatar = '';
             },
             onError: function (errors) {
                 toast.add({
@@ -132,7 +131,7 @@ const setDate = (date: Date | null): void => {
             <template #left-center-column>
                 <ProfileCard>
                     <div class="mb-2 space-y-4">
-                        <AvatarUploader :avatar="form.avatar" @cropped="onUpdateCropped" @delete="onDeleteAvatar"  />
+                        <AvatarUploader :avatar="form.avatar" @cropped="onUpdateCropped" @delete="onDeleteAvatar" />
                         <FloatLabel variant="on" class="">
                             <InputText
                                 id="name"
@@ -144,8 +143,8 @@ const setDate = (date: Date | null): void => {
                                 v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
                             />
                             <label for="name" class="bg-transparent! font-light!">{{ 'Имя:' }}</label>
-                            <InputError :message="form.errors.name" class="mt-4 mb-4" />
                         </FloatLabel>
+                        <InputError :message="form.errors.name" />
                         <FloatLabel variant="on" class="">
                             <InputText
                                 id="middleName"
@@ -157,8 +156,8 @@ const setDate = (date: Date | null): void => {
                                 v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
                             />
                             <label for="middleName" class="bg-transparent! font-light!">{{ 'Отчество:' }}</label>
-                            <InputError :message="form.errors.middleName" class="mt-4 mb-4" />
                         </FloatLabel>
+                        <InputError :message="form.errors.middleName" />
                         <FloatLabel variant="on" class="">
                             <InputText
                                 id="surname"
@@ -170,8 +169,8 @@ const setDate = (date: Date | null): void => {
                                 v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
                             />
                             <label for="surname" class="bg-transparent! font-light!">{{ 'Фамилия:' }}</label>
-                            <InputError :message="form.errors.surname" class="mt-4 mb-4" />
                         </FloatLabel>
+                        <InputError :message="form.errors.surname" />
                     </div>
                 </ProfileCard>
             </template>
@@ -192,8 +191,8 @@ const setDate = (date: Date | null): void => {
                                     fluid
                                 />
                                 <label for="branch" class="bg-transparent! font-light!">{{ 'Филиал' }}</label>
-                                <InputError :message="form.errors.branch_id" class="mt-4 mb-4" />
                             </FloatLabel>
+                            <InputError :message="form.errors.branch_id" />
                             <FloatLabel variant="on">
                                 <InputMask
                                     id="phone"
@@ -206,8 +205,8 @@ const setDate = (date: Date | null): void => {
                                     :aria-autocomplete="form.phone"
                                 />
                                 <label for="phone" class="bg-transparent! font-light!">{{ '+9 999 999 99 99' }}</label>
-                                <InputError :message="form.errors.phone" class="mt-4 mb-4" />
                             </FloatLabel>
+                            <InputError :message="form.errors.phone" />
 
                             <FloatLabel variant="on" class="">
                                 <InputText
@@ -221,7 +220,7 @@ const setDate = (date: Date | null): void => {
                                 />
                                 <label for="email" class="bg-transparent! font-light!">Email:</label>
                             </FloatLabel>
-                            <InputError :message="form.errors.email" class="mt-4 mb-4" />
+                            <InputError :message="form.errors.email" />
                             <FloatLabel variant="on">
                                 <DatePicker
                                     id="birthday"
@@ -249,9 +248,9 @@ const setDate = (date: Date | null): void => {
                                         },
                                     }"
                                 />
-                                <label class="bg-transparent! font-light!" for="birthday1" >{{ 'ДР' }}</label>
+                                <label class="bg-transparent! font-light!" for="birthday1">{{ 'ДР' }}</label>
                             </FloatLabel>
-                            <InputError :message="form.errors.birthday" class="mt-4 mb-4" />
+                            <InputError :message="form.errors.birthday" />
                         </div>
                     </InfoCard>
                 </div>
@@ -271,7 +270,7 @@ const setDate = (date: Date | null): void => {
                             />
                             <label class="bg-transparent! font-light!" for="comment">Заметка</label>
                         </FloatLabel>
-                        <InputError :message="form.errors.comment" class="mt-1 mb-2" />
+                        <InputError :message="form.errors.comment" />
                     </div>
                 </ProfileCard>
             </template>
