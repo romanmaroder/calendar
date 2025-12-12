@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
-import { Client, User } from '@/types';
+import { User } from '@/types';
 import { PropType, ref } from 'vue';
 import FilesList from './FilesList.vue';
 import FinanceCard from './FinanceCard.vue';
@@ -11,7 +11,7 @@ import VisitsList from './VisitsList.vue';
 
 defineProps({
     user: {
-        type: Object as PropType<User | Client>
+        type: Object as PropType<User>,
     },
 });
 
@@ -170,15 +170,12 @@ const notes = ref([
     { title: 'Примечание 31.06.23.pdf', size: '123kb' },
     { title: 'Примечание 23.06.23.pdf', size: '123kb' },
 ]);
-
 function downloadFile(file: any) {
     alert(`Скачиваем: ${file.name}`);
 }
-
 function removeFile(index: number) {
     files.value.splice(index, 1);
 }
-
 function downloadNote(note: any) {
     alert(`Скачиваем заметку: ${note.title}`);
 }
