@@ -17,8 +17,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('contact')->nullable();
             $table->string('avatar')->nullable();
-            $table->boolean('active')->default(true);
+            $table->boolean('status')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
