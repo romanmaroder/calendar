@@ -201,14 +201,14 @@ const filterFields = () => {
             <template #header>
                 <div class="flex flex-wrap items-center justify-center gap-2 sm:justify-between">
                     <h4 class="m-0 hidden sm:block">Manage users</h4>
-                    <IconField class="w-full shadow-md sm:w-auto">
+                    <IconField class="w-full shadow-sm sm:w-auto rounded-md">
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
                         <InputText
                             v-model="filters['global'].value"
                             name="search"
-                            class="h-[28px] w-full sm:w-auto"
+                            class="w-full sm:w-auto"
                             placeholder="Search..."
                             size="small"
                         />
