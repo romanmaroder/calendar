@@ -32,7 +32,7 @@ export interface User {
     surname?: string;
     middleName?: string;
     phone?: string;
-    comment?:  string;
+    comment?: string;
     birthday?: string;
     email: string;
     avatar?: string;
@@ -44,13 +44,14 @@ export interface User {
     deleted_at?: string;
     [key: string]: any;
 }
+
 export interface Client {
     id: number;
     name: string;
     surname?: string;
     middleName?: string;
     phone?: string;
-    comment?:  string;
+    comment?: string;
     email: string;
     avatar?: string;
     blacklist?: boolean;
@@ -62,6 +63,7 @@ export interface Client {
     created_at: string;
     updated_at: string;
     deleted_at?: string;
+    [key: string]: any;
 }
 
 export interface Branch {
@@ -69,10 +71,12 @@ export interface Branch {
     name: string;
     description: string;
     contact: string;
-    logo: null | string;
-    active: boolean;
+    avatar?: string;
+    status: boolean;
     created_at: string;
     updated_at: string;
+    deleted_at?: string;
+    [key: string]: any;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;
