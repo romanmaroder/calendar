@@ -3,7 +3,6 @@ import FormDrawer from '@/components/client/FormDrawer.vue';
 import Show from '@/components/client/Show.vue';
 import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 import Restore from '@/components/common/Restore.vue';
-import Filter from '@/components/filters/user/Filter.vue';
 import { getFullname } from '@/composables/useFullname';
 import { getInitials } from '@/composables/useInitials';
 import { useMediaQuery } from '@/composables/useMediaQuery';
@@ -52,7 +51,6 @@ const formatCurrency = (value: any) => {
 };
 const loading = ref(true);
 const pagination = ref(false);
-const visible = ref(false);
 
 const { getPhone } = usePhoneLink();
 const { useRows } = workingWithTableItems();
@@ -132,7 +130,12 @@ const filterFields = () => {
 
 <template>
     <div class="grid auto-cols-fr">
-        <Toolbar class="mb-6">
+        <Toolbar
+            class="mb-6"
+            :pt="{
+                end: 'w-full mt-3 sm:w-auto sm:mt-0', //FIXME добавить в другие таблицы вместо фильтра
+            }"
+        >
             <template #start>
                 <div class="flex flex-row items-start">
                     <span class="">
@@ -178,22 +181,12 @@ const filterFields = () => {
                 </div>
             </template>
             <template #end>
-                <Drawer
-                    v-model:visible="visible"
-                    header="Filter"
-                    :pt="{
-                        header: {
-                            class: '!py-[0.5rem]',
-                        },
-                        title: {
-                            class: '!text-lg',
-                        },
-                    }"
-                >
-                    <p class="text-center text-gray-500">Фильтр для модели Client в разработке</p>
-                    <Filter :entities="entities" class-name="grid items-end gap-5 mt-2 !hidden" />
-                </Drawer>
-                <Button icon="pi pi-search" raised @click="visible = true" size="small" />
+                <IconField class="w-full rounded-md shadow-sm sm:w-auto">
+                    <InputIcon>
+                        <i class="pi pi-search" />
+                    </InputIcon>
+                    <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
+                </IconField>
             </template>
         </Toolbar>
 
@@ -215,23 +208,6 @@ const filterFields = () => {
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
             :loading="loading"
         >
-            <template #header>
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h4 class="m-0 hidden sm:block">Manage clients</h4>
-                    <IconField class="w-full shadow-sm sm:w-auto rounded-md">
-                        <InputIcon>
-                            <i class="pi pi-search" />
-                        </InputIcon>
-                        <InputText
-                            v-model="filters['global'].value"
-                            name="search"
-                            class="w-full sm:w-auto"
-                            placeholder="Search..."
-                            size="small"
-                        />
-                    </IconField>
-                </div>
-            </template>
             <template #empty><p class="text-center text-xl font-bold">Add clients</p></template>
             <template #loading> Loading items data. Please wait.</template>
             <Column
