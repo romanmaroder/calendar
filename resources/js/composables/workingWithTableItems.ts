@@ -1,17 +1,8 @@
 import { Ref } from 'vue';
-import { type User } from '@/types';
-
-/*export function useSingleElement(items?: object, id?: number): object | undefined {
-    const item = ref<Arrayable<any>>(items);
-
-    if (!item.value) return {};
-    if (!id) return {};
-
-    item.value = item.value.filter((val: any) => val.id !== id);
-}*/
+import { Branch, Client, type User } from '@/types';
 
 /*Совместно с Алиса ИИ*/
-export function useRows<T extends User>(rows?: Ref<T[]>, selectedRows?: Ref<T[]>): void {
+export function useRows<T extends User | Client |Branch>(rows?: Ref<T[]>, selectedRows?: Ref<T[]>): void {
     // Проверяем, что оба аргумента переданы и не null
     if (!rows || !selectedRows) {
         return;
