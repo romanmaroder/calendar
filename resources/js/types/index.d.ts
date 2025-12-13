@@ -70,7 +70,7 @@ export interface Branch {
     description: string;
     contact: string;
     logo: null | string;
-    active: number; // или boolean, если возможно
+    active: boolean;
     created_at: string;
     updated_at: string;
 }

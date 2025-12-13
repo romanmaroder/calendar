@@ -21,7 +21,7 @@ class CompanyFactory extends Factory
             'description' => $this->faker->realText(10),
             'contact' => $this->faker->address(),
             'info' => $this->faker->realText(15),
-            'logo' => $this->faker->imageUrl(),
+            'avatar' => $this->faker->imageUrl(),
             'country_code' => $this->faker->countryCode(),
             'currency_code' => $this->faker->currencyCode(),
         ];

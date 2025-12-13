@@ -21,7 +21,7 @@ class BranchFactory extends Factory
             'name' => $this->faker->company(),
             'description' => $this->faker->realText(10),
             'contact'=>$this->faker->address(),
-            'logo' => $this->faker->imageUrl(),
+            'avatar' => $this->faker->imageUrl(),
             'active'=>$this->faker->boolean(100),
         ];
     }
