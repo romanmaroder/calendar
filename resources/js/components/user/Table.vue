@@ -11,7 +11,7 @@ import { User } from '@/types';
 import { FilterMatchMode } from '@primevue/core/api';
 import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
-import { useMediaQuery } from '@/composables/useMediaQuery';
+import { useMediaQuery } from '@vueuse/core';
 
 const props = defineProps({
     entities: {
@@ -55,7 +55,7 @@ onBeforeMount(() => {
     items.value = props.entities;
     loading.value = false;
 });
-const isLargeScreen = useMediaQuery(640);
+const isLargeScreen = useMediaQuery('(min-width: 640px)');
 
 watch(items, () => {
     pagination.value = items.value.length > 0;

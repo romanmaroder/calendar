@@ -3,7 +3,7 @@ import FinanceCard from '@/components/client/profile/FinanceCard.vue';
 import InfoCard from '@/components/user/profile/InfoCard.vue';
 import ProfileCard from '@/components/user/profile/ProfileCard.vue';
 import { useFullname } from '@/composables/useFullname';
-import { useMediaQuery } from '@/composables/useMediaQuery';
+import { useMediaQuery } from '@vueuse/core';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Client } from '@/types';
 import { computed, PropType, ref, watch } from 'vue';
@@ -39,7 +39,7 @@ const { getFullname } = useFullname();
 
 const visible = ref(false);
 
-const isLargeScreen = useMediaQuery(640);
+const isLargeScreen = useMediaQuery('(min-width: 640px)');
 
 watch(isLargeScreen, () => {
     visible.value = false;

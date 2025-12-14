@@ -5,7 +5,7 @@ import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 import Restore from '@/components/common/Restore.vue';
 import { getFullname } from '@/composables/useFullname';
 import { getInitials } from '@/composables/useInitials';
-import { useMediaQuery } from '@/composables/useMediaQuery';
+import { useMediaQuery } from '@vueuse/core';
 import { usePhoneLink } from '@/composables/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Client } from '@/types';
@@ -60,7 +60,7 @@ onBeforeMount(() => {
     loading.value = false;
 });
 
-const isLargeScreen = useMediaQuery(640);
+const isLargeScreen = useMediaQuery('(min-width: 640px)');
 
 watch(items, () => {
     pagination.value = items.value.length > 0;

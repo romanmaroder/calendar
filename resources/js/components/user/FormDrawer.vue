@@ -3,7 +3,7 @@ import { getFullname } from '@/composables/useFullname';
 import { computed, PropType, ref, watch } from 'vue';
 import FormUser from '@/components/user/FormUser.vue';
 import { User } from '@/types';
-import { useMediaQuery } from '@/composables/useMediaQuery';
+import { useMediaQuery } from '@vueuse/core';
 
 interface Data {
     name?: string;
@@ -45,7 +45,7 @@ const props = defineProps({
 });
 
 const visible = ref(false);
-const isLargeScreen = useMediaQuery(640);
+const isLargeScreen = useMediaQuery('(min-width: 640px)');
 
 watch(isLargeScreen, () => {
     visible.value = false;
