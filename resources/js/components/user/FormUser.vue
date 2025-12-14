@@ -262,7 +262,7 @@ const setDate = (date: Date | null): void => {
                             <Textarea
                                 id="comment"
                                 v-model="form.comment"
-                                rows="4"
+                                rows="1"
                                 cols="15"
                                 autoResize
                                 size="small"
