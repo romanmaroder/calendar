@@ -6,7 +6,7 @@ import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
 import { ref } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Archive', href: '/archive' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' },{ title: 'Archive', href: '' }];
 
 defineProps({
     clients: {

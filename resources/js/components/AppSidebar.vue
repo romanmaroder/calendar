@@ -5,29 +5,21 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, MapPinHouse, MapPinMinus, UserRoundXIcon, Users2, UsersIcon, UserX } from 'lucide-vue-next';
+import { BookOpen, Folder, MapPinHouse, Users2, UsersIcon } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItemsUser: NavItem[] = [
-    {
-        title: 'Users',
-        href: '/users',
-        icon: UsersIcon,
-    },
-    {
-        title: 'Users trash ',
-        href: '/users/archive',
-        icon: UserX,
-    },
+const mainNavItemCompany: NavItem[] = [
     {
         title: 'Branches ',
         href: '/branch',
         icon: MapPinHouse,
     },
+];
+const mainNavItemsUser: NavItem[] = [
     {
-        title: 'Branch trash ',
-        href: '/branch/archive',
-        icon: MapPinMinus,
+        title: 'Users',
+        href: '/users',
+        icon: UsersIcon,
     },
 ];
 const mainNavItemsClient: NavItem[] = [
@@ -35,11 +27,6 @@ const mainNavItemsClient: NavItem[] = [
         title: 'Clients',
         href: '/clients',
         icon: Users2,
-    },
-    {
-        title: 'Clients trash ',
-        href: '/clients/archive',
-        icon: UserRoundXIcon,
     },
 ];
 
@@ -71,6 +58,7 @@ const footerNavItems: NavItem[] = [
             </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
+            <NavMain :items="mainNavItemCompany" group-label="Company" />
             <NavMain :items="mainNavItemsUser" group-label="Users" />
             <NavMain :items="mainNavItemsClient" group-label="Clients" />
         </SidebarContent>

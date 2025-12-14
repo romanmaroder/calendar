@@ -164,12 +164,16 @@ const filterFields = () => {
                 </div>
             </template>
             <template #end>
-                <IconField class="w-full rounded-md shadow-sm sm:w-auto">
-                    <InputIcon>
-                        <i class="pi pi-search" />
-                    </InputIcon>
-                    <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
-                </IconField>
+                <div class="flex space-x-2 w-full">
+                    <IconField class="w-full rounded-md shadow-sm sm:w-auto">
+                        <InputIcon>
+                            <i class="pi pi-search" />
+                        </InputIcon>
+                        <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
+                    </IconField>
+                    <Button v-if="!isDeleted" as="a" :href="route('users.archive')" icon="pi pi-box" size="small"
+                            severity="warn" raised variant="text" v-tooltip.bottom="'Archive'" label="ARC" />
+                </div>
             </template>
         </Toolbar>
 
