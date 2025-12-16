@@ -77,9 +77,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUserRequest $request, $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $user = User::find($id);
         $data = $request->validated();
         //dd($data);
         $user->update($data);
