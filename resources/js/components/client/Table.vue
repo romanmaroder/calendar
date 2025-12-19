@@ -12,6 +12,7 @@ import { Client } from '@/types';
 import { FilterMatchMode } from '@primevue/core/api';
 import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
+import { usePage } from '@inertiajs/vue3';
 
 //Типизация клиента
 
@@ -38,6 +39,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['count']);
+
+const page = usePage();
 
 const dt = ref();
 const items = ref();
@@ -188,7 +191,8 @@ const filterFields = () => {
                         </InputIcon>
                         <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
                     </IconField>
-                    <Button v-if="!isDeleted" as="a" :href="route('clients.archive')" icon="pi pi-box" size="small"
+                    <Button v-if="page.url === '/clients'" as="a" :href="route('clients.archive')" icon="pi pi-box"
+                            size="small"
                             severity="warn" raised variant="text" v-tooltip.bottom="'Archive'" label="ARC" />
                 </div>
             </template>
