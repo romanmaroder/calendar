@@ -28,7 +28,11 @@ const props = defineProps({
     },
     text: {
         type: String,
-        default: 'Delete',
+        default: '',
+    },
+    deleteLabelBtn:{
+        type: String,
+        default: 'Yes, delete account',
     },
     iconName: {
         type: String,
@@ -132,12 +136,16 @@ function handleAction() {
             {{ entity.id }} - {{ getFullname({ name: entity.name, surname: entity.surname }) }}
         </div>
 
-        <span v-if="isDeleted" class="text-red-500"><b>will be moved to the basket.</b></span>
+        <div v-if="isDeleted" class="text-red-500">
+            <span v-if="text">{{text}} </span>
+            <span v-else>will be moved to the basket. </span>
+        </div>
         <span v-else class="text-red-500"><b>will be deleted forever.</b></span>
 
         <div class="mt-2 flex justify-end gap-2">
             <Button type="button" size="small" label="Cancel" severity="secondary" raised @click="visible = false" />
-            <Button type="button" size="small" label="Yes, delete account" severity="danger" raised @click="handleAction" />
+            <Button type="button" size="small" :label="deleteLabelBtn" severity="danger" raised
+                    @click="handleAction" />
         </div>
     </Dialog>
 </template>
