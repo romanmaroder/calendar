@@ -119,7 +119,7 @@ const filterFields = () => {
         <Toolbar
             class="mb-6"
             :pt="{
-                end: 'w-full mt-3 sm:w-auto sm:mt-0', //FIXME добавить в другие таблицы вместо фильтра
+                end: 'w-full mt-3 sm:w-auto sm:mt-0',
             }"
         >
             <template #start>
