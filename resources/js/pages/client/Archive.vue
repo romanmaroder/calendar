@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import Layout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, Client } from '@/types';
 import Table from '@/components/client/Table.vue';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { ref } from 'vue';
+import { PropType, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' },{ title: 'Archive', href: '' }];
 
 defineProps({
     clients: {
-        type: Object,
+        type: Object as PropType<Client>,
         required: true,
     },
     count: {
@@ -35,10 +35,6 @@ const counter = (num: number) => {
             }"
         />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="client-cards-description">
-                Всего карточек в корзине:
-                {{ total || count }}
-            </div>
             <div class="card">
                 <Table
                     :entities="clients"

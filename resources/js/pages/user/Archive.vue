@@ -35,10 +35,6 @@ const counter = (num: number) => {
             }"
         />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="client-cards-description">
-                Всего карточек в корзине:
-                {{ total || count }}
-            </div>
             <div class="card">
                 <Table
                     :entities="users"
