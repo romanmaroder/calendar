@@ -22,7 +22,7 @@ class BranchFactory extends Factory
             'description' => $this->faker->realText(10),
             'contact'=>$this->faker->address(),
             'avatar' => $this->faker->imageUrl(),
-            'active'=>$this->faker->boolean(100),
+            'status'=>$this->faker->boolean(100),
         ];
     }
 }
