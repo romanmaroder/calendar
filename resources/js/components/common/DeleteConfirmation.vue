@@ -127,13 +127,16 @@ function handleAction() {
         <!-- Список элементов для удаления (если множественное) -->
         <ol v-if="Array.isArray(entity)">
             <li v-for="item in entity" :key="item.id" class="text-surface-500 dark:text-surface-400 mb-1 block font-semibold">
-                {{ item.id }} - {{ getFullname({ name: item.name, surname: item.surname }) }}
+
+                {{ item.id }} - <span v-if="item.surname">{{ getFullname({ name: item.name, surname:  item.surname })  }}</span>
+                {{item.name}}
             </li>
         </ol>
 
         <!-- Одиночный элемент -->
         <div v-else class="text-surface-500 dark:text-surface-400 mb-1 block font-semibold">
-            {{ entity.id }} - {{ getFullname({ name: entity.name, surname: entity.surname }) }}
+            {{ entity.id }} - <span v-if="entity.surname">{{ getFullname({ name: entity.name, surname: entity.surname
+        }) }}</span>  {{entity.name}}
         </div>
 
         <div v-if="isDeleted" class="text-red-500">
