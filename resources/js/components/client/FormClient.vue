@@ -118,6 +118,7 @@ const onDeleteAvatar = () => {
 const cancel = () => {
     form.clearErrors();
     form.reset();
+    window.history.back();
 };
 </script>
 

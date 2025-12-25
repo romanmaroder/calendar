@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch } from '@/types';
-import { computed, onMounted, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import { useMediaQuery } from '@vueuse/core';
@@ -187,6 +187,31 @@ const isMobile = useMediaQuery('(max-width: 640px)');
 const visible = computed(() => {
     return props.branch.users.length > 0;
 });
+
+const items = ref([
+    {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => {
+            try {
+                window.location.href = route('branch.edit', props.branch.id);
+            } catch (error) {
+                console.error('Маршрут не найден:', error);
+            }
+        },
+    },
+    {
+        label: 'Branches',
+        icon: 'pi pi-map-marker',
+        command: () => {
+            try {
+                window.location.href = route('branch.index');
+            } catch (error) {
+                console.error('Маршрут не найден:', error);
+            }
+        },
+    },
+]);
 </script>
 
 <template>
@@ -200,6 +225,7 @@ const visible = computed(() => {
         </template>
         <template #center-column v-if="visible">
             <BranchUsersTable :branch="branch" :users-list="branch.users" />
+            <ContextMenu global :model="items" class="mobile-area"/>
         </template>
     </ProfileLayout>
 </template>

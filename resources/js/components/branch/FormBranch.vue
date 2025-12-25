@@ -1,10 +1,10 @@
-<!--Contains a form for creating/editing a user.
-Notifies the user about creation/editing and returns the data for display in the preview.-->
+<!--Contains a form for creating/editing a branch.
+Notifies the branch about creation/editing and returns the data for display in the preview.-->
 <script setup lang="ts">
 import AvatarUploader from '@/components/AvatarUploader.vue';
 import InputError from '@/components/InputError.vue';
-import InfoCard from '@/components/user/profile/InfoCard.vue';
-import ProfileCard from '@/components/user/profile/ProfileCard.vue';
+import InfoCard from '@/components/branch/profile/InfoCard.vue';
+import ProfileCard from '@/components/branch/profile/ProfileCard.vue';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch } from '@/types';
 import { useForm } from '@inertiajs/vue3';
@@ -111,7 +111,7 @@ const onDeleteAvatar = () => {
 const cancel = () => {
     form.clearErrors();
     form.reset();
-    console.log('FORM ' + form.name + ' cancelled');
+    window.history.back();
 };
 </script>
 

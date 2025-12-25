@@ -10,6 +10,7 @@ import VisitsList from './VisitsList.vue';
 const props = defineProps({
     client: {
         type: Object as PropType<Client>,
+        required:true,
     },
 });
 
@@ -188,6 +189,31 @@ const aov = computed(() => {
     }
     return 0;
 });
+
+const items = ref([
+    {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => {
+            try {
+                window.location.href = route('clients.edit', props.client.id);
+            } catch (error) {
+                console.error('Маршрут не найден:', error);
+            }
+        },
+    },
+    {
+        label: 'Clients',
+        icon: 'pi pi-users',
+        command: () => {
+            try {
+                window.location.href = route('clients');
+            } catch (error) {
+                console.error('Маршрут не найден:', error);
+            }
+        },
+    },
+]);
 </script>
 
 <template>
@@ -206,6 +232,7 @@ const aov = computed(() => {
 
         <template #right-column>
             <FinanceCard :data="{ total: client?.total, records: client?.records, aov: aov }" title="Доходность" />
+            <ContextMenu global :model="items" class="mobile-area"/>
         </template>
     </ProfileLayout>
 </template>

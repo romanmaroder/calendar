@@ -9,9 +9,10 @@ import NotesList from './NotesList.vue';
 import ProfileCard from './ProfileCard.vue';
 import VisitsList from './VisitsList.vue';
 
-defineProps({
+const props =defineProps({
     user: {
         type: Object as PropType<User>,
+        required:true,
     },
 });
 
@@ -179,6 +180,30 @@ function removeFile(index: number) {
 function downloadNote(note: any) {
     alert(`Скачиваем заметку: ${note.title}`);
 }
+const items = ref([
+    {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => {
+            try {
+                window.location.href = route('users.edit', props.user.id);
+            } catch (error) {
+                console.error('Маршрут не найден:', error);
+            }
+        },
+    },
+    {
+        label: 'Users',
+        icon: 'pi pi-users',
+        command: () => {
+            try {
+                window.location.href = route('users');
+            } catch (error) {
+                console.error('Маршрут не найден:', error);
+            }
+        },
+    },
+]);
 </script>
 
 <template>
@@ -199,6 +224,7 @@ function downloadNote(note: any) {
             <FinanceCard :data="salaryData" title="Зарплата" />
             <FilesList v-if="false" :files="files" title="Файлы" @download="downloadFile" @remove="removeFile" />
             <NotesList v-if="false" :notes="notes" title="Примечание" @download="downloadNote" />
+            <ContextMenu global :model="items" class="mobile-area"/>
         </template>
     </ProfileLayout>
 </template>
