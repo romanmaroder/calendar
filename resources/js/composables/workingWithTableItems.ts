@@ -1,8 +1,8 @@
 import { Ref } from 'vue';
-import { Branch, Client, type User } from '@/types';
+import { Branch, Client, Company, type User } from '@/types';
 
 /*Совместно с Алиса ИИ*/
-export function useRows<T extends User | Client |Branch>(rows?: Ref<T[]>, selectedRows?: Ref<T[]>): void {
+export function useRows<T extends User | Client | Branch | Company>(rows?: Ref<T[]>, selectedRows?: Ref<T[]>): void {
     // Проверяем, что оба аргумента переданы и не null
     if (!rows || !selectedRows) {
         return;
