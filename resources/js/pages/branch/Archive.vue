@@ -6,7 +6,8 @@ import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
 import { PropType, ref } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Branches', href: '/branch' },{title:'Archive',href:''}];
+const breadcrumbs: BreadcrumbItem[] =
+    [{ title: 'Branches', href: '/branch' },{title:'Archive',href:''}];
 
 defineProps({
     branches: {
@@ -25,8 +26,8 @@ const counter = (num: number) => {
 </script>
 
 <template>
-    <Head title="Archive" />
     <Layout :breadcrumbs="breadcrumbs">
+    <Head title="Archive" />
         <Toast
             :pt="{
                 root: {
