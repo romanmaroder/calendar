@@ -7,8 +7,10 @@ use App\Http\Requests\Branch\AvatarBranchRequest;
 use App\Http\Requests\Branch\StoreBranchRequest;
 use App\Http\Requests\Branch\UpdateBranchRequest;
 use App\Models\Branch\Branch;
+use App\Models\Country\Country;
 use App\Models\User;
 use App\Services\BranchUserService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -29,9 +31,10 @@ class BranchController extends Controller
      */
     public function index()
     {
-        $branches = Branch::with('users')->paginate(20);
+        $branches = Branch::with(['users','country'])->paginate(20);
         return Inertia::render('branch/Index', [
             'branches' => $branches->collect(),
+            'countries' => $this->getCountries(),
             'count' => $branches->total(),
         ]);
     }
@@ -41,7 +44,7 @@ class BranchController extends Controller
      */
     public function create()
     {
-        return Inertia::render('branch/Create', ['user' => $this->getUsers()]);
+        return Inertia::render('branch/Create', ['user' => $this->getUsers(), 'countries' => $this->getCountries()]);
     }
 
     /**
@@ -59,7 +62,7 @@ class BranchController extends Controller
      */
     public function show(Branch $branch)
     {
-        $branch->load('users');
+        $branch->load(['users','country']);
 
         if ($branch->trashed()) {
             return Inertia::render('branch/Show', [
@@ -77,6 +80,7 @@ class BranchController extends Controller
     {
         return Inertia::render('branch/Edit', [
             'branch' => $branch,
+            'countries' => $this->getCountries(),
         ]);
     }
 
@@ -127,7 +131,7 @@ class BranchController extends Controller
     {
         $branch = Branch::findOrFail($id);
         $usersIds = $branch->users->pluck('id')->toArray();
-        if ($usersIds){
+        if ($usersIds) {
             $this->branchUserService->unsubscribeUsers($usersIds, $branch->id);
         }
         $branch->delete();
@@ -147,7 +151,6 @@ class BranchController extends Controller
         $branches = Branch::whereIn('id', $ids)->with('users')->get();
 
         foreach ($branches as $branch) {
-
             $usersIds = $branch->users->pluck('id')->toArray();
             $this->branchUserService->unsubscribeUsers($usersIds, $branch->id);
         }
@@ -239,13 +242,10 @@ class BranchController extends Controller
                                             : 'Пользователь успешно отписан от филиала',
                                         'count' => $count
                                     ]);
-
         } catch (BranchUserException $e) {
             return response()
                 ->json(['success' => false, 'message' => $e->getMessage()], 400);
-        }
-
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // \Log::error($e->getMessage());
             return response()
                 ->json(['success' => false, 'message' => 'Произошла ошибка при отписке пользователей'], 500);
@@ -256,5 +256,10 @@ class BranchController extends Controller
     private function getUsers()
     {
         return User::all();
+    }
+
+    private function getCountries(): Collection
+    {
+        return Country::all();
     }
 }

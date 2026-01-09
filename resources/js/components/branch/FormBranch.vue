@@ -9,9 +9,10 @@ import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { PropType, watch } from 'vue';
+import { inject, PropType, watch } from 'vue';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
+const countries: any = inject('countries');
 
 const props = defineProps({
     branch: Object as PropType<Branch | null>,
@@ -26,6 +27,7 @@ const form = useForm({
     contact: props.branch?.contact ?? '',
     avatar: props.branch?.avatar ?? '',
     status: props.branch?.status ?? '',
+    country_id: props.branch?.country_id ?? null,
     created_at: props.branch?.created_at ?? '',
 });
 
@@ -156,6 +158,23 @@ const cancel = () => {
                                     <label for="name" class="bg-transparent! font-light!">{{ 'Контакты:' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.name" />
+                            </div>
+                            <div>
+                                <FloatLabel variant="on" class="">
+                                    <Select
+                                        v-model="form.country_id"
+                                        id="country"
+                                        optionLabel="name"
+                                        :options="countries"
+                                        option-value="id"
+                                        class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
+                                        aria-labelledby="countries"
+                                        size="small"
+                                        fluid
+                                    />
+                                    <label for="country" class="bg-transparent! font-light!">{{ 'Страна' }}</label>
+                                </FloatLabel>
+                                <InputError :message="form.errors.country_id" />
                             </div>
                             <div class="flex items-center gap-2">
                                 <Checkbox v-model="form.status" inputId="status" name="status" size="small" :tabindex="4" binary />

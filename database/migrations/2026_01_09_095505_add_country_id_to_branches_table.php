@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('branch_id')->nullable()->after('avatar');
-            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('set null');
+        Schema::table('branches', function (Blueprint $table) {
+            $table->unsignedBigInteger('country_id')->nullable()->after('status');
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
         });
     }
 
@@ -22,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['branch_id']);
+        Schema::table('branches', function (Blueprint $table) {
+            $table->dropForeign(['country_id']);
         });
     }
 };

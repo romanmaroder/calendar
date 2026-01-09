@@ -3,6 +3,7 @@ import Layout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { BreadcrumbItem } from '@/types';
 import FormBranch from '@/components/branch/FormBranch.vue';
+import { onMounted, provide, ref } from 'vue';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -10,10 +11,19 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create branch', href: '' },
 ];
 
-defineProps({
+const props = defineProps({
+    countries:{
+        type:Object,
+    },
     user: {
         type: Array,
     },
+});
+const countries: object = ref(props.countries);
+provide('countries', countries);
+
+onMounted(()=>{
+    console.log(countries);
 });
 </script>
 

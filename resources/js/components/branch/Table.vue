@@ -285,6 +285,28 @@ const filterFields = () => {
                 </template>
             </Column>
             <Column
+                field="country_id"
+                header="Country"
+                :sortable="true"
+                :pt="{
+                    root: {
+                        class: 'hidden md:table-cell md:max-w-[250px] md:truncate',
+                    },
+                }"
+            >
+                <template #body="slotProps">
+                    <div class="flex flex-row flex-wrap">
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.code}}</small>
+                        <Divider layout="vertical" />
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.iso_code}}</small>
+                        <Divider layout="vertical" />
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.phone_code}}</small>
+                        <Divider layout="vertical" />
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.currency}}</small>
+                    </div>
+                </template>
+            </Column>
+            <Column
                 field=""
                 header="Info"
                 :sortable="true"

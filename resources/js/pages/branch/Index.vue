@@ -3,16 +3,19 @@ import Table from '@/components/branch/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { Branch, BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { PropType, ref } from 'vue';
+import { PropType, provide, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Branches', href: '/branch' }];
 
-defineProps({
+const props = defineProps({
     branches: {
         type: Object as PropType<Branch>,
     },
     count: {
         type: Number,
+    },
+    countries: {
+        type: Object,
     },
 });
 
@@ -20,6 +23,9 @@ const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
+
+const countries: object = ref(props.countries);
+provide('countries', countries);
 </script>
 
 <template>

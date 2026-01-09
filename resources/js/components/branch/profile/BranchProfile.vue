@@ -6,6 +6,7 @@ import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import { useMediaQuery } from '@vueuse/core';
 import BranchUsersTable from '@/components/branch/profile/BranchUsersTable.vue';
+import CountryCard from '@/components/branch/profile/CountryCard.vue';
 
 const props = defineProps({
     branch: {
@@ -222,6 +223,9 @@ const items = ref([
 
         <template #right-center-column>
             <InfoCard :branch="branch" title="Общая информация" />
+        </template>
+        <template #right-column>
+            <CountryCard :branch="branch" title="Country"/>
         </template>
         <template #center-column v-if="visible">
             <BranchUsersTable :branch="branch" :users-list="branch.users" />

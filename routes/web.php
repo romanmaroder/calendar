@@ -18,6 +18,7 @@ Route::delete('/api/destroy', [AvatarController::class, 'destroy'])->name('destr
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+require __DIR__.'/company.php';
 require __DIR__.'/user.php';
 require __DIR__.'/branch.php';
 require __DIR__.'/client.php';
