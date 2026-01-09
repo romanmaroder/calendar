@@ -76,6 +76,36 @@ export interface Branch {
     created_at: string;
     updated_at: string;
     deleted_at?: string;
+    country?:{
+        id: number;
+        name: string;
+        code: string;
+        currency: string;
+        iso_code: string;
+        phone_code: string;
+        active:boolean;
+    },
+    country_id?:number,
+    [key: string]: any;
+}
+
+export interface Company {
+    id: number;
+    name: string;
+    description?: string;
+    contact?: string;
+    info?: string;
+    avatar?: string;
+    country?:{
+        id: number;
+        name: string;
+        code: string;
+        currency: string;
+        iso_code: string;
+        phone_code: string;
+        active:boolean;
+    },
+    country_id?:number,
     [key: string]: any;
 }
 

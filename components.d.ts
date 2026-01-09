@@ -39,6 +39,7 @@ declare module 'vue' {
     Message: typeof import('primevue/message')['default']
     OverlayBadge: typeof import('primevue/overlaybadge')['default']
     Password: typeof import('primevue/password')['default']
+    Popover: typeof import('primevue/popover')['default']
     ProgressBar: typeof import('primevue/progressbar')['default']
     Row: typeof import('primevue/row')['default']
     Select: typeof import('primevue/select')['default']

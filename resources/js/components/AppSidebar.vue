@@ -5,10 +5,15 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, MapPinHouse, Users2, UsersIcon } from 'lucide-vue-next';
+import { BookOpen, Building2Icon, Folder, MapPinHouse, Users2, UsersIcon } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItemCompany: NavItem[] = [
+    {
+        title:'Company',
+        href: '/company',
+        icon:Building2Icon
+    },
     {
         title: 'Branches ',
         href: '/branch',

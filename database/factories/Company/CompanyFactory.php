@@ -2,10 +2,11 @@
 
 namespace Database\Factories\Company;
 
+use App\Models\Company\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Company\Company>
+ * @extends Factory<Company>
  */
 class CompanyFactory extends Factory
 {
@@ -22,8 +23,7 @@ class CompanyFactory extends Factory
             'contact' => $this->faker->address(),
             'info' => $this->faker->realText(15),
             'avatar' => $this->faker->imageUrl(),
-            'country_code' => $this->faker->countryCode(),
-            'currency_code' => $this->faker->currencyCode(),
+            'country_id' => $this->faker->numberBetween(1, 3),
         ];
     }
 }

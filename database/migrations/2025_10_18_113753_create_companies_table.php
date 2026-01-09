@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('contact')->nullable();
             $table->string('info')->nullable();
             $table->string('avatar')->nullable();
-            $table->string('country_code')->nullable();
-            $table->string('currency_code')->nullable();
+            $table->index('name');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
