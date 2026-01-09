@@ -28,7 +28,7 @@ class UpdateUserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
-            'phone' => ['required','string','max:255',
+            'phone' => ['required','string','max:255','regex:/^\+7\d{10}$/',
                 Rule::unique(User::class, 'phone')->ignore($this->user)],
             'comment' => 'nullable|string|max:255',
             'birthday' => 'nullable|string|max:255',

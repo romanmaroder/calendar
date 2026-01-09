@@ -29,7 +29,7 @@ class UpdateClientRequest extends FormRequest
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
-            'phone' => ['required','string','max:255',
+            'phone' => ['required','string','max:255','regex:/^\+7\d{10}$/',
                 Rule::unique(Client::class, 'phone')->ignore($this->client)],
             'comment' => 'nullable|string|max:255',
             'blacklist' => 'nullable|boolean',
