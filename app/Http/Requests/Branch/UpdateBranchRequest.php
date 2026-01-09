@@ -27,6 +27,7 @@ class UpdateBranchRequest extends FormRequest
             'contact' => 'nullable|string|min:3|max:250',
             'avatar' => 'nullable|string',
             'status' => 'boolean',
+            'country_id' => 'nullable|numeric',
         ];
     }
 }
