@@ -117,7 +117,7 @@ class BranchController extends Controller
 
     public function archive()
     {
-        $branches = Branch::onlyTrashed()->latest('created_at')->paginate(20);
+        $branches = Branch::onlyTrashed()->with('country')->latest('created_at')->paginate(20);
         return Inertia::render('branch/Archive', [
             'branches' => $branches->collect(),
             'count' => $branches->total(),
@@ -131,7 +131,7 @@ class BranchController extends Controller
     {
         $branch = Branch::findOrFail($id);
         $usersIds = $branch->users->pluck('id')->toArray();
-        if ($usersIds) {
+        if (!empty($usersIds)) {
             $this->branchUserService->unsubscribeUsers($usersIds, $branch->id);
         }
         $branch->delete();
@@ -152,7 +152,9 @@ class BranchController extends Controller
 
         foreach ($branches as $branch) {
             $usersIds = $branch->users->pluck('id')->toArray();
-            $this->branchUserService->unsubscribeUsers($usersIds, $branch->id);
+            if (!empty($usersIds)) {
+                $this->branchUserService->unsubscribeUsers($usersIds, $branch->id);
+            }
         }
 
         Branch::whereIn('id', $ids)->delete();
