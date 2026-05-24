@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Branch\Branch;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -22,14 +23,15 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
+        $branch = Branch::with('country')->first();
         if ($this->isAdmin) {
             return [
                 'name' => 'Admin',
                 'surname' => 'Admin',
                 'email' => 'admin@admin.com',
                 'password' => 'admin',
-                'phone' => '+7 (949) 123-45-67',
-                'branch_id' => $this->faker->numberBetween(1, 3),
+                'phone' => $branch->country->generatePhoneNumber(),
+                'branch_id' => $branch->id,
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
             ];
@@ -38,10 +40,11 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->firstName,
             'surname' => $this->faker->lastName(),
+            'middleName' => $this->faker->firstName('male'),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
-            'phone' => $this->faker->phoneNumber(),
-            'branch_id' => $this->faker->numberBetween(1, 3),
+            'phone' => $branch->country->generatePhoneNumber(),
+            'branch_id' => $branch->id,
             'email_verified_at' => now(),
             'remember_token' => Str::random(10),
         ];

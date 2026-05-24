@@ -3,6 +3,7 @@
 namespace Database\Factories\Branch;
 
 use App\Models\Branch\Branch;
+use App\Models\Country\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,13 +18,15 @@ class BranchFactory extends Factory
      */
     public function definition(): array
     {
+        $country = Country::first();
         return [
             'name' => $this->faker->company(),
+            'phone' => $country->generatePhoneNumber(),
             'description' => $this->faker->realText(10),
             'contact'=>$this->faker->address(),
-            'avatar' => $this->faker->imageUrl(),
+            'avatar' => null,
             'status'=>$this->faker->boolean(100),
-            'country_id' => $this->faker->numberBetween(1, 3),
+            'country_id' => $this->faker->numberBetween(1, 1),
         ];
     }
 }

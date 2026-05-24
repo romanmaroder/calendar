@@ -2,7 +2,9 @@
 
 namespace Database\Factories\Company;
 
+use App\Models\Branch\Branch;
 use App\Models\Company\Company;
+use App\Models\Country\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,13 +19,15 @@ class CompanyFactory extends Factory
      */
     public function definition(): array
     {
+        $country = Country::first();
         return [
             'name' => $this->faker->company(),
+            'phone' => $country->generatePhoneNumber(),
             'description' => $this->faker->realText(10),
             'contact' => $this->faker->address(),
             'info' => $this->faker->realText(15),
             'avatar' => $this->faker->imageUrl(),
-            'country_id' => $this->faker->numberBetween(1, 3),
+            'country_id' => $this->faker->numberBetween(1, 1),
         ];
     }
 }
