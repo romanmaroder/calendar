@@ -2,6 +2,7 @@
 import { getInitials } from '@/composables/useInitials';
 import { Branch } from '@/types';
 import { computed, PropType } from 'vue';
+import { getPhone } from '@/composables/usePhoneLink';
 
 const props = defineProps({
     branch: { type: Object as PropType<Branch | null> },
@@ -35,6 +36,14 @@ const showAvatar = computed(() => props.branch?.avatar && props.branch?.avatar !
                     <h3 class="text-center text-lg leading-tight font-bold">
                         {{ branch?.name }}
                     </h3>
+                    <Button
+                        class="m-0! p-0! text-sm! font-medium! text-slate-500! md:text-base! dark:text-slate-300!"
+                        as="a"
+                        variant="link"
+                        :label="branch?.phone"
+                        :href="`tel:${getPhone(branch?.phone)}`"
+                        rel="noopener"
+                    />
                     <time class="font-light" :datetime="branch?.created_at"
                         ><small>{{ branch?.created_at }}</small></time
                     >

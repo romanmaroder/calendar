@@ -19,14 +19,14 @@ class Branch extends Model
     use HasFactory, Notifiable, SoftDeletes;
 
 
-    protected $fillable = ['name','status','description','contact','avatar','country_id' ];
+    protected $fillable = ['name','phone','status','description','contact','avatar','country_id' ];
     protected  $guarded = [];
     /**
      * Получить пользователей, которые принадлежат этому филиалу.
      */
     public function users(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class,'branch_id', 'id');
     }
 
     public function country(): BelongsTo
@@ -38,13 +38,16 @@ class Branch extends Model
         return $this->status ? 'active' : 'disabled';
     }
 
+    public function getBranchesWithUsersCount()
+    {
+        return Branch::withCount('users')->get();
+    }
+
     protected function casts(): array
     {
         return [
             'created_at' => 'datetime:Y/m/d H:i',
             'status' => 'boolean',
-            'name' => Ucfirst::class,
-            'description' => Ucfirst::class,
         ];
     }
 

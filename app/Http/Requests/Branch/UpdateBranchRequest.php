@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Branch;
 
+use App\Rules\PhoneByCountryRegex;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateBranchRequest extends FormRequest
@@ -17,17 +19,25 @@ class UpdateBranchRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => 'required|string|min:3|max:250',
             'description' => 'nullable|string|min:3|max:550',
             'contact' => 'nullable|string|min:3|max:250',
             'avatar' => 'nullable|string',
             'status' => 'boolean',
-            'country_id' => 'nullable|numeric',
+            'country_id' => 'required|exists:countries,id',
         ];
+        // Добавляем правила для phone только если country_id валиден
+        if ($this->filled('country_id')) {
+            $rules['phone'] = [
+                'required',
+                new PhoneByCountryRegex($this->input('country_id'))
+            ];
+        }
+        return $rules;
     }
 }

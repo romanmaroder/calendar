@@ -69,6 +69,7 @@ export interface Client {
 export interface Branch {
     id: number;
     name: string;
+    phone?:string;
     description: string;
     contact: string;
     avatar?: string;
@@ -92,6 +93,7 @@ export interface Branch {
 export interface Company {
     id: number;
     name: string;
+    phone?:string;
     description?: string;
     contact?: string;
     info?: string;

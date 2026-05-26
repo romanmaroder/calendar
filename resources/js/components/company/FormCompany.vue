@@ -5,12 +5,12 @@ import AvatarUploader from '@/components/AvatarUploader.vue';
 import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/company/profile/InfoCard.vue';
 import ProfileCard from '@/components/company/profile/ProfileCard.vue';
+import { useValidatePhone } from '@/composables/useValidatePhone';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Company } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, onMounted, PropType, watch } from 'vue';
-import { useValidatePhone } from '@/composables/useValidatePhone';
 
 const emit = defineEmits(['createCompany', 'updateCompany', 'drawerData']);
 const countries: any = inject('countries');
@@ -118,11 +118,8 @@ const cancel = () => {
     window.history.back();
 };
 
+const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '+7(999)999 99 99').join();
 
-const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex,1,'+7(999)999 99 99').join();
-onMounted(()=>{
-
-})
 </script>
 
 <template>
@@ -200,20 +197,22 @@ onMounted(()=>{
                                 <InputError :message="form.errors.country_id" />
                             </div>
 
-                            <div><FloatLabel variant="on">
-                                <InputMask
-                                    id="phone"
-                                    v-model="form.phone"
-                                    type="tel"
-                                    class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
-                                    aria-labelledby="phone"
-                                    size="small"
-                                    :mask="mask"
-                                    :aria-autocomplete="form.phone"
-                                />
-                                <label for="phone" class="bg-transparent! font-light!">{{mask}}</label>
-                            </FloatLabel>
-                                <InputError :message="form.errors.phone" /></div>
+                            <div>
+                                <FloatLabel variant="on">
+                                    <InputMask
+                                        id="phone"
+                                        v-model="form.phone"
+                                        type="tel"
+                                        class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
+                                        aria-labelledby="phone"
+                                        size="small"
+                                        :mask="mask"
+                                        :aria-autocomplete="form.phone"
+                                    />
+                                    <label for="phone" class="bg-transparent! font-light!">{{ mask }}</label>
+                                </FloatLabel>
+                                <InputError :message="form.errors.phone" />
+                            </div>
                         </div>
                     </InfoCard>
                 </div>

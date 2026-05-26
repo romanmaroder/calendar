@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import FormDrawer from '@/components/company/FormDrawer.vue';
-import Show from '@/components/company/Show.vue';
 import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 import Restore from '@/components/common/Restore.vue';
+import FormDrawer from '@/components/company/FormDrawer.vue';
+import Show from '@/components/company/Show.vue';
 import { getInitials } from '@/composables/useInitials';
-import { useMediaQuery } from '@vueuse/core';
+import { usePhoneLink } from '@/composables/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Company } from '@/types';
+import { usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
+import { useMediaQuery } from '@vueuse/core';
 import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
-import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     companies: {
@@ -49,6 +50,7 @@ const filters = ref({
 const loading = ref(true);
 const pagination = ref(false);
 
+const { getPhone } = usePhoneLink();
 const { useRows } = workingWithTableItems();
 
 onBeforeMount(() => {
@@ -202,7 +204,7 @@ const filterFields = () => {
             :paginator="pagination"
             :rows="10"
             filterDisplay="menu"
-            :globalFilterFields="['name', 'description', 'contact', 'created_at', 'info', 'country_code', 'currency_code']"
+            :globalFilterFields="['name', 'phone', 'description', 'contact', 'created_at', 'info', 'country_code', 'currency_code']"
             sortMode="multiple"
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -272,19 +274,26 @@ const filterFields = () => {
                     </p>
                 </template>
             </Column>
-
             <Column
-                field="country_id"
-                header="Country"
-                :sortable="true"
+                field="phone"
+                header="Phone/Country"
                 :pt="{
                     root: {
-                        class: 'hidden md:table-cell md:max-w-[250px] md:truncate',
+                        class: 'hidden sm:table-cell',
                     },
                 }"
             >
                 <template #body="slotProps">
-                    <div class="flex flex-row flex-wrap">
+                    <Button
+                        class="!px-0"
+                        as="a"
+                        variant="link"
+                        :label="slotProps.data.phone"
+                        :href="'tel:' + getPhone(slotProps.data.phone)"
+                        rel="noopener"
+                    />
+                    <div
+                        class="hidden md:flex flex-row flex-wrap text-xs font-normal text-gray-900 2xl:hidden dark:text-gray-300">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.code }}</small>
                         <Divider layout="vertical" />
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.iso_code }}</small>
@@ -295,7 +304,6 @@ const filterFields = () => {
                     </div>
                 </template>
             </Column>
-
             <Column
                 field=""
                 header="Info"
@@ -307,7 +315,16 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white"></div>
+                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
+                        <Button
+                            class="!px-0"
+                            as="a"
+                            variant="link"
+                            :label="slotProps.data.phone"
+                            :href="'tel:' + getPhone(slotProps.data.phone)"
+                            rel="noopener"
+                        />
+                    </div>
                     <div class="mt-3 flex items-center justify-between text-xs font-normal text-gray-900 dark:text-gray-300">
                         <SpeedDial
                             :model="[{ command: () => {} }]"

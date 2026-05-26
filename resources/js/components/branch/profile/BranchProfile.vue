@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch } from '@/types';
-import { computed, PropType, ref } from 'vue';
+import { computed, onMounted, PropType, ref } from 'vue';
 import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import { useMediaQuery } from '@vueuse/core';
@@ -185,8 +185,8 @@ function downloadNote(note: any) {
 
 const isMobile = useMediaQuery('(max-width: 640px)');
 
-const visible = computed(() => {
-    return props.branch.users.length > 0;
+const hasSubcribers  = computed(() => {
+    return props.branch.users_count > 0;
 });
 
 const items = ref([
@@ -213,6 +213,7 @@ const items = ref([
         },
     },
 ]);
+
 </script>
 
 <template>
@@ -223,13 +224,13 @@ const items = ref([
 
         <template #right-center-column>
             <InfoCard :branch="branch" title="Общая информация" />
+            <ContextMenu global :model="items" class="mobile-area"/>
         </template>
         <template #right-column>
             <CountryCard :branch="branch" title="Country"/>
         </template>
-        <template #center-column v-if="visible">
+        <template #center-column v-if="hasSubcribers">
             <BranchUsersTable :branch="branch" :users-list="branch.users" />
-            <ContextMenu global :model="items" class="mobile-area"/>
         </template>
     </ProfileLayout>
 </template>

@@ -2,6 +2,7 @@
 
 namespace App\Models\Company;
 
+use App\Casts\Ucfirst;
 use App\Models\Country\Country;
 use Database\Factories\Company\CompanyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

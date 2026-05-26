@@ -31,7 +31,11 @@ class BranchController extends Controller
      */
     public function index()
     {
-        $branches = Branch::with(['users','country'])->paginate(20);
+        $branches = Branch::with(['country','users'])
+            ->withCount('users')
+            ->paginate(20);
+
+
         return Inertia::render('branch/Index', [
             'branches' => $branches->collect(),
             'countries' => $this->getCountries(),
@@ -55,6 +59,7 @@ class BranchController extends Controller
         $validated = $request->validated();
 
         Branch::create($validated);
+        return to_route('branch.index')->with('success', 'Branch created successfully.');
     }
 
     /**
@@ -63,6 +68,7 @@ class BranchController extends Controller
     public function show(Branch $branch)
     {
         $branch->load(['users','country']);
+        $branch->loadCount('users');
 
         if ($branch->trashed()) {
             return Inertia::render('branch/Show', [

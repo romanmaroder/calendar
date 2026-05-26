@@ -4,14 +4,15 @@ import Show from '@/components/branch/Show.vue';
 import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 import Restore from '@/components/common/Restore.vue';
 import { getInitials } from '@/composables/useInitials';
-import { useMediaQuery } from '@vueuse/core';
+import { getPhone } from '@/composables/usePhoneLink';
+import { useStatus } from '@/composables/useStatus';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Branch } from '@/types';
+import { usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
+import { useMediaQuery } from '@vueuse/core';
 import { computed, onBeforeMount, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
-import { usePage } from '@inertiajs/vue3';
-import { useStatus } from '@/composables/useStatus';
 
 const props = defineProps({
     branches: {
@@ -51,7 +52,6 @@ const loading = ref(true);
 const pagination = ref(false);
 
 const { useRows } = workingWithTableItems();
-
 
 onBeforeMount(() => {
     items.value = props.branches;
@@ -191,15 +191,25 @@ const filterFields = () => {
                 </div>
             </template>
             <template #end>
-                <div class="flex space-x-2 w-full">
+                <div class="flex w-full space-x-2">
                     <IconField class="w-full rounded-md shadow-sm sm:w-auto">
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
                         <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
                     </IconField>
-                    <Button v-if="page.url === '/branch'" as="a" :href="route('branch.archive')" icon="pi pi-box" size="small"
-                            severity="warn" raised variant="text" v-tooltip.bottom="'Archive'" label="ARC" />
+                    <Button
+                        v-if="page.url === '/branch'"
+                        as="a"
+                        :href="route('branch.archive')"
+                        icon="pi pi-box"
+                        size="small"
+                        severity="warn"
+                        raised
+                        variant="text"
+                        v-tooltip.bottom="'Archive'"
+                        label="ARC"
+                    />
                 </div>
             </template>
         </Toolbar>
@@ -214,7 +224,7 @@ const filterFields = () => {
             :paginator="pagination"
             :rows="10"
             filterDisplay="menu"
-            :globalFilterFields="['name', 'status', 'description', 'contact', 'created_at']"
+            :globalFilterFields="['name', 'phone', 'status', 'description', 'contact', 'created_at']"
             sortMode="multiple"
             removable-sort
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -273,7 +283,10 @@ const filterFields = () => {
             </Column>
             <Column field="name" header="Name" :sortable="true">
                 <template #body="slotProps">
-                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white" :class="{ 'text-red-400!': !slotProps.data.status }">
+                    <div
+                        class="w-24 text-sm font-medium text-wrap break-words text-gray-900 sm:w-auto sm:break-normal dark:text-white"
+                        :class="{ 'text-red-400!': !slotProps.data.status }"
+                    >
                         {{ slotProps.data.name }}
                     </div>
                     <p>
@@ -285,27 +298,35 @@ const filterFields = () => {
                 </template>
             </Column>
             <Column
-                field="country_id"
-                header="Country"
-                :sortable="true"
+                field="phone"
+                header="Phone/Country"
                 :pt="{
                     root: {
-                        class: 'hidden md:table-cell md:max-w-[250px] md:truncate',
+                        class: 'hidden sm:table-cell',
                     },
                 }"
             >
                 <template #body="slotProps">
-                    <div class="flex flex-row flex-wrap">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.code}}</small>
+                    <Button
+                        class="!px-0"
+                        as="a"
+                        variant="link"
+                        :label="slotProps.data.phone"
+                        :href="'tel:' + getPhone(slotProps.data.phone)"
+                        rel="noopener"
+                    />
+                    <div class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300">
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.iso_code}}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.iso_code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.phone_code}}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.phone_code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{slotProps.data.country.currency}}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.currency }}</small>
                     </div>
                 </template>
             </Column>
+
             <Column
                 field=""
                 header="Info"
@@ -317,7 +338,16 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white"></div>
+                    <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
+                        <Button
+                            class="!px-0"
+                            as="a"
+                            variant="link"
+                            :label="slotProps.data.phone"
+                            :href="'tel:' + getPhone(slotProps.data.phone)"
+                            rel="noopener"
+                        />
+                    </div>
                     <div class="mt-3 flex items-center justify-between text-xs font-normal text-gray-900 dark:text-gray-300">
                         <SpeedDial
                             :model="[{ command: () => {} }]"
@@ -360,7 +390,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="status"
-                header="Status"
+                header="Status| Users"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -369,9 +399,24 @@ const filterFields = () => {
                 }"
             >
                 <template #body="slotProps">
-                    <Tag :value="getStatusInfo(slotProps.data).value.label"
-                         :severity="getStatusInfo(slotProps.data).value.severity"
-                    class="shadow-md"/>
+                    <div class="relative p-4">
+                        <!-- Полупрозрачная цифра в фоне -->
+                        <span
+                            v-if="slotProps.data.users_count > 0"
+                            class="absolute inset-0 flex items-center justify-center text-7xl font-bold text-emerald-500 opacity-20 select-none dark:text-gray-300"
+                        >
+                            {{ slotProps.data.users_count }}
+                        </span>
+
+                        <!-- Основной контент поверх -->
+                        <div class="relative z-10 text-center opacity-50">
+                            <Tag
+                                :value="getStatusInfo(slotProps.data).value.label"
+                                :severity="getStatusInfo(slotProps.data).value.severity"
+                                class="shadow-md"
+                            />
+                        </div>
+                    </div>
                 </template>
             </Column>
             <Column

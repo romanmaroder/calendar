@@ -10,6 +10,7 @@ import { Branch } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, watch } from 'vue';
+import { generateFormattedPhoneExamples } from '@/composables/useValidatePhone';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 const countries: any = inject('countries');
@@ -23,6 +24,7 @@ const toast = useToast();
 const form = useForm({
     id: props.branch?.id ?? '',
     name: props.branch?.name ?? '',
+    phone: props.branch?.phone ?? '',
     description: props.branch?.description ?? '',
     contact: props.branch?.contact ?? '',
     avatar: props.branch?.avatar ?? '',
@@ -115,6 +117,7 @@ const cancel = () => {
     form.reset();
     window.history.back();
 };
+const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '+7(999)999 99 99').join();
 </script>
 
 <template>
@@ -153,7 +156,7 @@ const cancel = () => {
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                         aria-labelledby="contact"
                                         size="small"
-                                        v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                        v-keyfilter="/^[A-zА-яёЁ\d\s.,-]+$/iu"
                                     />
                                     <label for="name" class="bg-transparent! font-light!">{{ 'Контакты:' }}</label>
                                 </FloatLabel>
@@ -175,6 +178,23 @@ const cancel = () => {
                                     <label for="country" class="bg-transparent! font-light!">{{ 'Страна' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.country_id" />
+                            </div>
+
+                            <div>
+                                <FloatLabel variant="on">
+                                    <InputMask
+                                        id="phone"
+                                        v-model="form.phone"
+                                        type="tel"
+                                        class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
+                                        aria-labelledby="phone"
+                                        size="small"
+                                        :mask="mask"
+                                        :aria-autocomplete="form.phone"
+                                    />
+                                    <label for="phone" class="bg-transparent! font-light!">{{ mask }}</label>
+                                </FloatLabel>
+                                <InputError :message="form.errors.phone" />
                             </div>
                             <div class="flex items-center gap-2">
                                 <Checkbox v-model="form.status" inputId="status" name="status" size="small" :tabindex="4" binary />
