@@ -19,7 +19,7 @@ const countries: object = ref(props.countries);
 provide('countries', countries);
 
 onMounted(()=>{
-    console.log(countries);
+    //console.log(countries);
 });
 </script>
 

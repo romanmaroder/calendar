@@ -20,7 +20,7 @@ class CountriesSeeder extends Seeder
                 'name' => 'Россия',
                 'iso_code' => 'RUS',
                 'phone_code' => '+7',
-                'phone_regex' => '/^\+7\d{10}$/',
+                'phone_regex' => '/^\+7\(\d{3}\)\d{3} \d{2} \d{2}$/',
                 'currency' => 'RUB',
                 'active' => true,
             ],

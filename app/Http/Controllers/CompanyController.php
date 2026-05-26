@@ -22,8 +22,7 @@ class CompanyController extends Controller
         $companies = Company::with('country')->paginate(20);
         return Inertia::render(
             'company/Index',
-            ['companies' => $companies->collect(),
-                'countries'=>$this->getCountries()]
+            ['companies' => $companies->collect()]
         );
     }
 
@@ -104,7 +103,7 @@ class CompanyController extends Controller
 
     public function archive()
     {
-        $companies = Company::onlyTrashed()->latest('created_at')->paginate(20);
+        $companies = Company::onlyTrashed()->with('country')->latest('created_at')->paginate(20);
         return Inertia::render('company/Archive', [
             'companies' => $companies->collect(),
             'count' => $companies->total(),

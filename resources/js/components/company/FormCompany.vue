@@ -10,6 +10,7 @@ import { Company } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, onMounted, PropType, watch } from 'vue';
+import { useValidatePhone } from '@/composables/useValidatePhone';
 
 const emit = defineEmits(['createCompany', 'updateCompany', 'drawerData']);
 const countries: any = inject('countries');
@@ -19,10 +20,12 @@ const props = defineProps({
 });
 
 const toast = useToast();
+const { generateFormattedPhoneExamples } = useValidatePhone();
 
 const form = useForm({
     id: props.company?.id ?? '',
     name: props.company?.name ?? '',
+    phone: props.company?.phone ?? '',
     description: props.company?.description ?? '',
     contact: props.company?.contact ?? '',
     info: props.company?.info ?? '',
@@ -115,9 +118,10 @@ const cancel = () => {
     window.history.back();
 };
 
+
+const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex,1,'+7(999)999 99 99').join();
 onMounted(()=>{
-    console.log(props.company);
-    console.log(countries);
+
 })
 </script>
 
@@ -195,6 +199,21 @@ onMounted(()=>{
                                 </FloatLabel>
                                 <InputError :message="form.errors.country_id" />
                             </div>
+
+                            <div><FloatLabel variant="on">
+                                <InputMask
+                                    id="phone"
+                                    v-model="form.phone"
+                                    type="tel"
+                                    class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
+                                    aria-labelledby="phone"
+                                    size="small"
+                                    :mask="mask"
+                                    :aria-autocomplete="form.phone"
+                                />
+                                <label for="phone" class="bg-transparent! font-light!">{{mask}}</label>
+                            </FloatLabel>
+                                <InputError :message="form.errors.phone" /></div>
                         </div>
                     </InfoCard>
                 </div>

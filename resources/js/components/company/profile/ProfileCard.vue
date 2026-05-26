@@ -2,6 +2,7 @@
 import { getInitials } from '@/composables/useInitials';
 import { Company } from '@/types';
 import { computed, PropType } from 'vue';
+import { getPhone } from '@/composables/usePhoneLink';
 
 const props = defineProps({
     company: { type: Object as PropType<Company | null> },
@@ -36,6 +37,14 @@ const showAvatar = computed(() => props.company?.avatar && props.company?.avatar
                         class="break-words md:w-48 xl:break-normal xl:w-auto text-center text-lg leading-tight font-bold">
                         {{ company?.name }}
                     </h3>
+                    <Button
+                        class="m-0! p-0! text-sm! font-medium! text-slate-500! md:text-base! dark:text-slate-300!"
+                        as="a"
+                        variant="link"
+                        :label="company?.phone"
+                        :href="`tel:${getPhone(company?.phone)}`"
+                        rel="noopener"
+                    />
                     <time class="font-light" :datetime="company?.created_at"
                         ><small>{{ company?.created_at }}</small></time
                     >

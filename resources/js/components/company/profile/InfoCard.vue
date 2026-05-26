@@ -9,14 +9,13 @@ const props = defineProps({
 });
 
 const { label, severity } = useStatus(props.company?.status);
-
 </script>
 
 <template>
     <Card class="rounded-xl shadow-sm not-dark:!bg-gray-100">
         <template #content>
-            <div class="flex items-start justify-between mb-3">
-                <h3 class="text-sm md:text-lg font-semibold text-shadow-slate-500 dark:text-slate-300">{{ title }}</h3>
+            <div class="mb-3 flex items-start justify-between">
+                <h3 class="text-sm font-semibold text-shadow-slate-500 md:text-lg dark:text-slate-300">{{ title }}</h3>
                 <!--            <Button icon="pi pi-pencil" class="p-button-text" />-->
             </div>
             <slot>
@@ -25,10 +24,6 @@ const { label, severity } = useStatus(props.company?.status);
                         <div class="w-44 text-slate-500 dark:text-slate-300">Контакты:</div>
                         <div class="font-medium">{{ company?.contact }}</div>
                     </div>
-                    <div v-if="company?.country" class="flex flex-wrap">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Страна:</div>
-                        <div class="font-medium">{{ company?.country?.name }}</div>
-                    </div>
                     <div v-if="company?.status" class="flex flex-wrap">
                         <div class="w-44 text-slate-500 dark:text-slate-300">Статус:</div>
                         <div class="font-medium">
@@ -36,7 +31,7 @@ const { label, severity } = useStatus(props.company?.status);
                         </div>
                     </div>
                     <div v-if="company?.description" class="flex flex-wrap">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Заметки:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">Описание:</div>
                         <div class="font-medium">{{ company?.description }}</div>
                     </div>
                     <div v-if="company?.info" class="flex flex-wrap">

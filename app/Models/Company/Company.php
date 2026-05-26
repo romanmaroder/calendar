@@ -6,7 +6,9 @@ use App\Models\Country\Country;
 use Database\Factories\Company\CompanyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Company extends Model
 {
@@ -14,12 +16,17 @@ class Company extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name','contact','description','info','avatar','country_id'
+        'name',
+        'phone',
+        'contact',
+        'description',
+        'info',
+        'avatar',
+        'country_id'
     ];
     protected $guarded = [];
 
-
-    public function country()
+    public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class, 'country_id', 'id');
     }
