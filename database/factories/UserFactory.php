@@ -23,14 +23,14 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
-        $branch = Branch::with('country')->first();
+        $branch = Branch::with('company.country')->first();
         if ($this->isAdmin) {
             return [
                 'name' => 'Admin',
                 'surname' => 'Admin',
                 'email' => 'admin@admin.com',
                 'password' => 'admin',
-                'phone' => $branch->country->generatePhoneNumber(),
+                'phone' => $branch->company->country->generatePhoneNumber(),
                 'branch_id' => $branch->id,
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
@@ -43,7 +43,7 @@ class UserFactory extends Factory
             'middleName' => $this->faker->firstName('male'),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
-            'phone' => $branch->country->generatePhoneNumber(),
+            'phone' => $branch->company->country->generatePhoneNumber(),
             'branch_id' => $branch->id,
             'email_verified_at' => now(),
             'remember_token' => Str::random(10),

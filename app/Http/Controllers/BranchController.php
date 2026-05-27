@@ -31,14 +31,13 @@ class BranchController extends Controller
      */
     public function index()
     {
-        $branches = Branch::with(['country','users'])
+        $branches = Branch::with(['company','users'])
             ->withCount('users')
             ->paginate(20);
 
 
         return Inertia::render('branch/Index', [
             'branches' => $branches->collect(),
-            'countries' => $this->getCountries(),
             'count' => $branches->total(),
         ]);
     }
@@ -48,7 +47,7 @@ class BranchController extends Controller
      */
     public function create()
     {
-        return Inertia::render('branch/Create', ['user' => $this->getUsers(), 'countries' => $this->getCountries()]);
+        return Inertia::render('branch/Create', ['user' => $this->getUsers()]);
     }
 
     /**
@@ -67,7 +66,7 @@ class BranchController extends Controller
      */
     public function show(Branch $branch)
     {
-        $branch->load(['users','country']);
+        $branch->load(['users','company']);
         $branch->loadCount('users');
 
         if ($branch->trashed()) {
@@ -84,9 +83,9 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
+        $branch->load(['users','company']);
         return Inertia::render('branch/Edit', [
             'branch' => $branch,
-            'countries' => $this->getCountries(),
         ]);
     }
 
@@ -123,7 +122,7 @@ class BranchController extends Controller
 
     public function archive()
     {
-        $branches = Branch::onlyTrashed()->with('country')->latest('created_at')->paginate(20);
+        $branches = Branch::onlyTrashed()->with('company')->latest('created_at')->paginate(20);
         return Inertia::render('branch/Archive', [
             'branches' => $branches->collect(),
             'count' => $branches->total(),

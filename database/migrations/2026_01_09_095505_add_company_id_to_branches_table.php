@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('branches', function (Blueprint $table) {
-            $table->unsignedBigInteger('country_id')->nullable()->after('status');
-            $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
+            $table->unsignedBigInteger('company_id')->nullable()->after('status');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('branches', function (Blueprint $table) {
-            $table->dropForeign(['country_id']);
+            $table->dropForeign(['company_id']);
         });
     }
 };

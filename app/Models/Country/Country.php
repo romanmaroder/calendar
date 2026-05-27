@@ -36,11 +36,6 @@ class Country extends Model
         return $this->hasMany(Company::class, 'country_id', 'id');
     }
 
-    public function branches(): HasMany|Country
-    {
-        return $this->hasMany(Branch::class, 'country_id', 'id');
-    }
-
     public function generatePhoneNumber(): string
     {
         if ($this->phone_regex) {

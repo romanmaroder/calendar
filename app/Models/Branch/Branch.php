@@ -2,8 +2,7 @@
 
 namespace App\Models\Branch;
 
-use App\Casts\Ucfirst;
-use App\Models\Country\Country;
+use App\Models\Company\Company;
 use App\Models\User;
 use Database\Factories\Branch\BranchFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +18,7 @@ class Branch extends Model
     use HasFactory, Notifiable, SoftDeletes;
 
 
-    protected $fillable = ['name','phone','status','description','contact','avatar','country_id' ];
+    protected $fillable = ['name','phone','status','description','contact','avatar','company_id' ];
     protected  $guarded = [];
     /**
      * Получить пользователей, которые принадлежат этому филиалу.
@@ -29,9 +28,9 @@ class Branch extends Model
         return $this->hasMany(User::class,'branch_id', 'id');
     }
 
-    public function country(): BelongsTo
+    public function company(): BelongsTo
     {
-        return $this->belongsTo(Country::class, 'country_id', 'id');
+        return $this->belongsTo(Company::class, 'company_id', 'id');
     }
     public function getStatus(): string
     {

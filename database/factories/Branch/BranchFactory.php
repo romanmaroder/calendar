@@ -26,7 +26,7 @@ class BranchFactory extends Factory
             'contact'=>$this->faker->address(),
             'avatar' => null,
             'status'=>$this->faker->boolean(100),
-            'country_id' => $this->faker->numberBetween(1, 1),
+            'company_id' => $this->faker->numberBetween(1, 1),
         ];
     }
 }

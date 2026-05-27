@@ -3,12 +3,13 @@
 namespace Database\Factories;
 
 use App\Models\Branch\Branch;
+use App\Models\Client;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Client>
+ * @extends Factory<Client>
  */
 class ClientFactory extends Factory
 {
@@ -24,12 +25,12 @@ class ClientFactory extends Factory
      */
     public function definition(): array
     {
-        $branch = Branch::inRandomOrder()->with('country')->first();
+        $branch = Branch::inRandomOrder()->with('company.country')->first();
         return [
             'name' => fake()->firstName(),
             'surname' => fake()->lastName(),
             'middleName' => fake()->firstName('male'),
-            'phone' => $branch->country->generatePhoneNumber(),
+            'phone' => $branch->company->country->generatePhoneNumber(),
             'comment' => fake()->text(20),
             'blacklist' => fake()->boolean(),
             'prepayment' => fake()->boolean(),
