@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Company\AvatarCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
+use App\Http\Resources\CompanyResource;
 use App\Models\Company\Company;
 use App\Models\Country\Country;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,10 +20,11 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::with('country')->paginate(20);
+        $companies = Company::with(['country', 'branches','branches.users'])->paginate(20);
+       // dd(CompanyResource::collection($companies)->toArray(request()));
         return Inertia::render(
             'company/Index',
-            ['companies' => $companies->collect()]
+            ['companies' => CompanyResource::collection($companies)->resolve()]
         );
     }
 

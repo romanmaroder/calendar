@@ -53,6 +53,9 @@ class CountryFactory extends Factory
             //'US' => '/^\+1\d{10}$/',
             //'DE' => '/^\+49\d{10,12}$/',
         ];
+        $phoneMask =[
+            'RU' => '+7(999)999-99-99',
+        ];
 
         // Валюты по странам
         $currencyMap = [
@@ -67,6 +70,7 @@ class CountryFactory extends Factory
             'iso_code' => $this->faker->countryISOAlpha3(),
             'phone_code' => $phoneCodeMap[$code] ?? $this->faker->optional()->numberBetween(1, 999),
             'phone_regex' => $phoneRegexMap[$code] ?? null,
+            'phone_mask' => $phoneMask[$code] ?? null,
             'currency' => $currencyMap[$code] ?? $this->faker->optional()->currencyCode(),
             'active' => $this->faker->boolean(80), // 80% вероятность active=true
         ];

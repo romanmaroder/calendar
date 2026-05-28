@@ -13,6 +13,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
+/**
+* @property int $id
+* @property string $name
+* @property string $phone
+* @property string $description
+* @property string $contact
+* @property string $info
+* @property string|null $avatar
+* @property int $country_id
+*/
 class Company extends Model
 {
     /** @use HasFactory<CompanyFactory> */

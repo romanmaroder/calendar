@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('iso_code', 3)->nullable();
             $table->string('phone_code', 10)->nullable();
             $table->text('phone_regex')->nullable();
+            $table->text('phone_mask')->nullable();
             $table->string('currency', 3)->nullable();
             $table->boolean('active')->default(true);
             $table->index('name');

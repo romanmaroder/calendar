@@ -14,6 +14,7 @@ class CountryRequest extends FormRequest
             'iso_code' => 'nullable|string|size:3|regex:/^[A-Z]{3}$/',
             'phone_code' => 'nullable|string|regex:/^\+\d{1,3}$/',
             'phone_regex' => 'required|string|regex:/^\/.*\/$/',
+            'phone_mask' => 'nullable|string',
             'currency' => 'nullable|string|size:3|regex:/^[A-Z]{3}$/',
             'active' => 'boolean',
         ];

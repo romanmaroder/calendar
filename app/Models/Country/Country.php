@@ -17,6 +17,18 @@ use Illuminate\Notifications\Notifiable;
  * Телефоны проходят валидацию по регулярному выражению.
  * В форме в поле phone применяется маска на основе регулярного выражения в поле phone_regex
  * */
+
+/**
+ * @property int $id
+ * @property string $code
+ * @property string $name
+ * @property string $iso_code
+ * @property string $phone_code
+ * @property string $phone_regex
+ * @property string $phone_mask
+ * @property string $currency
+ * @property int $active
+ */
 class Country extends Model
 {
     /** @use HasFactory<CountryFactory> */
@@ -27,6 +39,7 @@ class Country extends Model
         'name',
         'iso_code',
         'phone_code',
+        'phone_mask',
         'currency',
         'active',
     ];
