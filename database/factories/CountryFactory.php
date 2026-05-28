@@ -54,7 +54,7 @@ class CountryFactory extends Factory
             //'DE' => '/^\+49\d{10,12}$/',
         ];
         $phoneMask =[
-            'RU' => '+7(999)999-99-99',
+            'RU' => '+7(999)999 99 99',
         ];
 
         // Валюты по странам

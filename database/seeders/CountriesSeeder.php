@@ -21,7 +21,7 @@ class CountriesSeeder extends Seeder
                 'iso_code' => 'RUS',
                 'phone_code' => '+7',
                 'phone_regex' => '/^\+7\(\d{3}\)\d{3} \d{2} \d{2}$/',
-                'phone_mask'=>'+7(999)999-99-99',
+                'phone_mask'=>'+7(999)999 99 99',
                 'currency' => 'RUB',
                 'active' => true,
             ],
