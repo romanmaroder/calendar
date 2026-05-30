@@ -6,15 +6,16 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
-import { definePreset } from '@primeuix/themes';
+//import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
+import  Tooltip  from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
 import { en } from "primelocale/js/en.js";
 import { ru } from "primelocale/js/ru.js";
 import.meta.glob(['../img/**']);
 
-const MyPreset = definePreset(Aura, {
+/*const MyPreset = definePreset(Aura, {
     semantic: {
         primary: {
             50: '{blue.50}',
@@ -42,14 +43,14 @@ const MyPreset = definePreset(Aura, {
             900: '{orange.900}',
             950: '{orange.950}',
         },
-        /*formField: {
+        /!*formField: {
             paddingX:"0.5rem",
             paddingY:"0.5rem"
         },
         myButton: {
             paddingX: '0.3rem',
             paddingY: '0.9rem',
-        },*/
+        },*!/
         colorScheme: {
             light: {
                 formField: {
@@ -181,7 +182,7 @@ const MyPreset = definePreset(Aura, {
             },
         },
     },
-});
+});*/
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -226,12 +227,15 @@ createInertiaApp({
                     },
                 },
             })
+            .directive('tooltip', Tooltip)
             .mount(el);
     },
     progress: {
         color: '#4B5563',
     },
+}).then(() => {
+    initializeTheme();
 });
 
 // This will set light / dark mode on page load...
-initializeTheme();
+//initializeTheme();
