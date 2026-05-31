@@ -1,9 +1,9 @@
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import path from 'path';
-import tailwindcss from "@tailwindcss/vite/dist/index.mjs";
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
+import tailwindcss from "@tailwindcss/vite";
 import Components from 'unplugin-vue-components/vite';
 import {PrimeVueResolver} from '@primevue/auto-import-resolver';
 
@@ -32,6 +32,17 @@ export default defineConfig({
             ]
         })
     ],
+    server: {
+        host: '0.0.0.0', // слушать все интерфейсы
+        port: 5173,
+        strictPort: true,
+        cors: true, // включить CORS
+        hmr: {
+            host: '192.168.0.21', // IP вашего сервера
+            protocol: 'http',
+            clientPort: 5173
+        }
+    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './resources/js'),
