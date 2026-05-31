@@ -5,22 +5,21 @@ import AvatarUploader from '@/components/AvatarUploader.vue';
 import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/company/profile/InfoCard.vue';
 import ProfileCard from '@/components/company/profile/ProfileCard.vue';
-import { useValidatePhone } from '@/composables/useValidatePhone';
+import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
-import { Company } from '@/types';
+import { Company, Country } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { inject, onMounted, PropType, watch } from 'vue';
+import { inject, PropType, Ref, watch } from 'vue';
 
 const emit = defineEmits(['createCompany', 'updateCompany', 'drawerData']);
-const countries: any = inject('countries');
+const countries: Ref<Country[]> | undefined = inject('countries');
 
 const props = defineProps({
     company: Object as PropType<Company | null>,
 });
 
 const toast = useToast();
-const { generateFormattedPhoneExamples } = useValidatePhone();
 
 const form = useForm({
     id: props.company?.id ?? '',
@@ -34,8 +33,22 @@ const form = useForm({
 });
 
 watch(form, () => {
-    emit('drawerData', { name: form.name, avatar: form.avatar });
+        emit('drawerData', { name: form.name, avatar: form.avatar });
 });
+
+const { country, mask } = useCountryPhone({
+    countries,
+    form,
+});
+
+watch(
+    () => country.value,
+    (newCountry) => {
+        if (newCountry !== null) {
+            form.reset('phone');
+        }
+    },
+);
 
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
@@ -55,11 +68,12 @@ const submit = () => {
                 emit('updateCompany');
             },
             onError: function (errors) {
-                toast.add({
+                console.log(errors);
+                /*toast.add({
                     severity: 'error',
-                    summary: 'Validation Error' + errors,
+                    summary: 'Validation Error',
                     life: 2000,
-                });
+                });*/
             },
         });
     } else {
@@ -73,17 +87,19 @@ const submit = () => {
                     life: 3000,
                 });
                 emit('createCompany');
+                form.reset();
             },
             onFinish: function () {
                 //form.reset();
             },
             onError: function (errors) {
-                toast.add({
+                console.log(errors);
+                /*toast.add({
                     severity: 'error',
-                    summary: 'Validation Error' + errors,
+                    summary: 'Validation Error' + form.errors.name,
                     //detail: showErrors(errors),
                     life: 2000,
-                });
+                });*/
                 form.defaults();
             },
         });
@@ -103,9 +119,10 @@ const onDeleteAvatar = () => {
                 form.avatar = '';
             },
             onError: function (errors) {
+                console.log(errors);
                 toast.add({
                     severity: 'error',
-                    summary: 'Validation Error' + errors,
+                    summary: 'Validation Error',
                     life: 2000,
                 });
             },
@@ -117,9 +134,6 @@ const cancel = () => {
     form.reset();
     window.history.back();
 };
-
-const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '+7(999)999 99 99').join();
-
 </script>
 
 <template>
@@ -137,7 +151,7 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="name"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="name" class="bg-transparent! font-light!">{{ 'Название:' }}</label>
                         </FloatLabel>
@@ -147,7 +161,7 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
             </template>
             <template #right-center-column>
                 <div class="mb-2 space-y-4">
-                    <InfoCard title="Общая инфа">
+                    <InfoCard title="Общая информация">
                         <div class="flex flex-col flex-wrap space-y-4">
                             <div class="">
                                 <FloatLabel variant="on" class="">
@@ -158,9 +172,9 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                         aria-labelledby="contact"
                                         size="small"
-                                        v-keyfilter="/^[A-Za-zA-яёЁ\d\s.,-]+$/iu"
+                                        pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                                     />
-                                    <label for="name" class="bg-transparent! font-light!">{{ 'Контакты:' }}</label>
+                                    <label for="contact" class="bg-transparent! font-light!">{{ 'Контакты:' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.contact" />
                             </div>
@@ -183,16 +197,16 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                                 <FloatLabel variant="on" class="">
                                     <Select
                                         v-model="form.country_id"
-                                        id="country"
+                                        inputId="on_label"
                                         optionLabel="name"
-                                        :options="countries"
                                         option-value="id"
+                                        :options="countries"
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
-                                        aria-labelledby="countries"
+                                        aria-labelledby="country"
                                         size="small"
                                         fluid
                                     />
-                                    <label for="country" class="bg-transparent! font-light!">{{ 'Страна' }}</label>
+                                    <label for="on_label" class="bg-transparent! font-light!">{{ 'Страна' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.country_id" />
                             </div>
@@ -209,7 +223,7 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                                         :mask="mask"
                                         :aria-autocomplete="form.phone"
                                     />
-                                    <label for="phone" class="bg-transparent! font-light!">{{ mask }}</label>
+                                    <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'Телефон' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.phone" />
                             </div>
@@ -228,6 +242,7 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                                 cols="15"
                                 autoResize
                                 size="small"
+                                tabindex="6"
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                             />
                             <label class="bg-transparent! font-light!" for="description">Описание</label>

@@ -8,7 +8,7 @@ const props = defineProps({
     title: { type: String, default: '' },
 });
 
-const { label, severity } = useStatus(props.company?.status);
+const { severity } = useStatus(props.company?.status);
 </script>
 
 <template>
@@ -20,23 +20,23 @@ const { label, severity } = useStatus(props.company?.status);
             </div>
             <slot>
                 <div class="mt-3 space-y-4 text-sm text-slate-700 dark:text-slate-200">
-                    <div class="flex flex-wrap">
+                    <div class="flex flex-wrap justify-between">
                         <div class="w-44 text-slate-500 dark:text-slate-300">Контакты:</div>
                         <div class="font-medium">{{ company?.contact }}</div>
                     </div>
-                    <div v-if="company?.status" class="flex flex-wrap">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Статус:</div>
-                        <div class="font-medium">
-                            <Tag :value="label" :severity="severity" />
-                        </div>
-                    </div>
-                    <div v-if="company?.description" class="flex flex-wrap">
+                    <div v-if="company?.description" class="flex flex-wrap justify-between">
                         <div class="w-44 text-slate-500 dark:text-slate-300">Описание:</div>
                         <div class="font-medium">{{ company?.description }}</div>
                     </div>
-                    <div v-if="company?.info" class="flex flex-wrap">
+                    <div v-if="company?.info" class="flex flex-wrap justify-between">
                         <div class="w-44 text-slate-500 dark:text-slate-300">Инфо:</div>
                         <div class="font-medium">{{ company?.info }}</div>
+                    </div>
+                    <div v-if="company?.branches_count" class="flex flex-wrap justify-between">
+                        <div class="w-44 text-slate-500 dark:text-slate-300">Филиалы:</div>
+                        <div class="font-medium">
+                            <Tag :value="company?.branches_count" :severity="severity"/>
+                        </div>
                     </div>
                 </div>
             </slot>

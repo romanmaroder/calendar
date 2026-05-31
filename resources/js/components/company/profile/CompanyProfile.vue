@@ -4,7 +4,7 @@ import { Company } from '@/types';
 import { PropType, ref } from 'vue';
 import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
-import CountryCard from '@/components/company/profile/CountryCard.vue';
+import BranchCard from '@/components/company/profile/BranchCard.vue';
 
 const props = defineProps({
     company: {
@@ -46,10 +46,10 @@ const items = ref([
 
         <template #right-center-column>
             <InfoCard :company="company" title="Общая информация" />
-            <ContextMenu global :model="items" class="mobile-area"/>
+            <ContextMenu global :model="items" class="mobile-area" />
         </template>
         <template #right-column>
-            <CountryCard :company="company" title="Country"/>
+            <BranchCard :branches="company.branches" title="Филиалы" />
         </template>
     </ProfileLayout>
 </template>

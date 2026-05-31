@@ -6,25 +6,30 @@ use App\Http\Requests\Company\AvatarCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
 use App\Http\Resources\CompanyResource;
+use App\Http\Resources\CountryResource;
 use App\Models\Company\Company;
 use App\Models\Country\Country;
-use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\Contracts\CompanyRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class CompanyController extends Controller
 {
+
+    public function __construct(protected CompanyRepositoryInterface $companyRepository )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $companies = Company::with(['country', 'branches','branches.users'])->paginate(20);
-       // dd(CompanyResource::collection($companies)->toArray(request()));
+        $companies = $this->companyRepository->listWithCountryInfo();
         return Inertia::render(
             'company/Index',
-            ['companies' => CompanyResource::collection($companies)->resolve()]
+            ['companies' => CompanyResource::collection($companies)->resolve(),'countries'=>$this->getCountries()]
         );
     }
 
@@ -53,10 +58,21 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        $company->load('country');
+        $company=$this->companyRepository->findWithCountryInfo($company->id);
+
+        if (!$company){
+            abort(404);
+        }
+
+        $resource = new CompanyResource($company);
+        $resolved = $resource->resolve();
+        $transformedCompany = $resolved['data'] ?? $resolved;
+
+
+
         if ($company->trashed()) {
             return Inertia::render('company/Show', [
-                'company' => $company,
+                'company' => $transformedCompany,
                 'isDeleted' => true
             ]);
         }
@@ -68,8 +84,17 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
+        $company = $this->companyRepository->findWithCountryInfo($company->id);
+
+        if (!$company){
+            abort(404);
+        }
+
+        $resource = new CompanyResource($company);
+        $resolved = $resource->resolve();
+        $transformedCompany = $resolved['data'] ?? $resolved;
         return Inertia::render('company/Edit', [
-            'company' => $company,
+            'company' => $transformedCompany,
             'countries' => $this->getCountries(),
         ]);
     }
@@ -198,8 +223,8 @@ class CompanyController extends Controller
                                 ]);
     }
 
-    private function getCountries():Collection
+    private function getCountries()
     {
-        return Country::all();
+        return CountryResource::collection(Country::all(['id','name','phone_regex','phone_mask']))->resolve();
     }
 }

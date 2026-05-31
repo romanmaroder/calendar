@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, PropType, ref, watch } from 'vue';
+import { computed, onMounted, PropType, ref, watch } from 'vue';
 import { Company } from '@/types';
 import { useMediaQuery } from '@vueuse/core';
 import FormCompany from '@/components/company/FormCompany.vue';
@@ -52,7 +52,6 @@ watch(isLargeScreen, () => {
 const form = ref<Data>({});
 
 const previewOfCompanyData = (data: Data) => {
-    console.log(data);
     return (form.value = {
         name: data.name,
         avatar: data.avatar,
@@ -66,11 +65,19 @@ const avatar = computed(() => {
 const newCompany = () => {
     emit('newCompany');
     visible.value = false;
+    return (form.value = {
+        name: '',
+        avatar: '',
+    });
 };
 const updateCompany = () => {
     emit('updateCompany');
     visible.value = false;
 };
+
+onMounted(()=>{
+    //console.log('DRAWER',props.company);
+});
 </script>
 
 <template>
@@ -79,7 +86,9 @@ const updateCompany = () => {
         :blockScroll="true"
         :position="company?.id ? 'right' : undefined"
         :closeIcon="company?.id ? 'pi pi-chevron-right' : 'pi pi-chevron-left'"
-        :pt="{
+        :pt="{root: {
+                class: 'w-full!',
+            },
             header: {
                 class: '!py-[0.5rem]',
             },
@@ -96,7 +105,7 @@ const updateCompany = () => {
                 <Avatar
                     :image="avatar"
                     shape="circle"
-                    :icon="avatar ? '' : 'pi pi-builder'"
+                    :icon="avatar ? '' : 'pi pi-building'"
                     :pt="{
                         image: {
                             class: 'object-cover',
@@ -112,8 +121,7 @@ const updateCompany = () => {
                 <span v-else class="line-clamp-1 inline-block w-[150px] font-bold">{{ title }}</span>
             </div>
         </template>
-        <form-company :company="company" @newCompany="newCompany" @updateCompany="updateCompany"
-                      @drawerData="previewOfCompanyData" />
+        <form-company :company="company" @createCompany="newCompany" @updateCompany="updateCompany" @drawerData="previewOfCompanyData" />
     </Drawer>
 
     <Button :icon="iconName" :label="label" @click="visible = true" size="small" :variant="variant" :raised="raised" />

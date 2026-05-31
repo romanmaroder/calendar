@@ -4,13 +4,13 @@ import Restore from '@/components/common/Restore.vue';
 import FormDrawer from '@/components/company/FormDrawer.vue';
 import Show from '@/components/company/Show.vue';
 import { getInitials } from '@/composables/useInitials';
-import { usePhoneLink } from '@/composables/usePhoneLink';
+import { usePhoneLink } from '@/composables/utils/phone/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Company } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
+import { computed, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 
 const props = defineProps({
@@ -114,6 +114,10 @@ const filterFields = () => {
        });
    }
 };*/
+
+onMounted(()=>{
+    console.log(props.companies);
+});
 </script>
 
 <template>
@@ -129,7 +133,7 @@ const filterFields = () => {
                     <span class="">
                         <form-drawer
                             v-if="tools.create && !isLargeScreen"
-                            @new-company="onLoadItem"
+                            @newCompany="onLoadItem"
                             icon-name="pi pi-building"
                             raised
                             label="New"
@@ -292,8 +296,7 @@ const filterFields = () => {
                         :href="'tel:' + getPhone(slotProps.data.phone)"
                         rel="noopener"
                     />
-                    <div
-                        class="hidden md:flex flex-row flex-wrap text-xs font-normal text-gray-900 2xl:hidden dark:text-gray-300">
+                    <div class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.code }}</small>
                         <Divider layout="vertical" />
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.iso_code }}</small>
@@ -349,7 +352,7 @@ const filterFields = () => {
                                     icon-name="pi pi-pencil"
                                     label=""
                                     :company="slotProps.data"
-                                    @update-company="onLoadItem"
+                                    @updateCompany="onLoadItem"
                                     variant="link"
                                 />
                                 <show :company="slotProps.data" icon-name="pi pi-search" label="" route="" />

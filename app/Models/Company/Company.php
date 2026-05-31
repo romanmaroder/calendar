@@ -6,6 +6,7 @@ use App\Casts\Ucfirst;
 use App\Models\Branch\Branch;
 use App\Models\Country\Country;
 use Database\Factories\Company\CompanyFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 * @property string $info
 * @property string|null $avatar
 * @property int $country_id
+* @property Collection|null $branches
 */
 class Company extends Model
 {

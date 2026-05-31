@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import Layout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { onMounted, PropType } from 'vue';
+import { PropType, provide, ref } from 'vue';
 import { BreadcrumbItem, Company } from '@/types';
 import Table from '@/components/company/Table.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Company', href: '/company' }];
 
-defineProps({
+const props = defineProps({
     companies: {
         type: Object as PropType<Company>,
         required: true,
@@ -16,10 +16,8 @@ defineProps({
         type: Object,
     },
 });
-
-onMounted(() => {
-    //console.log(props.companies);
-});
+const countries: object = ref(props.countries);
+provide('countries', countries);
 </script>
 
 <template>

@@ -6,7 +6,7 @@ use App\Models\Company\Company;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Company*/
+/** @mixin Company */
 class CompanyResource extends JsonResource
 {
     /**
@@ -30,10 +30,25 @@ class CompanyResource extends JsonResource
                     'id' => $this->country->id,
                     'name' => $this->country->name,
                     'phone_regex' => $this->country->phone_regex,
+                    'phone_mask' => $this->country->phone_mask,
+                    'phone_code' => $this->when(!empty($this->country->phone_code),fn()=>$this->country->phone_code),
+                    'code' => $this->when(!empty($this->country->code),fn()=>$this->country->code),
+                    'iso_code' => $this->when(!empty($this->country->iso_code),fn()=>$this->country->iso_code),
+                    'currency' => $this->when(!empty($this->country->currency),fn()=>$this->country->currency),
                 ];
             }),
-            'branches' => BranchResource::collection($this->whenLoaded('branches'))->resolve(),
-            'users' => UserResource::collection($this->whenLoaded('users')),
+            'branches_count' => $this->when($this->branches_count > 0, fn() => $this->branches_count),
+            'branches' =>$this->whenLoaded('branches', function () {
+               return  $this->branches->map(function ($branches) {
+                        return [
+                            'id' => $branches->id,
+                            'name' => $branches->name,
+                            'contact' => $branches->contact,
+                            'phone' => $branches->phone,
+                            'created_at' => $branches->created_at?->format('Y-m-d'),
+                        ];
+                    });
+            }),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             //'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];

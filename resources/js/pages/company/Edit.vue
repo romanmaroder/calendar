@@ -11,8 +11,8 @@ const props = defineProps({
         required: true,
     },
     countries: {
-        type: Object
-    }
+        type: Object,
+    },
 });
 
 const breadcrumbs: BreadcrumbItem[] = [

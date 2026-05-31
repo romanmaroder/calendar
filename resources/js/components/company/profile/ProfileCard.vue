@@ -2,7 +2,7 @@
 import { getInitials } from '@/composables/useInitials';
 import { Company } from '@/types';
 import { computed, PropType } from 'vue';
-import { getPhone } from '@/composables/usePhoneLink';
+import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 
 const props = defineProps({
     company: { type: Object as PropType<Company | null> },
