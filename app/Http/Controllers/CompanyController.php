@@ -105,7 +105,6 @@ class CompanyController extends Controller
     public function update(UpdateCompanyRequest $request, Company $company)
     {
         $data = $request->validated();
-        //dd($data);
         $company->update($data);
 
         return to_route('company.index');

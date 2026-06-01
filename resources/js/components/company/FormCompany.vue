@@ -242,7 +242,6 @@ const cancel = () => {
                                 cols="15"
                                 autoResize
                                 size="small"
-                                tabindex="6"
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                             />
                             <label class="bg-transparent! font-light!" for="description">Описание</label>

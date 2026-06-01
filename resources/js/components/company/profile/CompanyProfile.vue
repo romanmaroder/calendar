@@ -36,6 +36,9 @@ const items = ref([
         },
     },
 ]);
+/*onMounted(()=>{
+    console.log(props.company);
+});*/
 </script>
 
 <template>
@@ -48,7 +51,7 @@ const items = ref([
             <InfoCard :company="company" title="Общая информация" />
             <ContextMenu global :model="items" class="mobile-area" />
         </template>
-        <template #right-column>
+        <template #center-column v-if="company.branches.length > 0">
             <BranchCard :branches="company.branches" title="Филиалы" />
         </template>
     </ProfileLayout>
