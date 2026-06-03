@@ -1,3 +1,4 @@
+/*Генерирует примеры номеров телефона по регулярному выражению*/
 export function generatePhoneExamples(regex: string, count: number = 5): string[] {
     // Убираем ^ и $, если есть
     const cleanRegex = regex.replace(/^[\^]|\$$/g, '');
@@ -32,6 +33,8 @@ export function generatePhoneExamples(regex: string, count: number = 5): string[
     }
     return examples;
 }
+
+/*Генерирует примеры номеров телефона по регулярному выражению по шаблону */
 export function generateFormattedPhoneExamples(
     regex: string,
     count: number = 5,
@@ -63,5 +66,5 @@ export function generateFormattedPhoneExamples(
 
 
 export function useValidatePhone(){
-    return { generatePhoneExamples ,generateFormattedPhoneExamples};
+    return { generateFormattedPhoneExamples};
 }
