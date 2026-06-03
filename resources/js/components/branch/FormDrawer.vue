@@ -51,7 +51,6 @@ watch(isLargeScreen, () => {
 const form = ref<Data>({});
 
 const previewOfUserData = (data: Data) => {
-    console.log(data);
     return (form.value = {
         name: data.name,
         avatar: data.avatar,
@@ -79,6 +78,9 @@ const updateUser = () => {
         :position="branch?.id ? 'right' : undefined"
         :closeIcon="branch?.id ? 'pi pi-chevron-right' : 'pi pi-chevron-left'"
         :pt="{
+            root: {
+                class: 'w-[20rem]!',
+            },
             header: {
                 class: '!py-[0.5rem]',
             },

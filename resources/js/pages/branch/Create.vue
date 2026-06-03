@@ -12,18 +12,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const props = defineProps({
-    countries:{
+    company:{
         type:Object,
     },
     user: {
         type: Array,
     },
 });
-const countries: object = ref(props.countries);
-provide('countries', countries);
+const company: object = ref(props.company);
+provide('company', company);
 
 onMounted(()=>{
-    console.log(countries);
+    //console.log(props.countries);
 });
 </script>
 

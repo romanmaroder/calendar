@@ -29,7 +29,7 @@ class StoreBranchRequest extends FormRequest
             'contact' => 'nullable|string|min:3|max:250',
             'avatar' => 'nullable|string',
             'status' => 'boolean',
-            'country_id' => 'required|exists:countries,id',
+            'company_id' => 'required|exists:companies,id','country_id' => 'required|exists:countries,id',
         ];
         // Добавляем правила для phone только если country_id валиден
         if ($this->filled('country_id')) {

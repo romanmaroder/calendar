@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch } from '@/types';
-import { computed, onMounted, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import { useMediaQuery } from '@vueuse/core';
 import BranchUsersTable from '@/components/branch/profile/BranchUsersTable.vue';
-import CountryCard from '@/components/branch/profile/CountryCard.vue';
 
 const props = defineProps({
     branch: {
@@ -185,7 +184,7 @@ function downloadNote(note: any) {
 
 const isMobile = useMediaQuery('(max-width: 640px)');
 
-const hasSubcribers  = computed(() => {
+const hasSubcribers = computed(() => {
     return props.branch.users_count > 0;
 });
 
@@ -213,7 +212,6 @@ const items = ref([
         },
     },
 ]);
-
 </script>
 
 <template>
@@ -224,11 +222,11 @@ const items = ref([
 
         <template #right-center-column>
             <InfoCard :branch="branch" title="Общая информация" />
-            <ContextMenu global :model="items" class="mobile-area"/>
+            <ContextMenu global :model="items" class="mobile-area" />
         </template>
-        <template #right-column>
-            <CountryCard :branch="branch" title="Country"/>
-        </template>
+        <!--        <template #right-column>
+            <CountryCard :branch="branch" title="Country" />
+        </template>-->
         <template #center-column v-if="hasSubcribers">
             <BranchUsersTable :branch="branch" :users-list="branch.users" />
         </template>

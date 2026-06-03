@@ -4,7 +4,7 @@ import Show from '@/components/branch/Show.vue';
 import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 import Restore from '@/components/common/Restore.vue';
 import { getInitials } from '@/composables/useInitials';
-import { getPhone } from '@/composables/usePhoneLink';
+import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 import { useStatus } from '@/composables/useStatus';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Branch } from '@/types';
@@ -299,7 +299,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="phone"
-                header="Phone/Country"
+                header="Phone"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -315,15 +315,7 @@ const filterFields = () => {
                         :href="'tel:' + getPhone(slotProps.data.phone)"
                         rel="noopener"
                     />
-                    <div class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.code }}</small>
-                        <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.iso_code }}</small>
-                        <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.phone_code }}</small>
-                        <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.currency }}</small>
-                    </div>
+                    <div class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300"></div>
                 </template>
             </Column>
 
@@ -420,14 +412,19 @@ const filterFields = () => {
                 </template>
             </Column>
             <Column
-                field="description"
-                header="Description"
+                field="contact"
+                header="Contact"
+                :sortable="true"
                 :pt="{
                     root: {
-                        class: 'hidden lg:table-cell max-w-[250px] lg:truncate',
+                        class: 'hidden lg:table-cell lg:max-w-[250px] lg:truncate',
                     },
                 }"
-            ></Column>
+            >
+                <template #body="slotProps">
+                    <p v-tooltip.top="slotProps.data.contact">{{ slotProps.data.contact }}</p>
+                </template>
+            </Column>
             <Column
                 :exportable="false"
                 header="Tools"
