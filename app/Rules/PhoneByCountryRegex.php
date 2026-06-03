@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Models\Company\Company;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\DB;
@@ -9,11 +10,10 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 
 class PhoneByCountryRegex implements ValidationRule
 {
-    protected string $countryId;
 
-    public function __construct(string $countryId)
+    public function __construct(protected string $countryId)
     {
-        $this->countryId = $countryId;
+
     }
 
     /**
