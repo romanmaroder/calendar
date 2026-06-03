@@ -29,7 +29,8 @@ class CompanyController extends Controller
         $companies = $this->companyRepository->listWithCountryInfo();
         return Inertia::render(
             'company/Index',
-            ['companies' => CompanyResource::collection($companies)->resolve(),'countries'=>$this->getCountries()]
+            ['companies' => CompanyResource::collection($companies)->resolve(),
+                'countries'=>$this->getCountries()]
         );
     }
 

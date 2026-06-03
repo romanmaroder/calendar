@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, PropType, ref, watch } from 'vue';
+import FormCompany from '@/components/company/FormCompany.vue';
 import { Company } from '@/types';
 import { useMediaQuery } from '@vueuse/core';
-import FormCompany from '@/components/company/FormCompany.vue';
+import { computed, onMounted, PropType, ref, watch } from 'vue';
 
 interface Data {
     name?: string;
     surname?: string;
     avatar?: string;
 }
+
 const emit = defineEmits(['newCompany', 'updateCompany']);
 
 const props = defineProps({
@@ -75,7 +76,7 @@ const updateCompany = () => {
     visible.value = false;
 };
 
-onMounted(()=>{
+onMounted(() => {
     //console.log('DRAWER',props.company);
 });
 </script>
@@ -86,8 +87,9 @@ onMounted(()=>{
         :blockScroll="true"
         :position="company?.id ? 'right' : undefined"
         :closeIcon="company?.id ? 'pi pi-chevron-right' : 'pi pi-chevron-left'"
-        :pt="{root: {
-                class: 'w-full!',
+        :pt="{
+            root: {
+                class: 'w-[20rem]!',
             },
             header: {
                 class: '!py-[0.5rem]',

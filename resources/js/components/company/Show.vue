@@ -48,7 +48,7 @@ watch(isLargeScreen, () => {
         closeIcon="pi pi-chevron-down"
         :pt="{
             root: {
-                class: 'sm:hidden! h-[100%]! dark:bg-black!',
+                class: 'sm:hidden! h-[100%]!',
             },
             content: {
                 class: 'p-0!',
