@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Table from '@/components/branch/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
-import { Branch, BreadcrumbItem } from '@/types';
+import { Branch, BreadcrumbItem, Company } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, provide, ref } from 'vue';
 
@@ -14,18 +14,18 @@ const props = defineProps({
     count: {
         type: Number,
     },
-    countries: {
-        type: Object,
-    },
+    company: {
+        type: Object as PropType<Company>
+    }
 });
+
+const company: object = ref(props.company);
+provide('company', company);
 
 const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
-
-const countries: object = ref(props.countries);
-provide('countries', countries);
 </script>
 
 <template>

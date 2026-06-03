@@ -6,14 +6,14 @@ import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/branch/profile/InfoCard.vue';
 import ProfileCard from '@/components/branch/profile/ProfileCard.vue';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
-import { Branch } from '@/types';
+import { Branch, Company, Country } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { inject, PropType, watch } from 'vue';
-import { generateFormattedPhoneExamples } from '@/composables/useValidatePhone';
+import { inject, PropType, ref, Ref, watch } from 'vue';
+import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
-const countries: any = inject('countries');
+const company: Ref<Company[]> | undefined = inject('company');
 
 const props = defineProps({
     branch: Object as PropType<Branch | null>,
@@ -28,7 +28,8 @@ const form = useForm({
     description: props.branch?.description ?? '',
     contact: props.branch?.contact ?? '',
     avatar: props.branch?.avatar ?? '',
-    status: props.branch?.status ?? '',
+    status: props.branch?.status ?? false,
+    company_id: props.branch?.company_id ?? null,
     country_id: props.branch?.country_id ?? null,
     created_at: props.branch?.created_at ?? '',
 });
@@ -36,6 +37,39 @@ const form = useForm({
 watch(form, () => {
     emit('drawerData', { name: form.name, avatar: form.avatar });
 });
+
+const countries = ref<Country[]>([]);
+
+// Используем composable
+const { mask } = useCountryPhone({
+    countries,
+    form,
+});
+
+// Watch для company_id с immediate: true
+watch(
+    () => form.company_id,
+    (newId, oldId) => {
+        if (!newId) {
+            form.country_id = null;
+            return;
+        }
+        const selectedCompany = company?.value.find((c) => c.id === Number(newId));
+
+        if (selectedCompany?.country) {
+            form.country_id = selectedCompany.country.id;
+            countries.value = [selectedCompany.country];
+            form.reset('phone');
+            if (oldId) {
+                form.phone = '';
+            }
+        } else {
+            form.country_id = null;
+            countries.value = [];
+        }
+    },
+    { immediate: true },
+);
 
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
@@ -117,7 +151,6 @@ const cancel = () => {
     form.reset();
     window.history.back();
 };
-const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '+7(999)999 99 99').join();
 </script>
 
 <template>
@@ -135,7 +168,7 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="name"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="name" class="bg-transparent! font-light!">{{ 'Имя:' }}</label>
                         </FloatLabel>
@@ -145,7 +178,7 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
             </template>
             <template #right-center-column>
                 <div class="mb-2 space-y-4">
-                    <InfoCard title="Общая инфа">
+                    <InfoCard title="Общая информация">
                         <div class="flex flex-col flex-wrap space-y-4">
                             <div class="">
                                 <FloatLabel variant="on" class="">
@@ -156,7 +189,7 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                         aria-labelledby="contact"
                                         size="small"
-                                        v-keyfilter="/^[A-zА-яёЁ\d\s.,-]+$/iu"
+                                        pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                                     />
                                     <label for="name" class="bg-transparent! font-light!">{{ 'Контакты:' }}</label>
                                 </FloatLabel>
@@ -165,19 +198,19 @@ const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '
                             <div>
                                 <FloatLabel variant="on" class="">
                                     <Select
-                                        v-model="form.country_id"
-                                        id="country"
+                                        v-model="form.company_id"
+                                        id="company"
                                         optionLabel="name"
-                                        :options="countries"
+                                        :options="company"
                                         option-value="id"
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
-                                        aria-labelledby="countries"
+                                        aria-labelledby="company"
                                         size="small"
                                         fluid
                                     />
-                                    <label for="country" class="bg-transparent! font-light!">{{ 'Страна' }}</label>
+                                    <label for="company" class="bg-transparent! font-light!">{{ 'Компания' }}</label>
                                 </FloatLabel>
-                                <InputError :message="form.errors.country_id" />
+                                <InputError :message="form.errors.company_id" />
                             </div>
 
                             <div>

@@ -8,7 +8,7 @@ import { useToast } from 'primevue/usetoast';
 import { Branch, User } from '@/types';
 import UnsubscribeConfirmation from '@/components/branch/profile/UnsubscribeConfirmation.vue';
 import { useRows } from '@/composables/workingWithTableItems';
-import { getPhone } from '@/composables/usePhoneLink';
+import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 import { useMediaQuery } from '@vueuse/core';
 
 const props = defineProps({

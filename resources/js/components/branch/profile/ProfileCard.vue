@@ -2,7 +2,7 @@
 import { getInitials } from '@/composables/useInitials';
 import { Branch } from '@/types';
 import { computed, PropType } from 'vue';
-import { getPhone } from '@/composables/usePhoneLink';
+import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 
 const props = defineProps({
     branch: { type: Object as PropType<Branch | null> },
