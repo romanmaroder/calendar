@@ -10,7 +10,7 @@ import { Company } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
+import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 
 const props = defineProps({
@@ -115,9 +115,7 @@ const filterFields = () => {
    }
 };*/
 
-onMounted(()=>{
-    console.log(props.companies);
-});
+//TODO подумать об отложенной загрузке компонентов с помощью import { defineAsyncComponent } from 'vue';
 </script>
 
 <template>

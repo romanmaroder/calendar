@@ -10,7 +10,7 @@ import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Company, Country } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { inject, onMounted, PropType, Ref, watch } from 'vue';
+import { inject, PropType, Ref, watch } from 'vue';
 
 const emit = defineEmits(['createCompany', 'updateCompany', 'drawerData']);
 const countries: Ref<Country[]> | undefined = inject('countries');
@@ -33,7 +33,7 @@ const form = useForm({
 });
 
 watch(form, () => {
-        emit('drawerData', { name: form.name, avatar: form.avatar });
+    emit('drawerData', { name: form.name, avatar: form.avatar });
 });
 
 const { country, mask } = useCountryPhone({
@@ -134,10 +134,6 @@ const cancel = () => {
     form.reset();
     window.history.back();
 };
-
-onMounted(()=>{
-    console.log(countries?.value);
-});
 </script>
 
 <template>

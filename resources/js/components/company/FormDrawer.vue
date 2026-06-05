@@ -2,7 +2,7 @@
 import FormCompany from '@/components/company/FormCompany.vue';
 import { Company } from '@/types';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, onMounted, PropType, ref, watch } from 'vue';
+import { computed, PropType, ref, watch } from 'vue';
 
 interface Data {
     name?: string;
@@ -75,10 +75,6 @@ const updateCompany = () => {
     emit('updateCompany');
     visible.value = false;
 };
-
-onMounted(() => {
-    //console.log('DRAWER',props.company);
-});
 </script>
 
 <template>
