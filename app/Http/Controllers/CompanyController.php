@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Company\AvatarCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
-use App\Http\Resources\CompanyResource;
-use App\Http\Resources\CountryResource;
+use App\Http\Resources\Company\CompanyResource;
+use App\Http\Resources\Country\CountryResource;
 use App\Models\Company\Company;
 use App\Models\Country\Country;
 use App\Repositories\Contracts\CompanyRepositoryInterface;
@@ -17,20 +17,23 @@ use Inertia\Inertia;
 class CompanyController extends Controller
 {
 
-    public function __construct(protected CompanyRepositoryInterface $companyRepository )
+    public function __construct(protected CompanyRepositoryInterface $companyRepository)
     {
     }
 
     /**
      * Display a listing of the resource.
+     * countries нужны для передачи в компоненты  (мобильная версия)
      */
     public function index()
     {
-        $companies = $this->companyRepository->listWithCountryInfo();
+        $companies = $this->companyRepository->listWithCountryAndBranchesInfo();
         return Inertia::render(
             'company/Index',
-            ['companies' => CompanyResource::collection($companies)->resolve(),
-                'countries'=>$this->getCountries()]
+            [
+                'companies' => CompanyResource::collection($companies)->resolve(),
+                'countries' => $this->getCountries()
+            ]
         );
     }
 
@@ -39,8 +42,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-
-        return Inertia::render('company/Create',['countries' => $this->getCountries()]);
+        return Inertia::render('company/Create', ['countries' => $this->getCountries()]);
     }
 
     /**
@@ -59,25 +61,18 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        $company=$this->companyRepository->findWithCountryInfo($company->id);
-
-        if (!$company){
-            abort(404);
-        }
-
-        $resource = new CompanyResource($company);
-        $resolved = $resource->resolve();
-        $transformedCompany = $resolved['data'] ?? $resolved;
-
-
+        $company = $this->companyRepository->findWithBranchesInfo($company->id);
 
         if ($company->trashed()) {
             return Inertia::render('company/Show', [
-                'company' => $transformedCompany,
+                'company' => (new CompanyResource($company))->resolve(),
                 'isDeleted' => true
             ]);
         }
-        return Inertia::render('company/Show', ['company' => $company, 'isDeleted' => false]);
+        return Inertia::render(
+            'company/Show',
+            ['company' => (new CompanyResource($company))->resolve(), 'isDeleted' => false]
+        );
     }
 
     /**
@@ -85,17 +80,8 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        $company = $this->companyRepository->findWithCountryInfo($company->id);
-
-        if (!$company){
-            abort(404);
-        }
-
-        $resource = new CompanyResource($company);
-        $resolved = $resource->resolve();
-        $transformedCompany = $resolved['data'] ?? $resolved;
         return Inertia::render('company/Edit', [
-            'company' => $transformedCompany,
+            'company' => (new CompanyResource($company))->resolve(),
             'countries' => $this->getCountries(),
         ]);
     }
@@ -130,18 +116,17 @@ class CompanyController extends Controller
 
     public function archive()
     {
-        $companies = Company::onlyTrashed()->with('country')->latest('created_at')->paginate(20);
+        $companies = $this->companyRepository->listOnlyTrashed();
         return Inertia::render('company/Archive', [
-            'companies' => $companies->collect(),
+            'companies' => CompanyResource::collection($companies)->resolve(),
             'count' => $companies->total(),
         ]);
     }
 
     public function softDelete(string $id)
     {
-        $company = Company::findOrFail($id);
+        $company = $this->companyRepository->findOrFail($id)->delete();
 
-        $company->delete();
         return response()->json([
                                     'success' => true,
                                     'message' => 'Company has been deleted',
@@ -167,7 +152,7 @@ class CompanyController extends Controller
 
     public function forceDelete(string $id)
     {
-        $company = Company::withTrashed()->findOrFail($id);
+        $company = $this->companyRepository->withTrashed($id);
 
         $extension = explode('/', $company->avatar);
         $avatar = end($extension);
@@ -203,7 +188,7 @@ class CompanyController extends Controller
 
     public function restore($id)
     {
-        $company = Company::onlyTrashed()->findOrFail($id);
+        $company = $this->companyRepository->onlyTrashed($id);
         $company->restore();
         return response()->json([
                                     'success' => true,
@@ -225,6 +210,6 @@ class CompanyController extends Controller
 
     private function getCountries()
     {
-        return CountryResource::collection(Country::all(['id','name','phone_regex','phone_mask']))->resolve();
+        return CountryResource::collection(Country::all(['id', 'name', 'phone_regex', 'phone_mask']))->resolve();
     }
 }

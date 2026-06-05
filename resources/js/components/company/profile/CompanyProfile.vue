@@ -51,7 +51,7 @@ const items = ref([
             <InfoCard :company="company" title="Общая информация" />
             <ContextMenu global :model="items" class="mobile-area" />
         </template>
-        <template #center-column v-if="company.branches.length > 0">
+        <template #center-column v-if="company.branches?.length > 0">
             <BranchCard :branches="company.branches" title="Филиалы" />
         </template>
     </ProfileLayout>
