@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Layout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, Company } from '@/types';
 import FormBranch from '@/components/branch/FormBranch.vue';
-import { onMounted, provide, ref } from 'vue';
+import { onMounted, PropType, provide, ref } from 'vue';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -12,18 +12,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const props = defineProps({
-    company:{
-        type:Object,
-    },
-    user: {
-        type: Array,
+    companies:{
+        type:Object as PropType<Company>,
     },
 });
-const company: object = ref(props.company);
-provide('company', company);
+const companies: object = ref(props.companies);
+provide('companies', companies);
 
 onMounted(()=>{
-    //console.log(props.countries);
+    console.log(props.companies);
 });
 </script>
 

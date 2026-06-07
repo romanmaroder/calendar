@@ -2,7 +2,7 @@
 import Layout from '@/layouts/AppLayout.vue';
 import { Branch, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { PropType } from 'vue';
+import { onMounted, PropType } from 'vue';
 import BranchProfile from '@/components/branch/profile/BranchProfile.vue';
 
 const props = defineProps({
@@ -16,6 +16,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Branches', href: '/branch' },
     { title: props.branch.name, href: '' },
 ];
+
+
+onMounted(()=>{
+    console.log('SHOW-PAGE-BRANCH', props.branch);
+});
+
 </script>
 
 <template>

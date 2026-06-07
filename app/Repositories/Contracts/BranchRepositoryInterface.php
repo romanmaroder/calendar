@@ -7,6 +7,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface BranchRepositoryInterface
 {
-    public function findWithCountryInfo(int $id): ?Branch;
-    public function listWithCountryInfo(int $perPage = 20): LengthAwarePaginator;
+    public function findWithUsers(int $id): ?Branch;
+    public function listWithCompanyAndUserInfo(int $perPage = 20): LengthAwarePaginator;
 }

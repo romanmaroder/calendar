@@ -13,7 +13,7 @@ import { inject, PropType, ref, Ref, watch } from 'vue';
 import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
-const company: Ref<Company[]> | undefined = inject('company');
+const companies: Ref<Company[]> | undefined = inject('companies');
 
 const props = defineProps({
     branch: Object as PropType<Branch | null>,
@@ -54,7 +54,7 @@ watch(
             form.country_id = null;
             return;
         }
-        const selectedCompany = company?.value.find((c) => c.id === Number(newId));
+        const selectedCompany = companies?.value.find((c) => c.id === Number(newId));
 
         if (selectedCompany?.country) {
             form.country_id = selectedCompany.country.id;
@@ -193,7 +193,7 @@ const cancel = () => {
                                     />
                                     <label for="name" class="bg-transparent! font-light!">{{ 'Контакты:' }}</label>
                                 </FloatLabel>
-                                <InputError :message="form.errors.name" />
+                                <InputError :message="form.errors.contact" />
                             </div>
                             <div>
                                 <FloatLabel variant="on" class="">
@@ -201,7 +201,7 @@ const cancel = () => {
                                         v-model="form.company_id"
                                         id="company"
                                         optionLabel="name"
-                                        :options="company"
+                                        :options="companies"
                                         option-value="id"
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                         aria-labelledby="company"

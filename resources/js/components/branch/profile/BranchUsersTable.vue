@@ -9,6 +9,7 @@ import { Branch, User } from '@/types';
 import UnsubscribeConfirmation from '@/components/branch/profile/UnsubscribeConfirmation.vue';
 import { useRows } from '@/composables/workingWithTableItems';
 import { getPhone } from '@/composables/utils/phone/usePhoneLink';
+import { getFullname } from '@/composables/useFullname';
 import { useMediaQuery } from '@vueuse/core';
 
 const props = defineProps({
@@ -123,12 +124,22 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                 ></Column>
 
                 <!-- Имя пользователя -->
-                <Column field="name" header="Имя" :sortable="true"></Column>
+                <Column field="name" header="Имя" :sortable="true">
+                    <template #body="{ data }">
+                        <div class="text-sm font-medium text-wrap text-gray-900 dark:text-gray-300">
+                            {{ getFullname({ name: data.name, surname: data.surname }) }}
+                        </div>
+                        <div class="sm:hidden">
+                            <Button class="!px-0" as="a" variant="link" :label="data.phone" :href="'tel:' +
+                            getPhone(data.phone)" rel="noopener" size="small" />
+                        </div>
+                    </template>
+                </Column>
 
                 <!-- Email -->
                 <Column field="phone" header="Phone" :sortable="true" v-if="isLargeScreen">
                     <template #body="{ data }">
-                        <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
+                        <div class="text-sm font-medium text-wrap">
                             <Button class="!px-0" as="a" variant="link" :label="data.phone" :href="'tel:' + getPhone(data.phone)" rel="noopener" />
                         </div>
                     </template>

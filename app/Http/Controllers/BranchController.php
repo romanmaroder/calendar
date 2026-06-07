@@ -6,15 +6,15 @@ use App\Exceptions\BranchUserException;
 use App\Http\Requests\Branch\AvatarBranchRequest;
 use App\Http\Requests\Branch\StoreBranchRequest;
 use App\Http\Requests\Branch\UpdateBranchRequest;
-use App\Http\Resources\BranchResource;
-use App\Http\Resources\CompanyResource;
+use App\Http\Resources\Branch\BranchMinResource;
+use App\Http\Resources\Branch\BranchResource;
+use App\Http\Resources\Branch\BranchWithUsersResource;
+use App\Http\Resources\Company\CompanyMinWithCountryMinResource;
 use App\Models\Branch\Branch;
 use App\Models\Company\Company;
-use App\Models\Country\Country;
-use App\Models\User;
 use App\Repositories\Contracts\BranchRepositoryInterface;
 use App\Services\BranchUserService;
-use Illuminate\Database\Eloquent\Collection;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -22,9 +22,10 @@ use Inertia\Inertia;
 class BranchController extends Controller
 {
 
-    public function __construct(protected BranchUserService $branchUserService, protected BranchRepositoryInterface
-    $branchRepository)
-    {
+    public function __construct(
+        protected BranchUserService $branchUserService,
+        protected BranchRepositoryInterface $branchRepository
+    ) {
     }
 
 
@@ -33,12 +34,12 @@ class BranchController extends Controller
      */
     public function index()
     {
-        $branches = $this->branchRepository->listWithCountryInfo(20);
+        $branches = $this->branchRepository->listWithCompanyAndUserInfo();
 
         return Inertia::render('branch/Index', [
             'branches' => BranchResource::collection($branches)->resolve(),
             'count' => $branches->total(),
-            'company' => $this->getCompany()
+            'companies' => $this->getCompanies()
         ]);
     }
 
@@ -47,7 +48,7 @@ class BranchController extends Controller
      */
     public function create()
     {
-        return Inertia::render('branch/Create', ['user' => $this->getUsers(),'company' => $this->getCompany()]);
+        return Inertia::render('branch/Create', ['companies' => $this->getCompanies()]);
     }
 
     /**
@@ -66,27 +67,17 @@ class BranchController extends Controller
      */
     public function show(Branch $branch)
     {
-        $branch = $this->branchRepository->findWithCountryInfo($branch->id);
-
-        if (!$branch) {
-            abort(404);
-        }
-
-        $resource = new BranchResource($branch);
-        $resolved = $resource->resolve();
-        $transformedBranch = $resolved['data'] ?? $resolved;
-
-
+        $branch = $this->branchRepository->findWithUsers($branch->id);
 
         if ($branch->trashed()) {
             return Inertia::render('branch/Show', [
-                'branch' => $transformedBranch,
+                'branch' => (new BranchWithUsersResource($branch))->resolve(),
                 'isDeleted' => true
             ]);
         }
 
         return Inertia::render('branch/Show', [
-            'branch' => $transformedBranch,
+            'branch' => (new BranchWithUsersResource($branch))->resolve(),
             'isDeleted' => false
         ]);
     }
@@ -96,17 +87,11 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
-        $branch = $this->branchRepository->findWithCountryInfo($branch->id);
+        $branch = $this->branchRepository->find($branch->id);
 
-        if (!$branch) {
-            abort(404);
-        }
-        $resource = new BranchResource($branch);
-        $resolved = $resource->resolve();
-        $transformedBranch = $resolved['data'] ?? $resolved;
         return Inertia::render('branch/Edit', [
-            'branch' => $transformedBranch,
-            'company' => $this->getCompany()
+            'branch' => (new BranchMinResource($branch))->resolve(),
+            'companies' => $this->getCompanies()
         ]);
     }
 
@@ -130,7 +115,6 @@ class BranchController extends Controller
          return response()->json(['success' => true, 'message' => 'Branch Deleted Successfully', 'code' => 200]);
      }*/
 
-
     public function avatar(AvatarBranchRequest $request, Branch $branch)
     {
         $request->validated();
@@ -142,9 +126,9 @@ class BranchController extends Controller
 
     public function archive()
     {
-        $branches = Branch::onlyTrashed()->with('company')->latest('created_at')->paginate(20);
+        $branches = $this->branchRepository->listOnlyTrashed();
         return Inertia::render('branch/Archive', [
-            'branches' => $branches->collect(),
+            'branches' =>BranchMinResource::collection($branches)->resolve(),
             'count' => $branches->total(),
         ]);
     }
@@ -195,7 +179,6 @@ class BranchController extends Controller
     }
 
     /**
-     * @throws BranchUserException
      */
     public function forceDelete(string $id)
     {
@@ -255,7 +238,6 @@ class BranchController extends Controller
                                 ]);
     }
 
-
     public function unsubscribeUsers(Request $request, Branch $branch)
     {
         try {
@@ -272,24 +254,18 @@ class BranchController extends Controller
         } catch (BranchUserException $e) {
             return response()
                 ->json(['success' => false, 'message' => $e->getMessage()], 400);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // \Log::error($e->getMessage());
             return response()
                 ->json(['success' => false, 'message' => 'Произошла ошибка при отписке пользователей'], 500);
         }
     }
 
-
-    private function getUsers()
+    private function getCompanies()
     {
-        return User::all();
-    }
-
-    private function getCompany()
-    {
-        /*return CompanyResource::collection(Company::with('country:id,phone_regex')->find(['id','name', 'country_id'])
-                                               ->all())->resolve();*/
-        return Company::with('country:id,name,phone_regex,phone_mask')
-            ->get(['id','name', 'country_id']);
+        return CompanyMinWithCountryMinResource::collection(
+            Company::with('country')
+                ->get(['id', 'name', 'country_id'])
+        )->resolve();
     }
 }

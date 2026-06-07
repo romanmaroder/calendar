@@ -26,7 +26,7 @@ class UpdateBranchRequest extends FormRequest
         $rules = [
             'name' => 'required|string|min:3|max:250',
             'description' => 'nullable|string|min:3|max:550',
-            'contact' => 'nullable|string|min:3|max:250',
+            'contact' => 'required|string|min:3|max:250',
             'avatar' => 'nullable|string',
             'status' => 'boolean',
             'company_id' => 'required|exists:companies,id',
@@ -40,5 +40,15 @@ class UpdateBranchRequest extends FormRequest
             ];
         }
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'company_id.required'      => 'Поле «Компания» обязательно для заполнения.',
+            'country_id.required'      => 'Поле «Страна» обязательно для заполнения.',
+            'name.required'      => 'Поле «Имя» обязательно для заполнения.',
+            'contact.required'      => 'Поле «Контакты» обязательно для заполнения.',
+        ];
     }
 }

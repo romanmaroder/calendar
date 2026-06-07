@@ -3,7 +3,7 @@ import Table from '@/components/branch/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { Branch, BreadcrumbItem, Company } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { PropType, provide, ref } from 'vue';
+import { onMounted, PropType, provide, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Branches', href: '/branch' }];
 
@@ -14,18 +14,22 @@ const props = defineProps({
     count: {
         type: Number,
     },
-    company: {
+    companies: {
         type: Object as PropType<Company>
     }
 });
 
-const company: object = ref(props.company);
-provide('company', company);
+const companies: object = ref(props.companies);
+provide('companies', companies);
 
 const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
+onMounted(()=>{
+    console.log('INDEX-PAGE-BRANCHES',props.branches);
+    console.log('INDEX-PAGE-COMPANIES',props.companies);
+});
 </script>
 
 <template>

@@ -15,7 +15,8 @@ const showAvatar = computed(() => props.branch?.avatar && props.branch?.avatar !
     <Card class="w-full rounded-xl shadow-sm not-dark:!bg-gray-100">
         <template #content>
             <slot>
-                <div class="flex flex-col items-center space-y-4 text-center">
+                <div
+                    class="flex flex-row items-center justify-around space-y-4 space-x-2 text-center md:flex-col md:justify-center">
                     <Avatar
                         v-if="!showAvatar"
                         size="xlarge"
@@ -33,20 +34,23 @@ const showAvatar = computed(() => props.branch?.avatar && props.branch?.avatar !
                             },
                         }"
                     />
-                    <h3 class="text-center text-lg leading-tight font-bold">
-                        {{ branch?.name }}
-                    </h3>
-                    <Button
-                        class="m-0! p-0! text-sm! font-medium! text-slate-500! md:text-base! dark:text-slate-300!"
-                        as="a"
-                        variant="link"
-                        :label="branch?.phone"
-                        :href="`tel:${getPhone(branch?.phone)}`"
-                        rel="noopener"
-                    />
-                    <time class="font-light" :datetime="branch?.created_at"
-                        ><small>{{ branch?.created_at }}</small></time
-                    >
+                    <div class="flex flex-col">
+                        <p class="text-center text-lg leading-tight font-bold break-all">
+                            {{ branch?.name }}
+                        </p>
+                        <Button
+                            class="m-0! p-0! font-medium!"
+                            as="a"
+                            variant="link"
+                            :label="branch?.phone"
+                            :href="`tel:${getPhone(branch?.phone)}`"
+                            rel="noopener"
+                            size="large"
+                        />
+                        <time class="font-light" :datetime="branch?.created_at"
+                            ><small>{{ branch?.created_at }}</small></time
+                        >
+                    </div>
                 </div>
             </slot>
         </template>
