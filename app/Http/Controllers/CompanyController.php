@@ -125,7 +125,7 @@ class CompanyController extends Controller
 
     public function softDelete(string $id)
     {
-        $company = $this->companyRepository->findOrFail($id)->delete();
+        $this->companyRepository->findOrFail($id)->delete();
 
         return response()->json([
                                     'success' => true,

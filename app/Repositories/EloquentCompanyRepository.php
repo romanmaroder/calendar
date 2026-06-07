@@ -49,11 +49,7 @@ class EloquentCompanyRepository implements Contracts\CompanyRepositoryInterface
 
     public function listOnlyTrashed(int $perPage = 20): LengthAwarePaginator
     {
-        return Company::onlyTrashed()->with([
-                                                'country' => function ($query) {
-                                                    $query->select('id', 'code', 'iso_code', 'phone_code', 'currency');
-                                                }
-                                            ])->latest('created_at')->paginate($perPage);
+        return Company::onlyTrashed()->latest('created_at')->paginate($perPage);
     }
 
     public function findOrFail(int $id):?Company

@@ -294,14 +294,19 @@ const filterFields = () => {
                         :href="'tel:' + getPhone(slotProps.data.phone)"
                         rel="noopener"
                     />
-                    <div class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.code }}</small>
+                    <div v-if="slotProps.data.country"
+                        class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300">
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.country?.code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.iso_code }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.country?.iso_code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.phone_code }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.country?.phone_code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country.currency }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
+                                slotProps.data.country?.currency }}</small>
                     </div>
                 </template>
             </Column>
