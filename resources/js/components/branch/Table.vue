@@ -149,7 +149,7 @@ const filterFields = () => {
                     <span class="">
                         <form-drawer
                             v-if="tools.create && !isLargeScreen"
-                            @new-user="onLoadItem"
+                            @new-branch="onLoadItem"
                             icon-name="pi pi-map-marker"
                             raised
                             label="New"
@@ -364,7 +364,7 @@ const filterFields = () => {
                                     icon-name="pi pi-pencil"
                                     label=""
                                     :branch="slotProps.data"
-                                    @update-user="onLoadItem"
+                                    @update-branch="onLoadItem"
                                     variant="link"
                                 />
                                 <show :branch="slotProps.data" icon-name="pi pi-search" label="" route="" />

@@ -8,7 +8,7 @@ interface Data {
     name?: string;
     avatar?: string;
 }
-const emit = defineEmits(['newUser', 'updateUser']);
+const emit = defineEmits(['newBranch', 'updateBranch']);
 
 const props = defineProps({
     iconName: {
@@ -61,12 +61,12 @@ const avatar = computed(() => {
     return form.value.avatar ?? props.branch?.avatar ?? '';
 });
 
-const newUser = () => {
-    emit('newUser');
+const newBranch = () => {
+    emit('newBranch');
     visible.value = false;
 };
-const updateUser = () => {
-    emit('updateUser');
+const updateBranch = () => {
+    emit('updateBranch');
     visible.value = false;
 };
 </script>
@@ -113,7 +113,8 @@ const updateUser = () => {
                 <span v-else class="line-clamp-1 inline-block w-[150px] font-bold">{{ title }}</span>
             </div>
         </template>
-        <form-branch :branch="branch" @createUser="newUser" @updateUser="updateUser" @drawerData="previewOfUserData" />
+        <form-branch :branch="branch" @createBranch="newBranch" @updateBranch="updateBranch"
+                     @drawerData="previewOfUserData" />
     </Drawer>
 
     <Button :icon="iconName" :label="label" @click="visible = true" size="small" :variant="variant" :raised="raised" />

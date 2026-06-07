@@ -12,7 +12,8 @@ import { useToast } from 'primevue/usetoast';
 import { inject, PropType, ref, Ref, watch } from 'vue';
 import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 
-const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
+const emit = defineEmits(['createBranch', 'updateBranch', 'drawerData']);
+
 const companies: Ref<Company[]> | undefined = inject('companies');
 
 const props = defineProps({
@@ -86,7 +87,7 @@ const submit = () => {
                     detail: form.name + ' - update successfully.',
                     life: 3000,
                 });
-                emit('updateUser');
+                emit('updateBranch');
             },
             onError: function (errors) {
                 toast.add({
@@ -106,7 +107,7 @@ const submit = () => {
                     detail: form.name + ' - add successfully.',
                     life: 3000,
                 });
-                emit('createUser');
+                emit('createBranch');
             },
             onFinish: function () {
                 //form.reset();
@@ -225,7 +226,8 @@ const cancel = () => {
                                         :mask="mask"
                                         :aria-autocomplete="form.phone"
                                     />
-                                    <label for="phone" class="bg-transparent! font-light!">{{ mask }}</label>
+                                    <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'телефон'
+                                        }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.phone" />
                             </div>
