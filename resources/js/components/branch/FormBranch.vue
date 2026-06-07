@@ -10,11 +10,19 @@ import { Branch, Company, Country } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, ref, Ref, watch } from 'vue';
+import { useCompanyCountryPhone } from '@/composables/utils/phone/useCompanyCountryPhone';
 import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 
 const emit = defineEmits(['createBranch', 'updateBranch', 'drawerData']);
 
-const companies: Ref<Company[]> | undefined = inject('companies');
+// 1. Получаем из дерева (может быть undefined)
+const rawCompanies = inject('companies') as Ref<Company[]> | undefined;
+
+// 2. Делаем безопасный ref. Если inject вернул undefined — будет пустой массив
+const companies = rawCompanies ?? ref<Company[]>([]);
+
+// countries всегда должен быть валидным ref (даже пустым), чтобы composable не падал
+const countries = ref<Country[]>([]);
 
 const props = defineProps({
     branch: Object as PropType<Branch | null>,
@@ -39,38 +47,14 @@ watch(form, () => {
     emit('drawerData', { name: form.name, avatar: form.avatar });
 });
 
-const countries = ref<Country[]>([]);
+// Только логика «компания → страна»
+useCompanyCountryPhone(form, companies, countries);
 
 // Используем composable
 const { mask } = useCountryPhone({
     countries,
     form,
 });
-
-// Watch для company_id с immediate: true
-watch(
-    () => form.company_id,
-    (newId, oldId) => {
-        if (!newId) {
-            form.country_id = null;
-            return;
-        }
-        const selectedCompany = companies?.value.find((c) => c.id === Number(newId));
-
-        if (selectedCompany?.country) {
-            form.country_id = selectedCompany.country.id;
-            countries.value = [selectedCompany.country];
-            form.reset('phone');
-            if (oldId) {
-                form.phone = '';
-            }
-        } else {
-            form.country_id = null;
-            countries.value = [];
-        }
-    },
-    { immediate: true },
-);
 
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
@@ -226,8 +210,7 @@ const cancel = () => {
                                         :mask="mask"
                                         :aria-autocomplete="form.phone"
                                     />
-                                    <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'телефон'
-                                        }}</label>
+                                    <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'телефон' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.phone" />
                             </div>

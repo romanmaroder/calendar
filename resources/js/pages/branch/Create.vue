@@ -20,7 +20,7 @@ const companies: object = ref(props.companies);
 provide('companies', companies);
 
 onMounted(()=>{
-    console.log(props.companies);
+    console.log('CREATE_COMPANIES',props.companies);
 });
 </script>
 

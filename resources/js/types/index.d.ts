@@ -42,6 +42,7 @@ export interface User {
     created_at?: string;
     updated_at?: string;
     deleted_at?: string;
+
     [key: string]: any;
 }
 
@@ -63,13 +64,14 @@ export interface Client {
     created_at: string;
     updated_at: string;
     deleted_at?: string;
+
     [key: string]: any;
 }
 
 export interface Branch {
     id: number;
     name: string;
-    phone?:string;
+    phone?: string;
     description: string;
     contact: string;
     avatar?: string;
@@ -77,38 +79,67 @@ export interface Branch {
     created_at: string;
     updated_at: string;
     deleted_at?: string;
-    country?:{
+    company?: {
         id: number;
         name: string;
-        code: string;
-        currency: string;
-        iso_code: string;
-        phone_code: string;
-        active:boolean;
-    },
-    country_id?:number,
+        phone?: string;
+        description?: string;
+        contact?: string;
+        info?: string;
+        avatar?: string;
+        country?: {
+            id: number;
+            code: string;
+            name: string;
+            iso_code: string;
+            phone_code: string;
+            phone_regex: string;
+            phone_mask: string;
+            currency: string;
+            active: boolean;
+        };
+    };
+
+    company_id?: number;
+
     [key: string]: any;
 }
 
 export interface Company {
     id: number;
     name: string;
-    phone?:string;
+    phone?: string;
     description?: string;
     contact?: string;
     info?: string;
     avatar?: string;
-    country?:{
+    country?: {
         id: number;
         name: string;
         code: string;
         currency: string;
         iso_code: string;
         phone_code: string;
-        active:boolean;
-    },
-    country_id?:number,
+        phone_regex: string;
+        phone_mask: string;
+        active: boolean;
+    };
+    country_id?: number;
+
     [key: string]: any;
 }
 
+export interface Country {
+    id: number;
+    code: string;
+    name: string;
+    iso_code: string;
+    phone_code: string;
+    phone_regex: string;
+    phone_mask: string;
+    currency: string;
+    active: boolean;
+    created_at?: string;
+    updated_at?: string;
+}
 export type BreadcrumbItemType = BreadcrumbItem;

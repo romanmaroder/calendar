@@ -20,7 +20,7 @@ class CompanyMinResource extends JsonResource
             'id' => $this->id,
             'name' => $this->when(!empty($this->name),fn()=>$this->name),
             'phone' => $this->when(!empty($this->phone),fn()=>$this->phone),
-            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->format('Y-m-d'),
         ];
     }
 }
