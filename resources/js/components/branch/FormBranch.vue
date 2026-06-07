@@ -74,11 +74,12 @@ const submit = () => {
                 emit('updateBranch');
             },
             onError: function (errors) {
-                toast.add({
+                console.log(errors);
+                /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
                     life: 2000,
-                });
+                });*/
             },
         });
     } else {
@@ -97,12 +98,13 @@ const submit = () => {
                 //form.reset();
             },
             onError: function (errors) {
-                toast.add({
+                console.log(errors);
+                /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
                     //detail: showErrors(errors),
                     life: 2000,
-                });
+                });*/
                 form.defaults();
             },
         });

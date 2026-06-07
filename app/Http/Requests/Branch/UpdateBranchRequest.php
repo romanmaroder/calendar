@@ -45,10 +45,11 @@ class UpdateBranchRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'company_id.required'      => 'Поле «Компания» обязательно для заполнения.',
-            'country_id.required'      => 'Поле «Страна» обязательно для заполнения.',
-            'name.required'      => 'Поле «Имя» обязательно для заполнения.',
-            'contact.required'      => 'Поле «Контакты» обязательно для заполнения.',
+            'company_id.required' => '«Компания» обязательно для заполнения.',
+            'country_id.required' => '«Страна» обязательно для заполнения.',
+            'name.required' => '«Имя» обязательно для заполнения.',
+            'contact.required' => '«Контакты» обязательно для заполнения.',
+            'phone.required' => '«Телефон» обязательно для заполнения.',
         ];
     }
 }
