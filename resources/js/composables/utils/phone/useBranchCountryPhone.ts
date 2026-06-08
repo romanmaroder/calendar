@@ -11,7 +11,7 @@ export const useBranchCountryPhone = (
         () => form.branch_id,
         (newId,oldId) => {
             if (!newId) {
-                form.country_id = null;
+                form.resolved_country_id = null;
                 countries.value = [];
                 if (form.phone) {
                     form.reset('phone');
@@ -24,14 +24,14 @@ export const useBranchCountryPhone = (
             );
 
             if (selectedBranch?.country) {
-                form.country_id = selectedBranch.country.id;
+                form.resolved_country_id = selectedBranch.country.id;
                 countries.value = [selectedBranch.country];
                 form.reset('phone');
                 if (oldId) {
                     form.phone = '';
                 }
             } else {
-                form.country_id = null;
+                form.resolved_country_id = null;
                 countries.value = [];
             }
         },

@@ -30,13 +30,13 @@ class StoreBranchRequest extends FormRequest
             'avatar' => 'nullable|string',
             'status' => 'boolean',
             'company_id' => 'required|exists:companies,id',
-            'country_id' => 'required|exists:countries,id',
+            'resolved_country_id' => 'required|exists:countries,id',
         ];
-        // Добавляем правила для phone только если country_id валиден
-        if ($this->filled('country_id')) {
+        // Добавляем правила для phone только если resolved_country_id валиден
+        if ($this->filled('resolved_country_id')) {
             $rules['phone'] = [
                 'required',
-                new PhoneByCountryRegex($this->input('country_id'))
+                new PhoneByCountryRegex($this->input('resolved_country_id'))
             ];
         }
         return $rules;
@@ -46,7 +46,7 @@ class StoreBranchRequest extends FormRequest
     {
         return [
             'company_id.required' => '«Компания» обязательно для заполнения.',
-            'country_id.required' => '«Страна» обязательно для заполнения.',
+            'resolved_country_id.required' => '«Страна» обязательно для заполнения.',
             'name.required' => '«Имя» обязательно для заполнения.',
             'contact.required' => '«Контакты» обязательно для заполнения.',
             'phone.required' => '«Телефон» обязательно для заполнения.',

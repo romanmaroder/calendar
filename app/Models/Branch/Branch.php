@@ -32,11 +32,10 @@ class Branch extends Model
     use HasFactory, Notifiable, SoftDeletes;
 
 
-    protected $fillable = ['name','phone','status','description','contact','avatar','company_id','country_id'];
+    protected $fillable = ['name','phone','status','description','contact','avatar','company_id'];
     protected  $guarded = [];
 
-    // Массив для хранения виртуальных атрибутов
-    protected array $virtualAttributes = [];
+    protected $appends = ['resolved_country_id'];
 
     /**
      * Получить пользователей, которые принадлежат этому филиалу.
@@ -55,52 +54,14 @@ class Branch extends Model
         return $this->status ? 'active' : 'disabled';
     }
 
-    /**
-     * Сеттер для виртуального поля country_id
-     */
-    public function setCountryIdAttribute($value): void
+    public function getResolvedCountryIdAttribute(): ?int
     {
-        $this->virtualAttributes['country_id'] = $value;
-    }
-
-    /**
-     * Геттер для виртуального поля country_id
-     */
-    public function getCountryIdAttribute(): ?int
-    {
-        // Сначала проверяем виртуальный атрибут
-        if (isset($this->virtualAttributes['country_id'])) {
-            return $this->virtualAttributes['country_id'];
-        }
-        // Если есть компания и у неё есть страна — возвращаем её ID
-        if ($this->company && $this->company->country) {
+        if ($this->company && $this->company?->country) {
             return $this->company->country->id;
         }
+
         return null;
     }
-
-    /**
-     * Исключаем виртуальные поля из массива атрибутов модели
-     */
-    public function attributesToArray(): array
-    {
-        $attributes = parent::attributesToArray();
-        unset($attributes['country_id']);
-        return $attributes;
-    }
-
-    /**
-     * При сериализации в JSON включаем виртуальное поле
-     */
-    public function toArray(): array
-    {
-        $array = parent::toArray();
-        $array['country_id'] = $this->country_id;
-        return $array;
-    }
-
-
-
     protected function casts(): array
     {
         return [

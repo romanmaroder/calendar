@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\AvatarUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Resources\Branch\BranchMinWithCountryMinResource;
+use App\Http\Resources\User\UserResource;
 use App\Models\Branch\Branch;
 use App\Models\User;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Traits\HasControllerRoutes;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -18,14 +20,18 @@ class UserController extends Controller
 {
     use HasControllerRoutes;
 
+    public function __construct(protected UserRepositoryInterface $userRepository)
+    {
+    }
+
     public function index()
     {
-        $users = User::with('branch')->paginate(20);
+        $users = $this->userRepository->listWithBranchInfo();
         return Inertia::render(
             'user/Index',
             [
-                'users' => $users->collect(),
-                'count' => $users->total(),
+                'users' => UserResource::collection($users)->resolve(),
+                'count' => $this->userRepository->countAll(),
                 'branch' => $this->getBranches(),
             ]
         );
@@ -33,7 +39,7 @@ class UserController extends Controller
 
     public function create()
     {
-        return Inertia::render('user/Create', ['branch' => $this->getBranches(),]);
+        return Inertia::render('user/Create', ['branch' => $this->getBranches()]);
     }
 
     public function store(StoreUserRequest $request)
@@ -42,6 +48,7 @@ class UserController extends Controller
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
         $data['password'] = $data['password'] ?? '';
+        unset($data['resolved_country_id']);
         User::create($data);
         return to_route('users');
     }
@@ -51,26 +58,29 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load('branch');
+
+        $user = $this->userRepository->findWithTrashedAndBranchInfo($user->id);
+
         if ($user->trashed()) {
             return Inertia::render('user/Show', [
-                'user' => $user,
+                'user' => (new UserResource($user))->resolve(),
                 'isDeleted' => true
             ]);
         }
-
         // Обычная модель (не удалена)
         return Inertia::render('user/Show', [
-            'user' => $user,
+            'user' => (new UserResource($user))->resolve(),
             'isDeleted' => false
         ]);
     }
 
     public function edit(User $user)
     {
+        $user = $this->userRepository->find($user->id);
+
         return Inertia::render('user/Edit', [
-            'user' => $user,
-            'branch' => $this->getBranches(),
+            'user' => (new UserResource($user))->resolve(),
+            'branches' => $this->getBranches(),
         ]);
     }
 
@@ -80,7 +90,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
-        //dd($data);
+        unset($data['resolved_country_id']);
         $user->update($data);
 
         return to_route('users');
@@ -96,10 +106,13 @@ class UserController extends Controller
 
     public function archive()
     {
-        $users = User::onlyTrashed()->with('branch')->latest('created_at')->paginate(20);
+       // $users = User::onlyTrashed()->with('branch')->latest('created_at')->paginate(20);
+
+        $users = $this->userRepository->listOnlyTrashed();
+
         return Inertia::render('user/Archive', [
-            'users' => $users->collect(),
-            'count' => $users->total(),
+            'users' => UserResource::collection($users)->resolve(),
+            'count' => $this->userRepository->countAll(),
             'branch' => $this->getBranches(),
         ]);
     }
@@ -178,9 +191,10 @@ class UserController extends Controller
                                 ]);
     }
 
-    private function getBranches(): Collection
+    private function getBranches()
     {
-        return Branch::all(['id', 'name']);
+        return BranchMinWithCountryMinResource::collection(Branch::with(['company.country'])->get(['id', 'name','company_id']))
+            ->resolve();
     }
 
 }

@@ -11,7 +11,7 @@ export const useCompanyCountryPhone = (
         () => form.company_id,
         (newId,oldId) => {
             if (!newId) {
-                form.country_id = null;
+                form.resolved_country_id = null;
                 countries.value = [];
                 if (form.phone) {
                     form.reset('phone');
@@ -24,14 +24,14 @@ export const useCompanyCountryPhone = (
             );
 
             if (selectedCompany?.country) {
-                form.country_id = selectedCompany.country.id;
+                form.resolved_country_id = selectedCompany.country.id;
                 countries.value = [selectedCompany.country];
                 form.reset('phone');
                 if (oldId) {
                     form.phone = '';
                 }
             } else {
-                form.country_id = null;
+                form.resolved_country_id = null;
                 countries.value = [];
             }
         },

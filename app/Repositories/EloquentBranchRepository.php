@@ -19,6 +19,12 @@ class EloquentBranchRepository implements Contracts\BranchRepositoryInterface
         return Branch::with('users')->withCount('users')->findOrFail($id);
     }
 
+    public function findWithTrashedAndUsersInfo(int $id): ?Branch
+    {
+        return Branch::withTrashed()->with('users')->withCount('users')->findOrFail($id);
+    }
+
+
     public function listWithCompanyAndUserInfo(int $perPage = 20): LengthAwarePaginator
     {
         return Branch::with(['users', 'company'])->withCount('users')->paginate($perPage);

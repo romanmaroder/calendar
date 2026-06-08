@@ -3,6 +3,7 @@
 namespace App\Http\Requests\User;
 
 use App\Models\User;
+use App\Rules\PhoneByCountryRegex;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,19 +24,34 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'avatar'=>'nullable|string',
+        $rules = [
+            'avatar' => 'nullable|string',
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
-            'phone' => ['required','string','max:255','regex:/^\+7\d{10}$/',
-                Rule::unique(User::class, 'phone')->ignore($this->user)],
             'comment' => 'nullable|string|max:255',
             'birthday' => 'nullable|string|max:255',
-            'branch_id' => 'nullable|integer',
-            'email' => ['string','lowercase','email','max:255',
-                Rule::unique('clients')->ignore($this->user)
-            ],
+            'branch_id' => 'required|integer',
+            'email' => 'nullable|string|lowercase|email|max:255|unique:' . User::class,
+            'resolved_country_id' => 'required|exists:countries,id',
+        ];
+        // Добавляем правила для phone только если country_id валиден
+        if ($this->filled('resolved_country_id')) {
+            $rules['phone'] = [
+                'required',
+                new PhoneByCountryRegex($this->input('resolved_country_id'))
+            ];
+        }
+        return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'branch_id.required' => '«Филиал» обязательно для заполнения.',
+            'resolved_country_id.required' => '«Страна» обязательно для заполнения.',
+            'name.required' => '«Имя» обязательно для заполнения.',
+            'phone.required' => '«Телефон» обязательно для заполнения.',
         ];
     }
 }

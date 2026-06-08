@@ -6,7 +6,7 @@ import { computed, Ref } from 'vue';
 interface UseCountryPhoneOptions {
     countries: Ref<Country[]> | undefined;
     form: {
-        country_id: number | null;
+        resolved_country_id: number | null;
         phone: string;
     };
 }
@@ -30,10 +30,10 @@ export const useCountryPhone = ({ countries, form }: UseCountryPhoneOptions) => 
             console.error('Ошибка: countries.value не определён в useCountryPhone');
             return null;
         }
-        if (form.country_id !== null && form.country_id !== undefined) {
-            const foundCountry = countries.value.find((country: Country) => country.id === Number(form.country_id));
+        if (form.resolved_country_id !== null && form.resolved_country_id !== undefined) {
+            const foundCountry = countries.value.find((country: Country) => country.id === Number(form.resolved_country_id));
             if (!foundCountry) {
-                console.warn(`Страна с ID ${form.country_id} не найдена в списке countries`);
+                console.warn(`Страна с ID ${form.resolved_country_id} не найдена в списке countries`);
             }
             return foundCountry;
         }

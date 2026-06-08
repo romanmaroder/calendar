@@ -39,7 +39,7 @@ const form = useForm({
     avatar: props.branch?.avatar ?? '',
     status: props.branch?.status ?? false,
     company_id: props.branch?.company_id ?? null,
-    country_id: props.branch?.country_id ?? null,
+    resolved_country_id: props.branch?.resolved_country_id ?? null,
     created_at: props.branch?.created_at ?? '',
 });
 
@@ -217,7 +217,7 @@ const cancel = () => {
                                 <InputError :message="form.errors.phone" />
                             </div>
                             <div class="flex items-center gap-2">
-                                <Checkbox v-model="form.status" inputId="status" name="status" size="small" :tabindex="4" binary />
+                                <Checkbox v-model="form.status" inputId="status" name="status" size="small" binary />
                                 <label for="active"> Статус </label>
                             </div>
                         </div>

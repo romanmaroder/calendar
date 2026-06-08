@@ -57,7 +57,7 @@ class BranchController extends Controller
     public function store(StoreBranchRequest $request)
     {
         $validated = $request->validated();
-
+        unset($validated['resolved_country_id']);
         Branch::create($validated);
         return to_route('branch.index')->with('success', 'Branch created successfully.');
     }
@@ -67,7 +67,7 @@ class BranchController extends Controller
      */
     public function show(Branch $branch)
     {
-        $branch = $this->branchRepository->findWithUsers($branch->id);
+        $branch = $this->branchRepository->findWithTrashedAndUsersInfo($branch->id);
 
         if ($branch->trashed()) {
             return Inertia::render('branch/Show', [
@@ -101,6 +101,7 @@ class BranchController extends Controller
     public function update(UpdateBranchRequest $request, Branch $branch)
     {
         $data = $request->validated();
+        unset($data['resolved_country_id']);
         $branch->update($data);
 
         return to_route('branch.index');

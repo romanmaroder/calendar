@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Layout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
 import FormUser from '@/components/user/FormUser.vue';
-import { provide, ref } from 'vue';
+import Layout from '@/layouts/AppLayout.vue';
+import { Branch, BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/vue3';
+import { PropType, provide, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Users', href: '/users' },
@@ -11,15 +11,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const props = defineProps({
-    branch:{
-        type:Array,
-    }
+    branch: {
+        type: Object as PropType<Branch>,
+    },
 });
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
 const listOfBranches: object = ref(props.branch);
 provide('listOfBranches', listOfBranches);
-
 </script>
 <template>
     <Head title="Create user" />

@@ -31,7 +31,6 @@ class BranchResource extends JsonResource
             'created_at' => $this->when(!empty($this->created_at),fn()=>$this->created_at?->format('Y-m-d')),
             'deleted_at' => $this->when(!empty($this->deleted_at), fn() => $this->deleted_at->format('Y-m-d')),
             'users_count' => $this->when($this->users_count > 0, fn() => $this->users_count),
-            'country_id' => $this->country_id,
         ];
 
         // Добавляем users только если загружены
@@ -45,6 +44,7 @@ class BranchResource extends JsonResource
         // Это предотвращает Lazy Loading и гарантирует отсутствие ключа, если данных нет
         if ($this->relationLoaded('company') && $this->company?->relationLoaded('country')) {
             $response['country'] = CountryMinResource::make($this->company->country)->resolve();
+            $response['resolved_country_id'] = $this->company?->country?->id;
         }
         return $response;
     }

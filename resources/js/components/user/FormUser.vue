@@ -7,10 +7,12 @@ import InfoCard from '@/components/user/profile/InfoCard.vue';
 import ProfileCard from '@/components/user/profile/ProfileCard.vue';
 import { useLabelName } from '@/composables/useLabelName';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
-import { User } from '@/types';
+import { Branch, Country, User } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { inject, PropType, watch } from 'vue';
+import { inject, onMounted, PropType, ref, Ref, watch } from 'vue';
+import { useBranchCountryPhone } from '@/composables/utils/phone/useBranchCountryPhone';
+import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 
@@ -28,17 +30,37 @@ const form = useForm({
     middleName: props.user?.middleName ?? '',
     phone: props.user?.phone ?? '',
     email: props.user?.email ?? '',
-    branch_id: props.user?.branch_id ?? '',
+    branch_id: props.user?.branch_id ?? null,
     birthday: props.user?.birthday ?? '',
     comment: props.user?.comment ?? '',
     created_at: props.user?.created_at ?? '',
+    resolved_country_id: props.user?.resolved_country_id ?? null,
 });
 
-const branches: any = inject('listOfBranches');
+/*const branches: Ref<Branch[]> | undefined = inject('listOfBranches');
+const countries: any = inject('countries');*/
+// 1. Получаем из дерева (может быть undefined)
+const rawBranches = inject('listOfBranches') as Ref<Branch[]> | undefined;
+
+// 2. Делаем безопасные ref-ы. Если данных нет — будет пустой массив
+const branches = rawBranches ?? ref<Branch[]>([]);
+const countries = ref<Country[]>([]);
 
 watch(form, () => {
     emit('drawerData', { name: form.name, surname: form.surname, avatar: form.avatar });
 });
+
+// Только логика «филиал → страна»
+useBranchCountryPhone(form, branches, countries);
+
+const { mask } = useCountryPhone({
+    countries,
+    form,
+});
+watch(countries, () => {
+    console.log('Countries',countries.value);
+})
+
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
     console.log('FORM ' + form.avatar, 'URL ' + value);
@@ -57,11 +79,12 @@ const submit = () => {
                 emit('updateUser');
             },
             onError: function (errors) {
-                toast.add({
+                console.log(errors);
+                /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
                     life: 2000,
-                });
+                });*/
             },
         });
     } else {
@@ -80,12 +103,13 @@ const submit = () => {
                 //form.reset();
             },
             onError: function (errors) {
-                toast.add({
+                console.log(errors);
+                /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
                     //detail: showErrors(errors),
                     life: 2000,
-                });
+                });*/
                 form.defaults();
             },
         });
@@ -124,6 +148,13 @@ const { dateLabelName } = useLabelName();
 const setDate = (date: Date | null): void => {
     form.birthday = dateLabelName(date);
 };
+
+//const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '+7(999)999 99 99').join();
+//const id = countries.value[0].id;
+onMounted(() => {
+    //console.log(mask);
+    console.log();
+});
 </script>
 
 <template>
@@ -141,7 +172,7 @@ const setDate = (date: Date | null): void => {
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="name"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="name" class="bg-transparent! font-light!">{{ 'Имя:' }}</label>
                         </FloatLabel>
@@ -154,7 +185,7 @@ const setDate = (date: Date | null): void => {
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="middleName"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="middleName" class="bg-transparent! font-light!">{{ 'Отчество:' }}</label>
                         </FloatLabel>
@@ -167,7 +198,7 @@ const setDate = (date: Date | null): void => {
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="surname"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="surname" class="bg-transparent! font-light!">{{ 'Фамилия:' }}</label>
                         </FloatLabel>
@@ -177,7 +208,7 @@ const setDate = (date: Date | null): void => {
             </template>
             <template #right-center-column>
                 <div class="mb-2 space-y-4">
-                    <InfoCard title="Общая инфа">
+                    <InfoCard title="Общая информация">
                         <div class="space-y-4">
                             <FloatLabel variant="on" class="">
                                 <Select
@@ -202,13 +233,12 @@ const setDate = (date: Date | null): void => {
                                     class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                     aria-labelledby="phone"
                                     size="small"
-                                    mask="+9 999 999 99 99"
+                                    :mask="mask"
                                     :aria-autocomplete="form.phone"
                                 />
-                                <label for="phone" class="bg-transparent! font-light!">{{ '+9 999 999 99 99' }}</label>
+                                <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'Телефон' }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.phone" />
-
                             <FloatLabel variant="on" class="">
                                 <InputText
                                     id="email"
