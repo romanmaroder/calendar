@@ -118,6 +118,7 @@ const removeAvatar = () => {
     url.value = '';
     path.value = '';
     fileInput.value = null;
+    emit('cropped', url.value);
 };
 
 const showMenuCropper = (event: Event) => {

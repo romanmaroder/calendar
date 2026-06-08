@@ -61,7 +61,7 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        $company = $this->companyRepository->findWithBranchesInfo($company->id);
+        $company = $this->companyRepository->findWithTrashedAndBranchesInfo($company->id);
 
         if ($company->trashed()) {
             return Inertia::render('company/Show', [

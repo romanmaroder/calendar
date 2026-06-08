@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getFullname } from '@/composables/useFullname';
 import { getInitials } from '@/composables/useInitials';
-import { getPhone } from '@/composables/usePhoneLink';
+import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 import { User } from '@/types';
 import { computed, PropType } from 'vue';
 
@@ -39,7 +39,7 @@ const showAvatar = computed(() => props.user?.avatar && props.user?.avatar !== '
                         {{ getFullname({ name: user?.name, middlename: user?.middleName, surname: user?.surname }) }}
                     </h3>
                     <Button
-                        class="m-0! p-0! text-sm! font-medium! text-slate-500! md:text-base! dark:text-slate-300!"
+                        class="m-0! p-0!"
                         as="a"
                         variant="link"
                         :label="user?.phone"
@@ -59,7 +59,7 @@ const showAvatar = computed(() => props.user?.avatar && props.user?.avatar !== '
                         <Button as="a" variant="link" :href="`tel:${getPhone(user?.phone)}`" rel="noopener" icon="pi pi-phone" />
                         <Divider layout="vertical" />
                         <Button
-                            class="font-medium text-slate-500 dark:text-slate-300"
+                            class="font-medium"
                             as="a"
                             variant="link"
                             :href="`sms:${getPhone(user?.phone)}`"

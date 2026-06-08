@@ -40,7 +40,7 @@ class CountryFactory extends Factory
         //
         $phoneCodeMap = [
             'RU' => '+7',
-            //'US' => '+1',
+            'US' => '+1',
             //'DE' => '+49',
             // Можно расширить список
         ];
@@ -50,17 +50,18 @@ class CountryFactory extends Factory
         */
         $phoneRegexMap = [
             'RU' => '/^\+7\(\d{3}\)\d{3} \d{2} \d{2}$/',
-            //'US' => '/^\+1\d{10}$/',
+            'US' => '/^(?:\+1)?\s?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/',
             //'DE' => '/^\+49\d{10,12}$/',
         ];
         $phoneMask =[
             'RU' => '+7(999)999 99 99',
+            'US' => '+1(999)999 9999',
         ];
 
         // Валюты по странам
         $currencyMap = [
             'RU' => 'RUB',
-            //'US' => 'USD',
+            'US' => 'USD',
             //'DE' => 'EUR',
         ];
 

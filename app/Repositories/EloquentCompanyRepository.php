@@ -24,13 +24,29 @@ class EloquentCompanyRepository implements Contracts\CompanyRepositoryInterface
             ->findOrFail($id);
     }
 
-    public function findWithBranchesInfo(int $id): ?Company
+    public function findWithTrashedAndBranchesInfo(int $id): ?Company
     {
-        return Company::with([
-                                 'branches' => function ($query) {
-                                     $query->select('id', 'name', 'phone', 'contact', 'created_at', 'company_id');
-                                 }
-                             ])->select('id', 'name', 'phone', 'description', 'contact', 'info', 'avatar', 'created_at')
+        return Company::withTrashed()->with([
+                                                'branches' => function ($query) {
+                                                    $query->select(
+                                                        'id',
+                                                        'name',
+                                                        'phone',
+                                                        'contact',
+                                                        'created_at',
+                                                        'company_id'
+                                                    );
+                                                }
+                                            ])->select(
+            'id',
+            'name',
+            'phone',
+            'description',
+            'contact',
+            'info',
+            'avatar',
+            'created_at'
+        )
             ->findOrFail($id);
     }
 
@@ -52,19 +68,19 @@ class EloquentCompanyRepository implements Contracts\CompanyRepositoryInterface
         return Company::onlyTrashed()->latest('created_at')->paginate($perPage);
     }
 
-    public function findOrFail(int $id):?Company
+    public function findOrFail(int $id): ?Company
     {
         return Company::findOrFail($id);
     }
 
-    public function withTrashed(int $id):?Company
+    public function withTrashed(int $id): ?Company
     {
-       return  Company::withTrashed()->findOrFail($id);
+        return Company::withTrashed()->findOrFail($id);
     }
 
-    public function onlyTrashed(int $id):?Company
+    public function onlyTrashed(int $id): ?Company
     {
-        return  Company::onlyTrashed()->findOrFail($id);
+        return Company::onlyTrashed()->findOrFail($id);
     }
 
 

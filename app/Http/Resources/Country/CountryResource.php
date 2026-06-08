@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Country;
 
 use App\Models\Country\Country;
 use Illuminate\Http\Request;
@@ -21,8 +21,8 @@ class CountryResource extends JsonResource
             'phone_mask' => $this->when(!empty($this->phone_mask),$this->phone_mask),
             'currency' => $this->when(!empty($this->currency),$this->currency),
             'active' => $this->when(!empty($this->active),$this->active),
-            'created_at' =>$this->when(!empty($this->created_at),$this->created_at?->format('Y-m-d H:i:s')),
-            'updated_at' =>$this->when(!empty($this->updated_at),$this->updated_at?->format('Y-m-d H:i:s')),
+            'created_at' =>$this->when(!empty($this->created_at),$this->created_at?->format('Y-m-d')),
+            'updated_at' =>$this->when(!empty($this->updated_at),$this->updated_at?->format('Y-m-d')),
         ];
     }
 }

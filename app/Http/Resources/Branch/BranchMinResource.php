@@ -25,7 +25,7 @@ class BranchMinResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->when(!empty($this->id),fn()=>$this->id),
             'name' => $this->when(!empty($this->name), fn() => $this->name),
             'phone' => $this->when(!empty($this->phone), fn() => $this->phone),
             'description' => $this->when(!empty($this->description), fn() => $this->description),

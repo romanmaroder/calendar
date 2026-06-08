@@ -15,7 +15,7 @@ const showAvatar = computed(() => props.company?.avatar && props.company?.avatar
     <Card class="w-full rounded-xl shadow-sm not-dark:!bg-gray-100">
         <template #content>
             <slot>
-                <div class="flex flex-col items-center space-y-4 text-center">
+                <div class="flex flex-row items-center justify-around space-y-4 space-x-2 text-center md:flex-col md:justify-center">
                     <Avatar
                         v-if="!showAvatar"
                         size="xlarge"
@@ -33,12 +33,12 @@ const showAvatar = computed(() => props.company?.avatar && props.company?.avatar
                             },
                         }"
                     />
-                    <h3
-                        class="break-words md:w-48 xl:break-normal xl:w-auto text-center text-lg leading-tight font-bold">
-                        {{ company?.name }}
-                    </h3>
+                    <div class="flex flex-col">
+                        <p class="text-center text-lg leading-tight font-bold break-all">
+                            {{ company?.name }}
+                        </p>
                     <Button
-                        class="m-0! p-0! text-sm! font-medium! text-slate-500! md:text-base! dark:text-slate-300!"
+                        class="m-0! p-0!"
                         as="a"
                         variant="link"
                         :label="company?.phone"
@@ -48,6 +48,7 @@ const showAvatar = computed(() => props.company?.avatar && props.company?.avatar
                     <time class="font-light" :datetime="company?.created_at"
                         ><small>{{ company?.created_at }}</small></time
                     >
+                </div>
                 </div>
             </slot>
         </template>
