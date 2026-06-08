@@ -2,6 +2,9 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 interface UserRepositoryInterface
 {
     /**
@@ -20,4 +23,10 @@ interface UserRepositoryInterface
      * @return int Количество обновлённых записей
      */
     public function unsubscribeFromBranch(array $userIds): int;
+
+
+
+    public function findWithBranchInfo(int $id): ?User;
+    public function listWithBranchInfo(int $perPage = 20): LengthAwarePaginator;
+    public function countAll(): int;
 }

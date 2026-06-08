@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Rules\PhoneByCountryRegex;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
@@ -31,7 +32,9 @@ class StoreUserRequest extends FormRequest
             'middleName' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:255',
             'birthday' => 'nullable|string',
-            'email' => 'nullable|string|lowercase|email|max:255|unique:' . User::class,
+            'email' => ['nullable','string','lowercase','email','max:255',
+                Rule::unique(User::class)->ignore($this->user)
+            ],
             'branch_id' => 'required|integer',
             'password' => 'nullable|string|min:8',
             'resolved_country_id' => 'required|exists:countries,id',

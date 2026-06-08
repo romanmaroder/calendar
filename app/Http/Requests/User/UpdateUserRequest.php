@@ -32,7 +32,9 @@ class UpdateUserRequest extends FormRequest
             'comment' => 'nullable|string|max:255',
             'birthday' => 'nullable|string|max:255',
             'branch_id' => 'required|integer',
-            'email' => 'nullable|string|lowercase|email|max:255|unique:' . User::class,
+            'email' => ['nullable','string','lowercase','email','max:255',
+                Rule::unique(User::class)->ignore($this->user)
+            ],
             'resolved_country_id' => 'required|exists:countries,id',
         ];
         // Добавляем правила для phone только если country_id валиден

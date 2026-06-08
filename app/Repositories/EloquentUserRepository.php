@@ -44,6 +44,11 @@ class EloquentUserRepository implements Contracts\UserRepositoryInterface
         return User::withTrashed()->with(['branch'])->findOrFail($id);
     }
 
+    public function onlyTrashed(int $id): ?User
+    {
+        return User::onlyTrashed()->findOrFail($id);
+    }
+
     public function listWithBranchInfo(int $perPage = 20): LengthAwarePaginator
     {
         return User::with(['branch'])->paginate($perPage);

@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import Table from '@/components/user/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, User } from '@/types';
-import Table from '@/components/user/Table.vue';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
 import { PropType, ref } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Users', href: '/users' },{ title: 'Archive', href: '' }];
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Users', href: '/users' },
+    { title: 'Archive', href: '' },
+];
 
 defineProps({
     users: {
@@ -15,7 +18,7 @@ defineProps({
     },
     count: {
         type: Number,
-    }
+    },
 });
 
 const total = ref();

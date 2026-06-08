@@ -48,6 +48,7 @@ class UserController extends Controller
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
         $data['password'] = $data['password'] ?? '';
+        //Удаляем виртуальное поле из массива
         unset($data['resolved_country_id']);
         User::create($data);
         return to_route('users');
@@ -58,7 +59,6 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-
         $user = $this->userRepository->findWithTrashedAndBranchInfo($user->id);
 
         if ($user->trashed()) {
@@ -90,6 +90,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
+        //Удаляем виртуальное поле из массива
         unset($data['resolved_country_id']);
         $user->update($data);
 
@@ -106,8 +107,6 @@ class UserController extends Controller
 
     public function archive()
     {
-       // $users = User::onlyTrashed()->with('branch')->latest('created_at')->paginate(20);
-
         $users = $this->userRepository->listOnlyTrashed();
 
         return Inertia::render('user/Archive', [
@@ -119,7 +118,7 @@ class UserController extends Controller
 
     public function softDelete(string $id)
     {
-        $resource = User::findOrFail($id);
+        $resource = $this->userRepository->find($id);
         $resource->delete();
         return response()->json(['success' => true, 'message' => 'User has been deleted', 'code' => 200]);
     }
@@ -129,14 +128,18 @@ class UserController extends Controller
         $ids = $request->input('ids', []);
         User::whereIn('id', $ids)->delete();
         return response()->json(
-            ['success' => true,
-                'count' => count($ids), 'message' => 'Move to the basket.', 'code' => 200]
+            [
+                'success' => true,
+                'count' => count($ids),
+                'message' => 'Move to the basket.',
+                'code' => 200
+            ]
         );
     }
 
     public function forceDelete(string $id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = $this->userRepository->findWithTrashedAndBranchInfo($id);
         $extension = explode('/', $user->avatar);
         $avatar = end($extension);
         Storage::disk('public')->delete('/avatars/' . $avatar);
@@ -171,7 +174,7 @@ class UserController extends Controller
 
     public function restore($id)
     {
-        $user = User::onlyTrashed()->findOrFail($id);
+        $user = $this->userRepository->onlyTrashed($id);
         $user->restore();
         return response()->json([
                                     'success' => true,
@@ -193,7 +196,9 @@ class UserController extends Controller
 
     private function getBranches()
     {
-        return BranchMinWithCountryMinResource::collection(Branch::with(['company.country'])->get(['id', 'name','company_id']))
+        return BranchMinWithCountryMinResource::collection(
+            Branch::with(['company.country'])->get(['id', 'name', 'company_id'])
+        )
             ->resolve();
     }
 

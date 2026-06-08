@@ -37,7 +37,7 @@ class User extends Authenticatable
         'branch_id',
         'password',
     ];
-    protected  $guarded = [];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -57,7 +57,7 @@ class User extends Authenticatable
      */
     public function branch(): BelongsTo
     {
-        return $this->belongsTo(Branch::class,'branch_id', 'id');
+        return $this->belongsTo(Branch::class, 'branch_id', 'id');
     }
 
     /**

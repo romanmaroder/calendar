@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import UserProfile from '@/components/user/profile/UserProfile.vue';
 import { getFullname } from '@/composables/useFullname';
 import Layout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { computed, PropType } from 'vue';
-import UserProfile from '@/components/user/profile/UserProfile.vue';
 
 const props = defineProps({
     user: {
@@ -19,8 +19,8 @@ const props = defineProps({
     },
 });
 
-const title = computed(()=>props.isDeleted ? 'Archive': 'Users');
-const href = computed(()=>props.isDeleted ? '/users/archive':'/users');
+const title = computed(() => (props.isDeleted ? 'Archive' : 'Users'));
+const href = computed(() => (props.isDeleted ? '/users/archive' : '/users'));
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: title.value, href: href.value },

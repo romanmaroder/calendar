@@ -3,9 +3,9 @@ import FinanceCard from '@/components/user/profile/FinanceCard.vue';
 import InfoCard from '@/components/user/profile/InfoCard.vue';
 import ProfileCard from '@/components/user/profile/ProfileCard.vue';
 import { useFullname } from '@/composables/useFullname';
-import { useMediaQuery } from '@vueuse/core';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { User } from '@/types';
+import { useMediaQuery } from '@vueuse/core';
 import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -44,7 +44,6 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
 watch(isLargeScreen, () => {
     visible.value = false;
 });
-
 </script>
 
 <template>
@@ -56,7 +55,7 @@ watch(isLargeScreen, () => {
         closeIcon="pi pi-chevron-down"
         :pt="{
             root: {
-                class: 'sm:hidden! h-[100vh]! dark:bg-black!',
+                class: 'sm:hidden! h-[100%]!',
             },
             content: {
                 class: 'p-0!',

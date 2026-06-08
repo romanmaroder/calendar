@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Layout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, User } from '@/types';
+import { Branch, BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
 import { PropType, provide, ref } from 'vue';
@@ -14,11 +14,11 @@ const props = defineProps({
         required: true,
     },
     branch: {
-        type: Array,
+        type: Object as PropType<Branch>,
     },
     count: {
         type: Number,
-    }
+    },
 });
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
@@ -30,7 +30,6 @@ const counter = (num: number) => {
     total.value = num;
 };
 </script>
-
 <template>
     <Head title="Users" />
     <Layout :breadcrumbs="breadcrumbs">

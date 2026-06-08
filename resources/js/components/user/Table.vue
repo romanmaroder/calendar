@@ -5,14 +5,14 @@ import FormDrawer from '@/components/user/FormDrawer.vue';
 import Show from '@/components/user/Show.vue';
 import { getFullname } from '@/composables/useFullname';
 import { getInitials } from '@/composables/useInitials';
-import { usePhoneLink } from '@/composables/usePhoneLink';
+import { usePhoneLink } from '@/composables/utils/phone/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { User } from '@/types';
+import { usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
+import { useMediaQuery } from '@vueuse/core';
 import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
-import { useMediaQuery } from '@vueuse/core';
-import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     entities: {
@@ -167,16 +167,25 @@ const filterFields = () => {
                 </div>
             </template>
             <template #end>
-                <div class="flex space-x-2 w-full">
+                <div class="flex w-full space-x-2">
                     <IconField class="w-full rounded-md shadow-sm sm:w-auto">
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
                         <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
                     </IconField>
-                    <Button v-if="page.url ==='/users'" as="a" :href="route('users.archive')" icon="pi pi-box"
-                            size="small"
-                            severity="warn" raised variant="text" v-tooltip.bottom="'Archive'" label="ARC" />
+                    <Button
+                        v-if="page.url === '/users'"
+                        as="a"
+                        :href="route('users.archive')"
+                        icon="pi pi-box"
+                        size="small"
+                        severity="warn"
+                        raised
+                        variant="text"
+                        v-tooltip.bottom="'Archive'"
+                        label="ARC"
+                    />
                 </div>
             </template>
         </Toolbar>
@@ -331,7 +340,7 @@ const filterFields = () => {
                                     v-if="tools.remove"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-user-minus"
-                                    :route="isDeleted ? 'users.bulk.force' : 'users.bulk.soft'"
+                                    :route="isDeleted ? 'users.force' : 'users.soft.delete'"
                                     @delete-item="onDeleteItem"
                                 />
                             </template>

@@ -10,7 +10,7 @@ import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch, Country, User } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { inject, onMounted, PropType, ref, Ref, watch } from 'vue';
+import { inject, PropType, ref, Ref, watch } from 'vue';
 import { useBranchCountryPhone } from '@/composables/utils/phone/useBranchCountryPhone';
 import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 
@@ -58,8 +58,8 @@ const { mask } = useCountryPhone({
     form,
 });
 watch(countries, () => {
-    console.log('Countries',countries.value);
-})
+    console.log('Countries', countries.value);
+});
 
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
@@ -148,13 +148,6 @@ const { dateLabelName } = useLabelName();
 const setDate = (date: Date | null): void => {
     form.birthday = dateLabelName(date);
 };
-
-//const mask = generateFormattedPhoneExamples(countries.value[0].phone_regex, 1, '+7(999)999 99 99').join();
-//const id = countries.value[0].id;
-onMounted(() => {
-    //console.log(mask);
-    console.log();
-});
 </script>
 
 <template>
