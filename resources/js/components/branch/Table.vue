@@ -285,12 +285,14 @@ const filterFields = () => {
                 <template #body="slotProps">
                     <div
                         class="w-24 text-sm font-medium text-wrap break-words text-gray-900 sm:w-auto sm:break-normal dark:text-white"
-                        :class="{ 'text-red-400!': !slotProps.data.status }"
-                    >
-                        {{ slotProps.data.name }}
-                    </div>
+                        :class="{ 'text-red-400!': !slotProps.data.status }">{{ slotProps.data.name }}</div>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
+                    </p>
+                    <p v-if="slotProps.data.users_count" class="lg:hidden">
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">Users:
+                            <span class="text-green-500" :class="{ 'text-red-400!': !slotProps.data.status }">{{slotProps.data.users_count}}</span>
+                        </small>
                     </p>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
