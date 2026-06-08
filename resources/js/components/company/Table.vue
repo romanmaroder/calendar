@@ -271,6 +271,11 @@ const filterFields = () => {
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
                     </p>
+                    <p v-if="slotProps.data.branches_count" class="lg:hidden">
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">Branches:
+                            <span class="text-green-500" >{{slotProps.data.branches_count}}</span>
+                        </small>
+                    </p>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.created_at }}</small>
                     </p>

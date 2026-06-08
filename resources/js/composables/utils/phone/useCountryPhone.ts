@@ -6,7 +6,8 @@ import { computed, Ref } from 'vue';
 interface UseCountryPhoneOptions {
     countries: Ref<Country[]> | undefined;
     form: {
-        resolved_country_id: number | null;
+        resolved_country_id?: number | null;
+        country_id?: number | null;
         phone: string;
     };
 }
@@ -25,13 +26,25 @@ export const useCountryPhone = ({ countries, form }: UseCountryPhoneOptions) => 
         };
     }
 
+    // 1. Нормализация: определяем ID страны из любого доступного источника
+    const countryId = computed(() => {
+        // Приоритет 1: Явно выбранная пользователем страна (если есть отдельный селектор)
+        if (form.country_id != null) return form.country_id;
+
+        // Приоритет 2: Временное поле для валидации (Стратегия 2)
+        if (form.resolved_country_id != null) return form.resolved_country_id;
+
+        // Приоритет 3: Вычисленное значение из филиала (Стратегия 1 - основной кейс)
+        return form.resolved_country_id ?? null;
+    });
+
     const country = computed(() => {
         if (countries?.value === undefined) {
             console.error('Ошибка: countries.value не определён в useCountryPhone');
             return null;
         }
-        if (form.resolved_country_id !== null && form.resolved_country_id !== undefined) {
-            const foundCountry = countries.value.find((country: Country) => country.id === Number(form.resolved_country_id));
+        if (countryId.value !== null && countryId.value !== undefined) {
+            const foundCountry = countries.value.find((country: Country) => country.id === Number(countryId.value));
             if (!foundCountry) {
                 console.warn(`Страна с ID ${form.resolved_country_id} не найдена в списке countries`);
             }
