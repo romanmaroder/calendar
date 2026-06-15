@@ -5,7 +5,6 @@ import AvatarUploader from '@/components/AvatarUploader.vue';
 import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/user/profile/InfoCard.vue';
 import ProfileCard from '@/components/user/profile/ProfileCard.vue';
-import { useLabelName } from '@/composables/useLabelName';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch, Country, User } from '@/types';
 import { useForm } from '@inertiajs/vue3';
@@ -13,6 +12,7 @@ import { useToast } from 'primevue/usetoast';
 import { inject, PropType, ref, Ref, watch } from 'vue';
 import { useBranchCountryPhone } from '@/composables/utils/phone/useBranchCountryPhone';
 import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
+import { useDateField } from '@/composables/utils/useDateField';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 
@@ -21,6 +21,12 @@ const props = defineProps({
 });
 
 const toast = useToast();
+
+
+const birthdayField = useDateField({
+    initialValue: props.user?.birthday ?? null,
+    format: 'local', // именно local для birthday
+});
 
 const form = useForm({
     id: props.user?.id ?? '',
@@ -31,7 +37,7 @@ const form = useForm({
     phone: props.user?.phone ?? '',
     email: props.user?.email ?? '',
     branch_id: props.user?.branch_id ?? null,
-    birthday: props.user?.birthday ?? '',
+    birthday: birthdayField.formValue.value,
     comment: props.user?.comment ?? '',
     created_at: props.user?.created_at ?? '',
     resolved_country_id: props.user?.resolved_country_id ?? null,
@@ -66,6 +72,10 @@ const onUpdateCropped = (value: string) => {
     console.log('FORM ' + form.avatar, 'URL ' + value);
 };
 const submit = () => {
+
+    // Перед отправкой убеждаемся, что в форме актуальное значение
+    form.birthday = birthdayField.getPayloadValue();
+
     if (form.id) {
         form.put(route('users.update', { id: form.id }), {
             preserveScroll: true,
@@ -142,11 +152,6 @@ const cancel = () => {
     form.clearErrors();
     form.reset();
     window.history.back();
-};
-
-const { dateLabelName } = useLabelName();
-const setDate = (date: Date | null): void => {
-    form.birthday = dateLabelName(date);
 };
 </script>
 
@@ -248,15 +253,13 @@ const setDate = (date: Date | null): void => {
                             <FloatLabel variant="on">
                                 <DatePicker
                                     id="birthday"
-                                    v-model="form.birthday"
+                                    v-model="birthdayField.internalDate.value"
                                     dateFormat="yy-mm-dd"
-                                    name="birthday"
                                     showIcon
                                     showButtonBar
                                     iconDisplay="input"
                                     size="small"
                                     aria-labelledby="birthday"
-                                    @update:model-value="setDate"
                                     :pt="{
                                         root: '!w-full',
                                         pcInputText: {
