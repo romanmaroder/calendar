@@ -4,6 +4,7 @@ namespace App\Http\Requests\Company;
 
 use App\Models\Company\Company;
 use App\Models\Country\Country;
+use App\Services\PhoneContextService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
@@ -31,7 +32,7 @@ class UpdateCompanyRequest extends FormRequest
                                                     ]);
         }
 
-        $this->country = Country::find($countryId);
+        $this->country = PhoneContextService::getCountryForCompany($countryId);
 
         if (!$this->country) {
             throw ValidationException::withMessages([
