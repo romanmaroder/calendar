@@ -5,12 +5,14 @@ import AvatarUploader from '@/components/AvatarUploader.vue';
 import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/company/profile/InfoCard.vue';
 import ProfileCard from '@/components/company/profile/ProfileCard.vue';
-import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Company, Country } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, Ref, watch } from 'vue';
+import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
+
+const { meta,load } = usePhoneMeta('/company/form-meta');
 
 const emit = defineEmits(['createCompany', 'updateCompany', 'drawerData']);
 const countries: Ref<Country[]> | undefined = inject('countries');
@@ -25,6 +27,7 @@ const form = useForm({
     id: props.company?.id ?? '',
     name: props.company?.name ?? '',
     phone: props.company?.phone ?? '',
+    is_primary: props.company?.is_primary ?? false,
     description: props.company?.description ?? '',
     contact: props.company?.contact ?? '',
     info: props.company?.info ?? '',
@@ -36,19 +39,23 @@ watch(form, () => {
     emit('drawerData', { name: form.name, avatar: form.avatar });
 });
 
-const { country, mask } = useCountryPhone({
-    countries,
-    form,
-});
 
+// Когда меняется страна — запрашиваем новую маску и сбрасываем телефон
 watch(
-    () => country.value,
-    (newCountry) => {
-        if (newCountry !== null) {
+    () => form.country_id,
+    async (newCountryId) => {
+        if (!newCountryId) {
             form.reset('phone');
+            meta.value = null;
+            return;
         }
+
+        await load({ country_id: newCountryId });
+        form.reset('phone'); // обязательно сбрасываем: маска изменилась
     },
 );
+load({ country_id: form.country_id });
+
 
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
@@ -220,13 +227,18 @@ const cancel = () => {
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                         aria-labelledby="phone"
                                         size="small"
-                                        :mask="mask"
+                                        :mask="meta?.phone_mask"
                                         :aria-autocomplete="form.phone"
                                     />
-                                    <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'Телефон' }}</label>
+                                    <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? 'Телефон' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.phone" />
                             </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model="form.is_primary" inputId="is_primary" name="is_primary" size="small" binary />
+                                <label for="active">Основная </label>
+                            </div>
+                                <InputError :message="form.errors.is_primary" />
                         </div>
                     </InfoCard>
                 </div>

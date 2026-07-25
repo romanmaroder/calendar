@@ -33,6 +33,7 @@ class Company extends Model
     protected $fillable = [
         'name',
         'phone',
+        'is_primary',
         'contact',
         'description',
         'info',
@@ -54,6 +55,7 @@ class Company extends Model
     {
         return [
             'created_at' => 'datetime:Y/m/d H:i',
+            'is_primary' => 'boolean',
         ];
     }
 }
