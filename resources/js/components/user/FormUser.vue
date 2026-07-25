@@ -6,13 +6,12 @@ import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/user/profile/InfoCard.vue';
 import ProfileCard from '@/components/user/profile/ProfileCard.vue';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
-import { Branch, Country, User } from '@/types';
+import { Branch, User } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, ref, Ref, watch } from 'vue';
-import { useBranchCountryPhone } from '@/composables/utils/phone/useBranchCountryPhone';
-import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
 import { useDateField } from '@/composables/utils/useDateField';
+import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 
@@ -21,7 +20,6 @@ const props = defineProps({
 });
 
 const toast = useToast();
-
 
 const birthdayField = useDateField({
     initialValue: props.user?.birthday ?? null,
@@ -40,39 +38,42 @@ const form = useForm({
     birthday: birthdayField.formValue.value,
     comment: props.user?.comment ?? '',
     created_at: props.user?.created_at ?? '',
-    resolved_country_id: props.user?.resolved_country_id ?? null,
 });
 
-/*const branches: Ref<Branch[]> | undefined = inject('listOfBranches');
-const countries: any = inject('countries');*/
 // 1. Получаем из дерева (может быть undefined)
 const rawBranches = inject('listOfBranches') as Ref<Branch[]> | undefined;
 
 // 2. Делаем безопасные ref-ы. Если данных нет — будет пустой массив
 const branches = rawBranches ?? ref<Branch[]>([]);
-const countries = ref<Country[]>([]);
 
 watch(form, () => {
     emit('drawerData', { name: form.name, surname: form.surname, avatar: form.avatar });
 });
 
-// Только логика «филиал → страна»
-useBranchCountryPhone(form, branches, countries);
+const { meta, load } = usePhoneMeta('/users/form-meta');
 
-const { mask } = useCountryPhone({
-    countries,
-    form,
-});
-watch(countries, () => {
-    console.log('Countries', countries.value);
-});
+// Когда меняется филиал — запрашиваем новую маску и сбрасываем телефон
+watch(
+    () => form.branch_id,
+    async (newBranchId) => {
+        if (!newBranchId) {
+            form.reset('phone');
+            meta.value = null;
+            return;
+        }
+
+        await load({ branch_id: newBranchId });
+        form.reset('phone'); // обязательно сбрасываем: маска изменилась
+    },
+);
+
+load({ branch_id: form.branch_id });
 
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
     console.log('FORM ' + form.avatar, 'URL ' + value);
 };
 const submit = () => {
-
     // Перед отправкой убеждаемся, что в форме актуальное значение
     form.birthday = birthdayField.getPayloadValue();
 
@@ -89,7 +90,7 @@ const submit = () => {
                 emit('updateUser');
             },
             onError: function (errors) {
-                console.log(errors);
+                console.error(errors);
                 /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
@@ -113,7 +114,7 @@ const submit = () => {
                 //form.reset();
             },
             onError: function (errors) {
-                console.log(errors);
+                console.error(errors);
                 /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
@@ -231,10 +232,10 @@ const cancel = () => {
                                     class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                     aria-labelledby="phone"
                                     size="small"
-                                    :mask="mask"
+                                    :mask="meta?.phone_mask"
                                     :aria-autocomplete="form.phone"
                                 />
-                                <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'Телефон' }}</label>
+                                <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? 'Телефон' }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.phone" />
                             <FloatLabel variant="on" class="">

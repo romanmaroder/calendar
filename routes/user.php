@@ -3,6 +3,8 @@
 use App\Http\Controllers\User\UserController;
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/users/form-meta', [UserController::class, 'formMeta']);
+
     Route::redirect('users', '/users/index');
 
     Route::get('users/archive', [UserController::class, 'archive'])->name('users.archive');

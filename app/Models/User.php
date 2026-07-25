@@ -50,8 +50,6 @@ class User extends Authenticatable
         'email_verified_at'
     ];
 
-    protected $appends = ['resolved_country_id'];
-
     /**
      * Получить филиал, которому принадлежит пользователь.
      */
@@ -72,16 +70,6 @@ class User extends Authenticatable
         $this->attributes['password'] = $hashed;
         $this->syncOriginal('password'); // важно для сохранения
     }
-
-    public function getResolvedCountryIdAttribute(): ?int
-    {
-        if ($this->branch && $this->branch->company?->country) {
-            return $this->branch->company->country->id;
-        }
-
-        return null;
-    }
-
 
     /**
      * Get the attributes that should be cast.

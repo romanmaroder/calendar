@@ -2,14 +2,20 @@
 
 namespace App\Http\Requests\User;
 
+use App\Models\Country\Country;
 use App\Models\User;
 use App\Rules\PhoneByCountryRegex;
+use App\Services\PhoneContextService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class StoreUserRequest extends FormRequest
 {
+
+    protected ?Country $country = null;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -18,6 +24,26 @@ class StoreUserRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $branchId = $this->input('branch_id');
+
+        if (!$branchId) {
+            throw ValidationException::withMessages([
+                                                        'branch_id' => 'Поле Филиал обязательно для заполнения.',
+                                                    ]);
+        }
+
+        $this->country = PhoneContextService::getCountryByBranchId($branchId);
+
+        if (!$this->country) {
+            throw ValidationException::withMessages([
+                                                        'branch_id' => 'Страна у указанного филиала не найдена.',
+                                                    ]);
+        }
+    }
+
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -25,7 +51,7 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'avatar' => 'nullable|string',
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
@@ -37,23 +63,14 @@ class StoreUserRequest extends FormRequest
             ],
             'branch_id' => 'required|integer',
             'password' => 'nullable|string|min:8',
-            'resolved_country_id' => 'required|exists:countries,id',
+            'phone' => PhoneContextService::rulesForCountry($this->country),
         ];
-        // Добавляем правила для phone только если country_id валиден
-        if ($this->filled('resolved_country_id')) {
-            $rules['phone'] = [
-                'required',
-                new PhoneByCountryRegex($this->input('resolved_country_id'))
-            ];
-        }
-        return $rules;
     }
 
     public function messages(): array
     {
         return [
             'branch_id.required' => '«Филиал» обязательно для заполнения.',
-            'resolved_country_id.required' => '«Страна» обязательно для заполнения.',
             'name.required' => '«Имя» обязательно для заполнения.',
             'phone.required' => '«Телефон» обязательно для заполнения.',
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Actions\PhoneMetaAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\AvatarUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
@@ -12,6 +13,8 @@ use App\Models\Branch\Branch;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Traits\HasControllerRoutes;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -48,8 +51,6 @@ class UserController extends Controller
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
         $data['password'] = $data['password'] ?? '';
-        //Удаляем виртуальное поле из массива
-        unset($data['resolved_country_id']);
         User::create($data);
         return to_route('users');
     }
@@ -194,10 +195,26 @@ class UserController extends Controller
                                 ]);
     }
 
+
+    public function formMeta(): JsonResponse
+    {
+        try {
+            $branchId = request()->input('branch_id');
+            $meta = PhoneMetaAction::getByBranchId($branchId);
+
+            return response()->json(['success' => true, 'data' => $meta]);
+        } catch (Exception $e) {
+            return response()->json([
+                                        'success' => false,
+                                        'message' => $e->getMessage(),
+                                    ], 400);
+        }
+    }
+
     private function getBranches()
     {
         return BranchMinWithCountryMinResource::collection(
-            Branch::with(['company.country'])->get(['id', 'name', 'company_id'])
+            Branch::with(['company.country'])->where('status', '=', 1)->get(['id', 'name', 'company_id'])
         )
             ->resolve();
     }
