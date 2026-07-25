@@ -3,6 +3,8 @@
 use App\Http\Controllers\BranchController;
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/branch/form-meta', [BranchController::class, 'formMeta']);
+
     Route::get('/branch/archive', [BranchController::class, 'archive'])->name('branch.archive');
     Route::put('/avatar/{branch}', [BranchController::class, 'avatar'])->name('branch.avatar');
 // Soft delete (один/несколько)

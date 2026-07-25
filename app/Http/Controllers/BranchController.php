@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\PhoneMetaAction;
 use App\Exceptions\BranchUserException;
 use App\Http\Requests\Branch\AvatarBranchRequest;
 use App\Http\Requests\Branch\StoreBranchRequest;
@@ -15,6 +16,7 @@ use App\Models\Company\Company;
 use App\Repositories\Contracts\BranchRepositoryInterface;
 use App\Services\BranchUserService;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -57,7 +59,6 @@ class BranchController extends Controller
     public function store(StoreBranchRequest $request)
     {
         $validated = $request->validated();
-        unset($validated['resolved_country_id']);
         Branch::create($validated);
         return to_route('branch.index')->with('success', 'Branch created successfully.');
     }
@@ -129,7 +130,7 @@ class BranchController extends Controller
     {
         $branches = $this->branchRepository->listOnlyTrashed();
         return Inertia::render('branch/Archive', [
-            'branches' =>BranchMinResource::collection($branches)->resolve(),
+            'branches' => BranchMinResource::collection($branches)->resolve(),
             'count' => $branches->total(),
         ]);
     }
@@ -259,6 +260,22 @@ class BranchController extends Controller
             // \Log::error($e->getMessage());
             return response()
                 ->json(['success' => false, 'message' => 'Произошла ошибка при отписке пользователей'], 500);
+        }
+    }
+
+
+    public function formMeta(): JsonResponse
+    {
+        try {
+            $companyId = request()->input('company_id');
+            $meta = PhoneMetaAction::getByCompanyId($companyId);
+
+            return response()->json(['success' => true, 'data' => $meta]);
+        } catch (Exception $e) {
+            return response()->json([
+                                        'success' => false,
+                                        'message' => $e->getMessage(),
+                                    ], 400);
         }
     }
 

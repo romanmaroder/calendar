@@ -35,8 +35,6 @@ class Branch extends Model
     protected $fillable = ['name','phone','status','description','contact','avatar','company_id'];
     protected  $guarded = [];
 
-    protected $appends = ['resolved_country_id'];
-
     /**
      * Получить пользователей, которые принадлежат этому филиалу.
      */
@@ -54,14 +52,6 @@ class Branch extends Model
         return $this->status ? 'active' : 'disabled';
     }
 
-    public function getResolvedCountryIdAttribute(): ?int
-    {
-        if ($this->company && $this->company?->country) {
-            return $this->company->country->id;
-        }
-
-        return null;
-    }
     protected function casts(): array
     {
         return [

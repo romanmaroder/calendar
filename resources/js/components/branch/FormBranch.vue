@@ -6,12 +6,11 @@ import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/branch/profile/InfoCard.vue';
 import ProfileCard from '@/components/branch/profile/ProfileCard.vue';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
-import { Branch, Company, Country } from '@/types';
+import { Branch, Company } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, ref, Ref, watch } from 'vue';
-import { useCompanyCountryPhone } from '@/composables/utils/phone/useCompanyCountryPhone';
-import { useCountryPhone } from '@/composables/utils/phone/useCountryPhone';
+import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
 
 const emit = defineEmits(['createBranch', 'updateBranch', 'drawerData']);
 
@@ -20,9 +19,6 @@ const rawCompanies = inject('companies') as Ref<Company[]> | undefined;
 
 // 2. Делаем безопасный ref. Если inject вернул undefined — будет пустой массив
 const companies = rawCompanies ?? ref<Company[]>([]);
-
-// countries всегда должен быть валидным ref (даже пустым), чтобы composable не падал
-const countries = ref<Country[]>([]);
 
 const props = defineProps({
     branch: Object as PropType<Branch | null>,
@@ -39,7 +35,6 @@ const form = useForm({
     avatar: props.branch?.avatar ?? '',
     status: props.branch?.status ?? false,
     company_id: props.branch?.company_id ?? null,
-    resolved_country_id: props.branch?.resolved_country_id ?? null,
     created_at: props.branch?.created_at ?? '',
 });
 
@@ -47,14 +42,24 @@ watch(form, () => {
     emit('drawerData', { name: form.name, avatar: form.avatar });
 });
 
-// Только логика «компания → страна»
-useCompanyCountryPhone(form, companies, countries);
+const { meta, load } = usePhoneMeta('/branch/form-meta');
 
-// Используем composable
-const { mask } = useCountryPhone({
-    countries,
-    form,
-});
+// Когда меняется компания — запрашиваем новую маску и сбрасываем телефон
+watch(
+    () => form.company_id,
+    async (newCompanyId) => {
+        if (!newCompanyId) {
+            form.reset('phone');
+            meta.value = null;
+            return;
+        }
+
+        await load({ company_id: newCompanyId });
+        form.reset('phone'); // обязательно сбрасываем: маска изменилась
+    },
+);
+
+load({ company_id: form.company_id });
 
 const onUpdateCropped = (value: string) => {
     form.avatar = value;
@@ -209,10 +214,10 @@ const cancel = () => {
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                         aria-labelledby="phone"
                                         size="small"
-                                        :mask="mask"
+                                        :mask="meta?.phone_mask"
                                         :aria-autocomplete="form.phone"
                                     />
-                                    <label for="phone" class="bg-transparent! font-light!">{{ mask ?? 'телефон' }}</label>
+                                    <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? 'Телефон' }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.phone" />
                             </div>
