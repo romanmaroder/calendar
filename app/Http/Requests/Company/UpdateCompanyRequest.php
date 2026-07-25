@@ -67,7 +67,7 @@ class UpdateCompanyRequest extends FormRequest
             'info' => 'nullable|string|max:500',
             'avatar' => 'nullable|string',
             'is_primary' => 'nullable|boolean',
-            'phone' => ['required', 'string', 'max:50', 'regex:' . $this->country->phone_regex],
+            'phone'=>PhoneContextService::rulesForCountry($this->country),
         ];
     }
 }

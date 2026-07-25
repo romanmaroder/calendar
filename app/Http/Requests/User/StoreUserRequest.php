@@ -63,7 +63,8 @@ class StoreUserRequest extends FormRequest
             ],
             'branch_id' => 'required|integer',
             'password' => 'nullable|string|min:8',
-            'phone' => PhoneContextService::rulesForCountry($this->country),
+            'phone' =>array_merge(PhoneContextService::rulesForCountry($this->country),[Rule::unique(User::class)
+                ->ignore($this->user)]),
         ];
     }
 

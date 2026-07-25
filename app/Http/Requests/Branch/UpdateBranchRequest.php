@@ -54,7 +54,7 @@ class UpdateBranchRequest extends FormRequest
             'avatar' => 'nullable|string',
             'status' => 'boolean',
             'company_id' => 'required|exists:companies,id',
-            'phone' => ['required', 'string', 'max:50', 'regex:' . $this->country->phone_regex],
+            'phone'=>PhoneContextService::rulesForCountry($this->country),
         ];
     }
 

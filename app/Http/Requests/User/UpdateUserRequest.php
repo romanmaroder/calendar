@@ -62,7 +62,8 @@ class UpdateUserRequest extends FormRequest
             'email' => ['nullable','string','lowercase','email','max:255',
                 Rule::unique(User::class)->ignore($this->user)
             ],
-            'phone' => ['required', 'string', 'max:50', 'regex:' . $this->country->phone_regex],
+            'phone' =>array_merge(PhoneContextService::rulesForCountry($this->country),[Rule::unique(User::class)
+                ->ignore($this->user)]),
         ];
     }
 
