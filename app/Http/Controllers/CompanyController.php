@@ -231,7 +231,7 @@ class CompanyController extends Controller
                                         ]);
             }
 
-            $country = Country::findOrFail($countryId);
+            $country = PhoneContextService::getCountryForCompany($countryId);
             $meta = PhoneContextService::metaForCountry($country);
 
             return response()->json(['success' => true, 'data' => $meta]);
