@@ -4,6 +4,7 @@
 use App\Http\Controllers\CompanyController;
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/company/form-meta', [CompanyController::class, 'formMeta']);
     Route::get('/company/archive', [CompanyController::class, 'archive'])->name('company.archive');
     Route::put('/avatar/{company}', [CompanyController::class, 'avatar'])->name('company.avatar');
 // Soft delete (один/несколько)

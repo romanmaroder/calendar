@@ -20,6 +20,7 @@ class CompanyResource extends JsonResource
             'id' => $this->id,
             'name' => $this->when(!empty($this->name),fn()=>$this->name),
             'phone' => $this->when(!empty($this->phone),fn()=>$this->phone),
+            'is_primary' => $this->when(!empty($this->is_primary),fn()=>$this->is_primary),
             'description' => $this->when(!empty($this->description),fn()=>$this->description),
             'contact' => $this->when(!empty($this->contact),fn()=>$this->contact),
             'info' => $this->when(!empty($this->info),fn()=>$this->info),

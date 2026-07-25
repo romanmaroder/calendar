@@ -2,7 +2,6 @@
 
 namespace Database\Factories\Company;
 
-use App\Models\Branch\Branch;
 use App\Models\Company\Company;
 use App\Models\Country\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,6 +22,7 @@ class CompanyFactory extends Factory
         return [
             'name' => $this->faker->company(),
             'phone' => $country->generatePhoneNumber(),
+            'is_primary'=>$this->faker->boolean(),
             'description' => $this->faker->realText(10),
             'contact' => $this->faker->address(),
             'info' => $this->faker->realText(15),
