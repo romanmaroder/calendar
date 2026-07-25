@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\PhoneMetaAction;
 use App\Http\Requests\Company\AvatarCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
@@ -10,7 +11,8 @@ use App\Http\Resources\Country\CountryResource;
 use App\Models\Company\Company;
 use App\Models\Country\Country;
 use App\Repositories\Contracts\CompanyRepositoryInterface;
-use App\Services\PhoneContextService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -214,29 +216,14 @@ class CompanyController extends Controller
         return CountryResource::collection(Country::all(['id', 'name', 'phone_regex', 'phone_mask']))->resolve();
     }
 
-    public function formMeta(): \Illuminate\Http\JsonResponse
+    public function formMeta(): JsonResponse
     {
         try {
             $countryId = request()->input('country_id');
-
-            if (!$countryId) {
-                // Если страна не выбрана — возвращаем пустой ответ или дефолт (по желанию)
-                return response()->json([
-                                            'success' => true,
-                                            'data' => [
-                                                'phone_mask' => null,
-                                                'phone_regex' => null,
-                                                'country_code' => null,
-                                            ],
-                                        ]);
-            }
-
-            $country = PhoneContextService::getCountryForCompany($countryId);
-            $meta = PhoneContextService::metaForCountry($country);
+            $meta = PhoneMetaAction::getByCountryId($countryId);
 
             return response()->json(['success' => true, 'data' => $meta]);
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                                         'success' => false,
                                         'message' => $e->getMessage(),

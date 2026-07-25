@@ -10,6 +10,26 @@ use Illuminate\Support\Facades\Auth;
 
 class PhoneContextService
 {
+
+    /**
+     * Получить страну по ID (для компании)
+     */
+    public static function getCountryForCompany(int $countryId): Country
+    {
+        return Country::findOrFail($countryId);
+    }
+
+    /**
+     * Получить страну по ID (для филиала)
+     */
+    public static function getCountryByCompanyId(int $companyId): Country
+    {
+        return Company::with('country')
+            ->findOrFail($companyId)
+            ->country;
+    }
+
+
     /**
      * Получить страну по ID филиала (для филиалов, сотрудников, любых сущностей с branch_id)
      */
@@ -51,7 +71,7 @@ class PhoneContextService
     public static function rulesForCountry(Country $country): array
     {
         return [
-            'phone' => [ 'string', 'max:50', 'regex:' . $country->phone_regex],
+            'phone' => [ 'required','string', 'max:50', 'regex:' . $country->phone_regex],
             //'phone_secondary' => ['nullable', 'string', 'max:50', 'regex:' . $country->phone_regex],
         ];
     }
