@@ -6,7 +6,6 @@ use App\Models\Branch\Branch;
 use App\Models\Company\Company;
 use App\Models\Country\Country;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 
 class PhoneContextService
 {
@@ -46,14 +45,7 @@ class PhoneContextService
      */
     public static function getCountryForClient(): Country
     {
-        $user = Auth::user();
-        if (!$user || !$user->branch_id) {
-            throw new Exception('У пользователя не указан филиал.');
-        }
-
         $primaryCompany = Company::query()
-            ->join('branches', 'companies.id', '=', 'branches.company_id')
-            ->where('branches.id', $user->branch_id)
             ->where('is_primary', true)
             ->with('country')
             ->first();
@@ -61,7 +53,6 @@ class PhoneContextService
         if (!$primaryCompany) {
             throw new Exception('Нет основной компании. Назначьте её.');
         }
-
         return $primaryCompany->country;
     }
 
@@ -71,7 +62,7 @@ class PhoneContextService
     public static function rulesForCountry(Country $country): array
     {
         return [
-            'phone' => [ 'required','string', 'max:50', 'regex:' . $country->phone_regex],
+            'phone' => [ 'required','string', 'max:50','regex:' . $country->phone_regex],
             //'phone_secondary' => ['nullable', 'string', 'max:50', 'regex:' . $country->phone_regex],
         ];
     }

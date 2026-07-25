@@ -33,5 +33,20 @@ class PhoneMetaAction
         $country = PhoneContextService::getCountryByCompanyId($companyId);
         return PhoneContextService::metaForCountry($country);
     }
+
+    public static function getByBranchId(?int $branchId): array
+    {
+        if (!$branchId) {
+            return [
+                'phone_mask' => null,
+                'phone_regex' => null,
+                'country_code' => null,
+            ];
+        }
+
+        $country = PhoneContextService::getCountryByBranchId($branchId);
+        return PhoneContextService::metaForCountry($country);
+    }
+
 }
 
