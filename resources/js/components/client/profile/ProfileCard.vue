@@ -2,7 +2,7 @@
 import { computed, PropType } from 'vue';
 import { Client } from '@/types';
 import { getFullname } from '@/composables/useFullname';
-import { getPhone } from '@/composables/usePhoneLink';
+import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 import { getInitials } from '@/composables/useInitials';
 
 const props = defineProps({

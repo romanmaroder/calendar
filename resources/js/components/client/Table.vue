@@ -6,7 +6,7 @@ import Restore from '@/components/common/Restore.vue';
 import { getFullname } from '@/composables/useFullname';
 import { getInitials } from '@/composables/useInitials';
 import { useMediaQuery } from '@vueuse/core';
-import { usePhoneLink } from '@/composables/usePhoneLink';
+import { usePhoneLink } from '@/composables/utils/phone/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Client } from '@/types';
 import { FilterMatchMode } from '@primevue/core/api';

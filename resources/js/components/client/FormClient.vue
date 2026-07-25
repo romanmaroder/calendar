@@ -10,6 +10,8 @@ import { Client } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { PropType, watch } from 'vue';
+import { useDateField } from '@/composables/utils/useDateField';
+import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 
@@ -19,6 +21,11 @@ const props = defineProps({
 
 const toast = useToast();
 
+const birthdayField = useDateField({
+    initialValue: props.client?.birthday ?? null,
+    format: 'local', // именно local для birthday
+});
+
 const form = useForm({
     id: props.client?.id ?? '',
     avatar: props.client?.avatar ?? '',
@@ -27,6 +34,7 @@ const form = useForm({
     middleName: props.client?.middleName ?? '',
     phone: props.client?.phone ?? '',
     email: props.client?.email ?? '',
+    birthday: birthdayField.formValue.value,
     comment: props.client?.comment ?? '',
     blacklist: props.client?.blacklist ?? '',
     prepayment: props.client?.prepayment ?? '',
@@ -45,6 +53,9 @@ const onUpdateCropped = (value: string) => {
     console.log('FORM ' + form.avatar, 'URL ' + value);
 };
 const submit = () => {
+    // Перед отправкой убеждаемся, что в форме актуальное значение
+    form.birthday = birthdayField.getPayloadValue();
+
     if (form.id) {
         form.put(route('clients.update', { id: form.id }), {
             preserveScroll: true,
@@ -58,11 +69,12 @@ const submit = () => {
                 emit('updateUser');
             },
             onError: function (errors) {
-                toast.add({
+                console.error(errors);
+                /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
                     life: 2000,
-                });
+                });*/
             },
         });
     } else {
@@ -81,12 +93,13 @@ const submit = () => {
                 //form.reset();
             },
             onError: function (errors) {
-                toast.add({
+                console.error(errors);
+                /*toast.add({
                     severity: 'error',
                     summary: 'Validation Error' + errors,
                     //detail: showErrors(errors),
                     life: 2000,
-                });
+                });*/
                 form.defaults();
             },
         });
@@ -120,6 +133,9 @@ const cancel = () => {
     form.reset();
     window.history.back();
 };
+
+const { meta, load } = usePhoneMeta('/clients/form-meta');
+load();
 </script>
 
 <template>
@@ -137,7 +153,7 @@ const cancel = () => {
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="name"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="name" class="bg-transparent! font-light!">{{ 'Имя:' }}</label>
                         </FloatLabel>
@@ -150,7 +166,7 @@ const cancel = () => {
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="middleName"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="middleName" class="bg-transparent! font-light!">{{ 'Отчество:' }}</label>
                         </FloatLabel>
@@ -163,7 +179,7 @@ const cancel = () => {
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                 aria-labelledby="surname"
                                 size="small"
-                                v-keyfilter="/^[A-zА-яёЁ\s]+$/iu"
+                                pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
                             <label for="surname" class="bg-transparent! font-light!">{{ 'Фамилия:' }}</label>
                         </FloatLabel>
@@ -173,7 +189,7 @@ const cancel = () => {
             </template>
             <template #right-center-column>
                 <div class="mb-2 space-y-4">
-                    <InfoCard title="Общая инфа">
+                    <InfoCard title="Общая информация">
                         <div class="space-y-4">
                             <FloatLabel variant="on">
                                 <InputMask
@@ -183,10 +199,10 @@ const cancel = () => {
                                     class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                     aria-labelledby="phone"
                                     size="small"
-                                    mask="+9 999 999 99 99"
+                                    :mask="meta?.phone_mask"
                                     :aria-autocomplete="form.phone"
                                 />
-                                <label for="phone" class="bg-transparent! font-light!">{{ '+9 999 999 99 99' }}</label>
+                                <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? 'Телефон' }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.phone" />
 
@@ -203,7 +219,34 @@ const cancel = () => {
                                 <label for="email" class="bg-transparent! font-light!">Email:</label>
                             </FloatLabel>
                             <InputError :message="form.errors.email" />
-
+                            <FloatLabel variant="on">
+                                <DatePicker
+                                    id="birthday"
+                                    v-model="birthdayField.internalDate.value"
+                                    dateFormat="yy-mm-dd"
+                                    showIcon
+                                    showButtonBar
+                                    iconDisplay="input"
+                                    size="small"
+                                    aria-labelledby="birthday"
+                                    :pt="{
+                                        root: '!w-full',
+                                        pcInputText: {
+                                            root: {
+                                                class: '!w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none',
+                                                // класс для корневого элемента
+                                                style: { width: '100%' },
+                                            },
+                                            input: {
+                                                class: 'inner-input', // класс для <input>
+                                                style: { fontWeight: '500' },
+                                            },
+                                        },
+                                    }"
+                                />
+                                <label class="bg-transparent! font-light!" for="birthday1">{{ 'ДР' }}</label>
+                            </FloatLabel>
+                            <InputError :message="form.errors.birthday" />
                             <FloatLabel variant="on" class="">
                                 <InputText
                                     id="source"
@@ -253,10 +296,9 @@ const cancel = () => {
                                 size="small"
                                 aria-labelledby="discount"
                                 :pt="{
-                                    root:'w-full!',
+                                    root: 'w-full!',
                                     pcInputText: {
-                                        root:
-                                        'w-full! rounded-none! border-0! border-b-1! bg-transparent! shadow-none!',
+                                        root: 'w-full! rounded-none! border-0! border-b-1! bg-transparent! shadow-none!',
                                     },
                                 }"
                             />

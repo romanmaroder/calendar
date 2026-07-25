@@ -3,12 +3,18 @@
 namespace App\Http\Requests\Client;
 
 use App\Models\Client;
+use App\Models\Country\Country;
+use App\Services\PhoneContextService;
+use Exception;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Email;
+use Illuminate\Validation\ValidationException;
 
 class UpdateClientRequest extends FormRequest
 {
+
+    protected ?Country $country = null;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -18,9 +24,22 @@ class UpdateClientRequest extends FormRequest
     }
 
     /**
+     * @throws Exception
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->country = PhoneContextService::getCountryForClient();
+        if (!$this->country) {
+            throw ValidationException::withMessages([
+                                                        'phone' => 'Страна у указанного филиала не найдена.',
+                                                    ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -29,8 +48,6 @@ class UpdateClientRequest extends FormRequest
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'middleName' => 'nullable|string|max:255',
-            'phone' => ['required','string','max:255','regex:/^\+7\d{10}$/',
-                Rule::unique(Client::class, 'phone')->ignore($this->client)],
             'comment' => 'nullable|string|max:255',
             'blacklist' => 'nullable|boolean',
             'prepayment' => 'nullable|boolean',
@@ -38,9 +55,12 @@ class UpdateClientRequest extends FormRequest
             'records' => 'nullable|numeric',
             'total' => 'nullable|numeric',
             'source' => 'nullable|string',
+            'birthday' => 'nullable|string',
             'email' => ['nullable','string','lowercase','email','max:255',
                 Rule::unique(Client::class)->ignore($this->client)
             ],
+            'phone' =>array_merge(PhoneContextService::rulesForCountry($this->country),[Rule::unique(Client::class)
+                ->ignore($this->client)]),
         ];
     }
 }

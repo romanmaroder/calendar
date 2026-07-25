@@ -3,7 +3,12 @@
 use App\Http\Controllers\Client\ClientController;
 
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/clients/form-meta', [ClientController::class, 'formMeta']);
+
     Route::redirect('clients', '/clients/index');
+
+    Route::get('/clients/form-meta', [ClientController::class, 'formMeta']);
 
     Route::get('clients/archive', [ClientController::class, 'archive'])->name('clients.archive');
     Route::get('/clients', [ClientController::class, 'index'])->name('clients');
@@ -13,6 +18,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show')->withTrashed();
     Route::put('/avatar/{client}', [ClientController::class, 'avatar'])->name('clients.avatar');
+
+
     // Soft delete (один/несколько)
     Route::delete('/clients/bulk/soft', [ClientController::class, 'bulkSoftDelete'])->name('clients.bulk.soft');
     Route::delete('/clients/{id}', [ClientController::class, 'softDelete'])->name('clients.soft.delete');

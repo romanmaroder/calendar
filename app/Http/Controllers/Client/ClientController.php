@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\AvatarClientRequest;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
+use App\Http\Resources\Client\ClientResource;
 use App\Models\Client;
+use App\Services\PhoneContextService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -21,7 +25,7 @@ class ClientController extends Controller
     {
         $clients = Client::paginate(20);
         return Inertia::render('client/Index', [
-            'clients' => $clients->collect(),
+            'clients' => ClientResource::collection($clients)->resolve(),
             'count' => $clients->total(),
         ]);
     }
@@ -44,7 +48,7 @@ class ClientController extends Controller
         // Если поле не установлено в форме, мутатор не сработает
         $data['password'] = $data['password'] ?? '';
         Client::create($data);
-        return to_route('clients.index');
+        return to_route('clients');
     }
 
     /**
@@ -172,5 +176,21 @@ class ClientController extends Controller
                                     'message' => 'Clients restored'
                                 ]);
     }
+
+    public function formMeta(): JsonResponse
+    {
+        try {
+            $country = PhoneContextService::getCountryForClient();
+            $meta = PhoneContextService::metaForCountry($country);
+
+            return response()->json(['success' => true, 'data' => $meta]);
+        } catch (Exception $e) {
+            return response()->json([
+                                        'success' => false,
+                                        'message' => $e->getMessage(),
+                                    ], 400);
+        }
+    }
+
 
 }

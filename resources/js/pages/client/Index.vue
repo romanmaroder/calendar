@@ -4,11 +4,11 @@ import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, Client } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { PropType, ref } from 'vue';
+import { onMounted, PropType, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
 
- defineProps({
+ const props=defineProps({
     clients: {
         type: Object as PropType<Client>,
         required: true,
@@ -23,6 +23,9 @@ const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
+onMounted(()=>{
+   console.log('INDEX-PAGE',props.clients);
+});
 </script>
 
 <template>

@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Client;
 
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+
+/**@mixin Client*/
 class ClientCollection extends ResourceCollection
 {
 
@@ -29,6 +32,7 @@ class ClientCollection extends ResourceCollection
             'total'=>$this->total,
             'source'=>$this->source,
             'email' =>$this->email,
+            'birthday'=>$this->birthday,
             'data' => $this->collection,
             'links' => [
                 'self' => 'link-value',
