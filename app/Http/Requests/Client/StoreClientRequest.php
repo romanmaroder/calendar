@@ -60,7 +60,7 @@ class StoreClientRequest extends FormRequest
             'source' => 'nullable|string',
             'birthday' => 'nullable|string',
             'email' => 'required|string|lowercase|email|max:255|unique:' . Client::class,
-            'password' => 'required|string|min:8',
+            'password' => 'nullable|string|min:8',
             'phone' =>array_merge(PhoneContextService::rulesForCountry($this->country),[Rule::unique(Client::class)
                 ->ignore($this->client)]),
         ];

@@ -38,7 +38,7 @@ const showAvatar = computed(() => props.client?.avatar && props.client?.avatar !
                         {{ getFullname({ name: client?.name, middlename: client?.middleName, surname: client?.surname }) }}
                     </h3>
                     <Button
-                        class="m-0! p-0! text-sm! font-medium! text-slate-500! md:text-base! dark:text-slate-300!"
+                        class="m-0! p-0!"
                         as="a"
                         variant="link"
                         :label="client?.phone"
