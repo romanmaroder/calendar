@@ -9,11 +9,7 @@ class PhoneMetaAction
     public static function getByCountryId(?int $countryId): array
     {
         if (!$countryId) {
-            return [
-                'phone_mask' => null,
-                'phone_regex' => null,
-                'country_code' => null,
-            ];
+            return self::defaultMeta();
         }
 
         $country = PhoneContextService::getCountryForCompany($countryId);
@@ -23,11 +19,7 @@ class PhoneMetaAction
     public static function getByCompanyId(?int $companyId): array
     {
         if (!$companyId) {
-            return [
-                'phone_mask' => null,
-                'phone_regex' => null,
-                'country_code' => null,
-            ];
+            return self::defaultMeta();
         }
 
         $country = PhoneContextService::getCountryByCompanyId($companyId);
@@ -37,16 +29,22 @@ class PhoneMetaAction
     public static function getByBranchId(?int $branchId): array
     {
         if (!$branchId) {
-            return [
-                'phone_mask' => null,
-                'phone_regex' => null,
-                'country_code' => null,
-            ];
+            return self::defaultMeta();
         }
 
         $country = PhoneContextService::getCountryByBranchId($branchId);
         return PhoneContextService::metaForCountry($country);
     }
+
+    private static function defaultMeta(): array
+    {
+        return [
+            'phone_mask' => null,
+            'phone_regex' => null,
+            'country_code' => null,
+        ];
+    }
+
 
 }
 
