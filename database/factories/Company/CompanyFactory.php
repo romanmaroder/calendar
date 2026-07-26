@@ -20,12 +20,12 @@ class CompanyFactory extends Factory
     {
         $country = Country::first();
         return [
-            'name' => $this->faker->company(),
+            'name' => 'New Company',
             'phone' => $country->generatePhoneNumber(),
-            'is_primary'=>$this->faker->boolean(),
-            'description' => $this->faker->realText(10),
+            'is_primary'=>$this->faker->boolean(100),
+            'description' => 'Company Description',
             'contact' => $this->faker->address(),
-            'info' => $this->faker->realText(15),
+            'info' => 'What does the company do?',
             'avatar' => null,
             'country_id' => $this->faker->numberBetween(1, 1),
         ];

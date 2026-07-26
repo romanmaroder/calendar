@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Actions\PhoneMetaAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\AvatarClientRequest;
 use App\Http\Requests\Client\StoreClientRequest;
@@ -180,8 +181,7 @@ class ClientController extends Controller
     public function formMeta(): JsonResponse
     {
         try {
-            $country = PhoneContextService::getCountryForClient();
-            $meta = PhoneContextService::metaForCountry($country);
+            $meta = PhoneMetaAction::getForClient();
 
             return response()->json(['success' => true, 'data' => $meta]);
         } catch (Exception $e) {

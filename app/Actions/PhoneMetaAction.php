@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Services\PhoneContextService;
+use Exception;
 
 class PhoneMetaAction
 {
@@ -26,13 +27,26 @@ class PhoneMetaAction
         return PhoneContextService::metaForCountry($country);
     }
 
+    /**
+     * @throws Exception
+     */
     public static function getByBranchId(?int $branchId): array
     {
         if (!$branchId) {
-            return self::defaultMeta();
+            return self::getForClient();
         }
 
         $country = PhoneContextService::getCountryByBranchId($branchId);
+        return PhoneContextService::metaForCountry($country);
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public static function getForClient(): array
+    {
+        $country = PhoneContextService::getCountryForClient();
         return PhoneContextService::metaForCountry($country);
     }
 
