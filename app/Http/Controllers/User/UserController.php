@@ -214,9 +214,14 @@ class UserController extends Controller
     private function getBranches()
     {
         return BranchMinWithCountryMinResource::collection(
-            Branch::with(['company.country'])->where('status', '=', 1)->get(['id', 'name', 'company_id'])
-        )
-            ->resolve();
+            Branch::query()
+                ->with(['company.country'])
+                ->where('status', 1)
+                ->whereHas('company.country', function ($query) {
+                    $query->where('is_primary', 1);
+                })
+                ->get(['id', 'name', 'company_id'])
+        )->resolve();
     }
 
 }
