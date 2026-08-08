@@ -5,7 +5,7 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Building2Icon, Folder, MapPinHouse, Users2, UsersIcon,Shield, ShieldAlert } from 'lucide-vue-next';
+import { BookOpen, Building2Icon, Folder, MapPinHouse, Shield, ShieldAlert, Users2, UsersIcon } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const page = usePage();
@@ -13,13 +13,11 @@ const userPermissions = page.props.auth?.user?.permissions ?? [];
 
 const hasPermission = (perm: string): boolean => userPermissions.includes(perm);
 
-
-
 const mainNavItemCompany: NavItem[] = [
     {
-        title:'Company',
+        title: 'Company',
         href: '/company',
-        icon:Building2Icon
+        icon: Building2Icon,
     },
     {
         title: 'Branches ',
@@ -86,9 +84,12 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
         <SidebarContent>
             <NavMain :items="mainNavItemCompany" group-label="Company" />
-            <NavMain :items="mainNavItemsUser" group-label="Users" />
-            <NavMain :items="mainNavItemsClient" group-label="Clients" />
-
+            <template v-if="hasPermission('users.view')">
+                <NavMain :items="mainNavItemsUser" group-label="Users" />
+            </template>
+            <template v-if="hasPermission('clients.view')">
+                <NavMain :items="mainNavItemsClient" group-label="Clients" />
+            </template>
             <!-- Показываем только при наличии разрешения roles.view -->
             <template v-if="hasPermission('roles.view')">
                 <NavMain :items="mainNavItemsRoles" group-label="Roles" />
