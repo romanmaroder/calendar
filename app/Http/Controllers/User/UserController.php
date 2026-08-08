@@ -51,6 +51,10 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
+        if (! $request->user()->can('users.create')) {
+            abort(403, 'Недостаточно прав для создания пользователя');
+        }
+
         $data = $request->validated();
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
@@ -101,6 +105,10 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
+        if (! $request->user()->can('users.edit')) {
+            abort(403, 'Недостаточно прав для создания пользователя');
+        }
+
         $data = $request->validated();
         $roleIds = $validated['role_ids'] ?? [];
         unset($data['role_ids']);

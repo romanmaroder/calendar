@@ -40,6 +40,11 @@ const emit = defineEmits(['count']);
 
 const page = usePage();
 
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
+
 const dt = ref();
 const items = ref();
 const count = ref();
@@ -126,7 +131,7 @@ const filterFields = () => {
                 <div class="flex flex-row items-start">
                     <span class="">
                         <form-drawer
-                            v-if="tools.create && !isLargeScreen"
+                            v-if="tools.create && !isLargeScreen && hasPermission('users.create')"
                             @new-user="onLoadItem"
                             icon-name="pi pi-user-plus"
                             raised
@@ -134,7 +139,7 @@ const filterFields = () => {
                             title="New user"
                         />
                         <Button
-                            v-if="tools.create && isLargeScreen"
+                            v-if="tools.create && isLargeScreen && hasPermission('users.create')"
                             as="a"
                             icon="pi pi-user-plus"
                             label="New"
@@ -156,6 +161,7 @@ const filterFields = () => {
                             @restore-items="onRestoreSelectedItems"
                         />
                         <delete-confirmation
+                            v-if="hasPermission('users.delete')"
                             :entity="selectedItems"
                             icon-name="pi pi-trash"
                             type="multi"
@@ -175,7 +181,7 @@ const filterFields = () => {
                         <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
                     </IconField>
                     <Button
-                        v-if="page.url === '/users'"
+                        v-if="page.url === '/users' && hasPermission('users.delete')"
                         as="a"
                         :href="route('users.archive')"
                         icon="pi pi-box"
@@ -210,6 +216,7 @@ const filterFields = () => {
             <template #empty><p class="text-center text-xl font-bold">Add users</p></template>
             <template #loading>Uploading user data. Please wait.</template>
             <Column
+                v-if="hasPermission('users.delete')"
                 selectionMode="multiple"
                 :exportable="false"
                 :pt="{
@@ -327,7 +334,7 @@ const filterFields = () => {
                                     @restore-item="onRestoreItem"
                                 />
                                 <form-drawer
-                                    v-if="tools.update"
+                                    v-if="tools.update && hasPermission('users.edit')"
                                     icon-name="pi pi-user-edit"
                                     label=""
                                     :entity="slotProps.data"
@@ -336,7 +343,7 @@ const filterFields = () => {
                                 />
                                 <show :entity="slotProps.data" icon-name="pi pi-user" label="" route="" />
                                 <delete-confirmation
-                                    v-if="tools.remove"
+                                    v-if="tools.remove && hasPermission('users.delete')"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-user-minus"
                                     :route="isDeleted ? 'users.force' : 'users.soft.delete'"
@@ -414,7 +421,7 @@ const filterFields = () => {
                 <template #body="slotProps">
                     <span class="flex flex-row flex-wrap items-start justify-start">
                         <Button
-                            v-if="tools.update"
+                            v-if="tools.update && hasPermission('users.edit')"
                             as="a"
                             variant="link"
                             icon="pi pi-user-edit"
@@ -448,7 +455,7 @@ const filterFields = () => {
                             @restore-item="onRestoreItem"
                         />
                         <delete-confirmation
-                            v-if="tools.remove"
+                            v-if="tools.remove && hasPermission('users.delete')"
                             :entity="slotProps.data"
                             icon-name="pi pi-user-minus"
                             :route="isDeleted ? 'users.force' : 'users.soft.delete'"

@@ -9,7 +9,6 @@ use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Http\Resources\Client\ClientResource;
 use App\Models\Client;
-use App\Services\PhoneContextService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,6 +43,9 @@ class ClientController extends Controller
      */
     public function store(StoreClientRequest $request)
     {
+        if (!$request->user()->can('clients.create')) {
+            abort(403, 'Недостаточно прав для создания клиента');
+        }
         $data = $request->validated();
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
@@ -81,6 +83,11 @@ class ClientController extends Controller
      */
     public function update(UpdateClientRequest $request, Client $client)
     {
+
+        if (!$request->user()->can('clients.edit')) {
+            abort(403, 'Недостаточно прав для создания клиента');
+        }
+
         $data = $request->validated();
 
         $client->update($data);

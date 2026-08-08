@@ -114,9 +114,11 @@ const goToEdit = (id: number) => {
                         }"
                     >
                         <template #body="slotProps">
-                            <Tag v-for="perm in slotProps.data.permissions" :key="perm.id">
-                                {{ perm.name }}
-                            </Tag>
+                            <div class="space-x-1 space-y-1">
+                                <Tag v-for="perm in slotProps.data?.permissions" :key="perm.id" severity="info">
+                                    {{ perm.name }}
+                                </Tag>
+                            </div>
                         </template>
                     </Column>
                     <Column
@@ -213,8 +215,7 @@ const goToEdit = (id: number) => {
                 <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> Are you absolutely sure? </span>
             </template>
             <div class="text-surface-500 dark:text-surface-400 mb-1 block font-semibold">
-                {{ deleteEntity?.id }} - <span v-if="deleteEntity?.name">{{ deleteEntity?.name }} - will be deleted
-                forever.</span>
+                {{ deleteEntity?.id }} - <span v-if="deleteEntity?.name">{{ deleteEntity?.name }} - will be deleted forever.</span>
             </div>
             <span class="text-red-500">
                 <b>
