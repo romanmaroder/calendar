@@ -8,6 +8,8 @@ use App\Http\Resources\Country\CountryMinResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 /** @mixin User */
 class UserResource extends JsonResource
@@ -32,6 +34,13 @@ class UserResource extends JsonResource
             'birthday' => $this->when(!empty($this->birthday), fn() => $this->birthday?->format('Y-m-d')),
             'created_at' => $this->when(!empty($this->created_at), fn() => $this->created_at?->format('Y-m-d')),
             'deleted_at' => $this->when(!empty($this->deleted_at), fn() => $this->deleted_at?->format('Y-m-d')),
+            // Важно: отдаём роли
+            'roles' => $this->whenLoaded('roles', fn () => $this->roles->map(fn (Role $role) => [
+                'id' => $role->id,
+                'name' => $role->name,
+            ])),
+            // Опционально: флаг, если пользователь сам себе смотрит профиль
+            'is_self' => $this->id === Auth::id(),
         ];
 
         if ($this->relationLoaded('branch')) {

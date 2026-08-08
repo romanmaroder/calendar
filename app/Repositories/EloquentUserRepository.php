@@ -11,7 +11,7 @@ class EloquentUserRepository implements Contracts\UserRepositoryInterface
 
     public function find(int $id): ?User
     {
-        return User::findOrFail($id);
+        return User::with('roles')->findOrFail($id);
     }
     /**
      * @inheritDoc
@@ -37,11 +37,11 @@ class EloquentUserRepository implements Contracts\UserRepositoryInterface
 
     public function findWithBranchInfo(int $id): ?User
     {
-       return User::with(['branch'])->findOrFail($id);
+       return User::with(['branch', 'roles'])->findOrFail($id);
     }
     public function findWithTrashedAndBranchInfo(int $id): ?User
     {
-        return User::withTrashed()->with(['branch'])->findOrFail($id);
+        return User::withTrashed()->with(['branch', 'roles'])->findOrFail($id);
     }
 
     public function onlyTrashed(int $id): ?User
@@ -51,7 +51,7 @@ class EloquentUserRepository implements Contracts\UserRepositoryInterface
 
     public function listWithBranchInfo(int $perPage = 20): LengthAwarePaginator
     {
-        return User::with(['branch'])->paginate($perPage);
+        return User::with(['branch', 'roles'])->paginate($perPage);
     }
 
     public function listOnlyTrashed(int $perPage = 20): LengthAwarePaginator

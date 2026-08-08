@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -36,13 +37,16 @@ class UserController extends Controller
                 'users' => UserResource::collection($users)->resolve(),
                 'count' => $this->userRepository->countAll(),
                 'branch' => $this->getBranches(),
+                'roles' => Role::all(['id', 'name'])->toArray(),
             ]
         );
     }
 
     public function create()
     {
-        return Inertia::render('user/Create', ['branch' => $this->getBranches()]);
+
+        return Inertia::render('user/Create', ['branch' => $this->getBranches(),
+            'roles' => Role::all(['id', 'name'])->toArray()]);
     }
 
     public function store(StoreUserRequest $request)
@@ -51,7 +55,13 @@ class UserController extends Controller
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
         $data['password'] = $data['password'] ?? '';
-        User::create($data);
+        $user = User::create($data);
+
+        /*if ($request->has('role_ids')) {
+            $user->assignRole($request->role_ids); // массив ID ролей
+        }*/
+
+
         return to_route('users');
     }
 
@@ -82,6 +92,7 @@ class UserController extends Controller
         return Inertia::render('user/Edit', [
             'user' => (new UserResource($user))->resolve(),
             'branches' => $this->getBranches(),
+            'roles' => Role::all(['id', 'name'])->toArray(),
         ]);
     }
 
@@ -91,9 +102,14 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
-        //Удаляем виртуальное поле из массива
-        unset($data['resolved_country_id']);
+        $roleIds = $validated['role_ids'] ?? [];
+        unset($data['role_ids']);
         $user->update($data);
+
+        if ($request->has('role_ids')) {
+            $user->syncRoles($request->role_ids); // синхронизация: старые роли уберутся, новые добавятся
+        }
+
 
         return to_route('users');
     }
@@ -209,6 +225,14 @@ class UserController extends Controller
                                     ], 400);
         }
     }
+
+    /*public function assignRoles(Request $request, User $user)
+    {
+        $request->validate(['role_ids' => 'array|integer']);
+        $user->syncRoles($request->role_ids ?? []);
+        return response()->json(['success' => true]);
+    }*/
+
 
     private function getBranches()
     {

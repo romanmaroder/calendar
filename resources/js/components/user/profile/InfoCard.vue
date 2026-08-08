@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { computed, PropType } from 'vue';
 import { User } from '@/types';
 
-defineProps({
+const props =defineProps({
     user: { type: Object as PropType<User | null>},
     title: { type: String, default: '' },
+});
+
+const roleNames = computed(() => {
+    if (!props.user?.roles || !Array.isArray(props.user.roles)) return '';
+    return props.user.roles.map((r: { name: string }) => r.name).join(',  ');
 });
 </script>
 
@@ -31,6 +36,10 @@ defineProps({
                     <div class="flex flex-wrap">
                         <div class="w-44 text-slate-500 dark:text-slate-300">Дата регистрации:</div>
                         <time class="font-medium" :datetime="user?.created_at">{{ user?.created_at }}</time>
+                    </div>
+                    <div v-if="user?.roles.length >0" class="flex flex-wrap">
+                        <div class="w-44 text-slate-500 dark:text-slate-300">Роль:</div>
+                        <div class="font-medium text-emerald-400">{{ roleNames }}</div>
                     </div>
 
                     <div v-if="user?.comment" class="flex flex-wrap">

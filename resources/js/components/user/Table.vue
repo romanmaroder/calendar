@@ -191,7 +191,6 @@ const filterFields = () => {
         </Toolbar>
 
         <DataTable
-            class="text-[15px]"
             ref="dt"
             v-model:selection="selectedItems"
             v-model:filters="filters"

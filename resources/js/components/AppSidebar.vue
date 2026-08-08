@@ -4,9 +4,16 @@ import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Building2Icon, Folder, MapPinHouse, Users2, UsersIcon } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import { BookOpen, Building2Icon, Folder, MapPinHouse, Users2, UsersIcon,Shield, ShieldAlert } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
+
+const page = usePage();
+const userPermissions = page.props.auth?.user?.permissions ?? [];
+
+const hasPermission = (perm: string): boolean => userPermissions.includes(perm);
+
+
 
 const mainNavItemCompany: NavItem[] = [
     {
@@ -32,6 +39,21 @@ const mainNavItemsClient: NavItem[] = [
         title: 'Clients',
         href: '/clients',
         icon: Users2,
+    },
+];
+const mainNavItemsRoles: NavItem[] = [
+    {
+        title: 'Roles',
+        href: route('admin.roles.index'),
+        icon: Shield,
+    },
+];
+
+const mainNavItemsPermissions: NavItem[] = [
+    {
+        title: 'Permissions',
+        href: route('admin.permissions.index'),
+        icon: ShieldAlert,
     },
 ];
 
@@ -66,6 +88,16 @@ const footerNavItems: NavItem[] = [
             <NavMain :items="mainNavItemCompany" group-label="Company" />
             <NavMain :items="mainNavItemsUser" group-label="Users" />
             <NavMain :items="mainNavItemsClient" group-label="Clients" />
+
+            <!-- Показываем только при наличии разрешения roles.view -->
+            <template v-if="hasPermission('roles.view')">
+                <NavMain :items="mainNavItemsRoles" group-label="Roles" />
+            </template>
+
+            <!-- Показываем только при наличии разрешения permissions.view -->
+            <template v-if="hasPermission('permissions.view')">
+                <NavMain :items="mainNavItemsPermissions" group-label="Permissions" />
+            </template>
         </SidebarContent>
 
         <SidebarFooter>
