@@ -33,7 +33,8 @@ class UserResource extends JsonResource
             'comment' => $this->when(!empty($this->comment), fn() => $this->comment),
             'birthday' => $this->when(!empty($this->birthday), fn() => $this->birthday?->format('Y-m-d')),
             'created_at' => $this->when(!empty($this->created_at), fn() => $this->created_at?->format('Y-m-d')),
-            'deleted_at' => $this->when(!empty($this->deleted_at), fn() => $this->deleted_at?->format('Y-m-d')),
+            //'deleted_at' => $this->when(!empty($this->deleted_at), fn() => $this->deleted_at?->format('Y-m-d')),
+            'deleted_at'=>$this->deleted_at,
             // Важно: отдаём роли
             'roles' => $this->whenLoaded('roles', fn () => $this->roles->map(fn (Role $role) => [
                 'id' => $role->id,

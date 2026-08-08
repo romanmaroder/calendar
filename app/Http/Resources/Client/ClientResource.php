@@ -30,7 +30,8 @@ class ClientResource extends JsonResource
             'email' => $this->when(!empty($this->email),fn()=> $this->email),
             'birthday' => $this->when(!empty($this->birthday), fn() => $this->birthday?->format('Y-m-d')),
             'created_at' => $this->when(!empty($this->created_at),fn()=> $this->created_at->format('Y-m-d')),
-            'deleted_at' => $this->when(!empty($this->deleted_at),fn()=> $this->deleted_at->format('Y-m-d')),
+            //'deleted_at' => $this->when(!empty($this->deleted_at),fn()=> $this->deleted_at->format('Y-m-d')),
+            'deleted_at' => $this->deleted_at,
         ];
     }
 }
