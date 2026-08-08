@@ -38,6 +38,7 @@ const form = useForm({
     birthday: birthdayField.formValue.value,
     comment: props.user?.comment ?? '',
     created_at: props.user?.created_at ?? '',
+    role_ids: props.user?.roles?.map((r: any) => r.id) ?? [], // <-- загружаем текущие роли
 });
 
 // 1. Получаем из дерева (может быть undefined)
@@ -45,6 +46,8 @@ const rawBranches = inject('listOfBranches') as Ref<Branch[]> | undefined;
 
 // 2. Делаем безопасные ref-ы. Если данных нет — будет пустой массив
 const branches = rawBranches ?? ref<Branch[]>([]);
+
+const roles: any[] | undefined = inject('roles');
 
 watch(form, () => {
     emit('drawerData', { name: form.name, surname: form.surname, avatar: form.avatar });
@@ -279,6 +282,20 @@ const cancel = () => {
                                 <label class="bg-transparent! font-light!" for="birthday1">{{ 'ДР' }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.birthday" />
+                            <FloatLabel variant="on">
+                                <MultiSelect
+                                    v-model="form.role_ids"
+                                    id="role_ids"
+                                    :options="roles"
+                                    option-value="id"
+                                    option-label="name"
+                                    display="chip"
+                                    size="small"
+                                    class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
+                                />
+                                <label for="roles">Роли</label>
+                            </FloatLabel>
+                            <InputError :message="form.errors.role_ids" />
                         </div>
                     </InfoCard>
                 </div>

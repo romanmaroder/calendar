@@ -13,6 +13,9 @@ const props = defineProps({
     branches: {
         type: Object as PropType<Branch>,
     },
+    roles: {
+        type: Array as PropType<{ id: number; name: string }[]>,
+    }, // <-- передаём роли из Inertia
 });
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,7 +25,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
 const listOfBranches: object = ref(props.branches);
+const roles = ref(props.roles);
+
 provide('listOfBranches', listOfBranches);
+provide('roles', roles);
 </script>
 
 <template>

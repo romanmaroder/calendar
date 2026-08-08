@@ -4,6 +4,8 @@ use App\Http\Controllers\User\UserController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/users/form-meta', [UserController::class, 'formMeta']);
+    //Route::put('/users/{user}/roles', [UserController::class, 'assignRoles'])->name('users.roles.assign');
+
 
     Route::redirect('users', '/users/index');
 

@@ -65,6 +65,8 @@ class StoreUserRequest extends FormRequest
             'password' => 'nullable|string|min:8',
             'phone' =>array_merge(PhoneContextService::rulesForCountry($this->country),[Rule::unique(User::class)
                 ->ignore($this->user)]),
+            'role_ids' => ['sometimes', 'array', 'integer'],
+            'role_ids.*' => ['exists:roles,id'],
         ];
     }
 

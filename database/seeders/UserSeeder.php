@@ -15,7 +15,8 @@ class UserSeeder extends Seeder
     {
         User::factory()
             ->admin()
-            ->create();
+            ->create()
+            ->assignRole('admin');
         User::factory(3)->create();
     }
 }

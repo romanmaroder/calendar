@@ -64,6 +64,8 @@ class UpdateUserRequest extends FormRequest
             ],
             'phone' =>array_merge(PhoneContextService::rulesForCountry($this->country),[Rule::unique(User::class)
                 ->ignore($this->user)]),
+            'role_ids' => ['sometimes', 'array'],
+            'role_ids.*' => ['integer','exists:roles,id'],
         ];
     }
 

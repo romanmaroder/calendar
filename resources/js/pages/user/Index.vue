@@ -16,6 +16,9 @@ const props = defineProps({
     branch: {
         type: Object as PropType<Branch>,
     },
+    roles:{
+        type: Array as PropType<{ id: number; name: string }[]>
+    },
     count: {
         type: Number,
     },
@@ -23,7 +26,10 @@ const props = defineProps({
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
 const listOfBranches: object = ref(props.branch);
+const roles = ref(props.roles);
+
 provide('listOfBranches', listOfBranches);
+provide('roles', roles);
 
 const total = ref();
 const counter = (num: number) => {
