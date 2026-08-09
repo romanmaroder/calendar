@@ -92,7 +92,7 @@ class ClientController extends Controller
 
         $client->update($data);
 
-        return to_route('clients');
+        return to_route('clients.index');
     }
 
     public function avatar(AvatarClientRequest $request, Client $client)

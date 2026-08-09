@@ -22,17 +22,14 @@ defineProps({
                         <div class="w-44 text-slate-500 dark:text-slate-300">Дата рождения:</div>
                         <time class="font-medium" :datetime="client?.birthday">{{ client?.birthday }}</time>
                     </div>
-
-                    <div v-if="client?.branch" class="flex flex-wrap">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Филиал:</div>
-                        <div class="font-medium">{{ client?.branch?.name }}</div>
-                    </div>
-
                     <div v-if="client?.created_at" class="flex flex-wrap">
                         <div class="w-44 text-slate-500 dark:text-slate-300">Дата регистрации:</div>
                         <time class="font-medium" :datetime="client?.created_at">{{ client?.created_at }}</time>
                     </div>
-
+                    <div v-if="client?.source" class="flex flex-wrap">
+                        <div class="w-44 text-slate-500 dark:text-slate-300">Источник:</div>
+                        <div class="font-medium">{{ client?.source }}</div>
+                    </div>
                     <div v-if="client?.comment" class="flex flex-wrap">
                         <div class="w-44 text-slate-500 dark:text-slate-300">Заметки:</div>
                         <div class="font-medium">{{ client?.comment }}</div>
