@@ -1,44 +1,63 @@
 <?php
 
 use App\Http\Controllers\User\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/users/form-meta', [UserController::class, 'formMeta']);
-    //Route::put('/users/{user}/roles', [UserController::class, 'assignRoles'])->name('users.roles.assign');
+    // --- Кастомные роуты (всегда ПЕРЕД resource) ---
+
+    Route::get('/users/form-meta', [UserController::class, 'formMeta'])
+        ->name('users.form-meta')
+        ->middleware('permission:users.view');
+
+    Route::get('/users/archive', [UserController::class, 'archive'])
+        ->name('users.archive')
+        ->middleware('permission:users.delete');
+
+    // Аватар
+    Route::put('/avatar/{user}', [UserController::class, 'avatar'])
+        ->name('avatar')
+        ->middleware('permission:users.edit');
 
 
-    Route::redirect('users', '/users/index');
+    // Soft delete (одна запись)
+    Route::delete('/users/{id}', [UserController::class, 'softDelete'])
+        ->name('users.soft.delete')
+        ->middleware('permission:users.delete');
 
-    // Просмотр доступен тем, у кого users.view
-    Route::get('users/archive', [UserController::class, 'archive'])->name('users.archive')->middleware('permission:users.view');
-    Route::get('/users', [UserController::class, 'index'])->name('users')->middleware('permission:users.view');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create')->middleware('permission:users.create');
+    // Bulk soft delete
+    Route::delete('/users/bulk/soft', [UserController::class, 'bulkSoftDelete'])
+        ->name('users.bulk.soft')
+        ->middleware('permission:users.delete');
 
-    // Только те, у кого есть permission:users.create, смогут делать POST
-    Route::post('/users', [UserController::class, 'store'])->name('users.store')->middleware('permission:users.create');
-
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit')->middleware('permission:users.edit');
-
-    // Только с правом edit могут делать PUT/PATCH
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('permission:users.edit');
-    Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('permission:users.edit');;
+    // Force delete (одна запись)
+    Route::delete('/users/{id}/force', [UserController::class, 'forceDelete'])
+        ->name('users.force')
+        ->middleware('permission:users.force-delete');
 
 
-    // Просмотр доступен тем, у кого users.view
-    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show')->withTrashed();
-    Route::put('/avatar/{user}', [UserController::class, 'avatar'])->name('users.avatar');
+    // Bulk force delete
+    Route::delete('/users/{ids}/bulk/force', [UserController::class, 'bulkForceDelete'])
+        ->name('users.bulk.force')
+        ->middleware('permission:users.force-delete');
 
-    // Только с правом delete могут удалять
-    // Soft delete (один/несколько)
-    Route::delete('/users/bulk/soft', [UserController::class, 'bulkSoftDelete'])->name('users.bulk.soft')->middleware('permission:users.delete');
-    Route::delete('/users/{id}', [UserController::class, 'softDelete'])->name('users.soft.delete')->middleware('permission:users.delete');
+    // Restore (одна запись)
+    Route::post('/users/{id}/restore', [UserController::class, 'restore'])
+        ->name('users.restore')
+        ->middleware('permission:users.restore');
 
-    // Force delete (один/несколько)
-    Route::delete('/users/bulk/force', [UserController::class, 'bulkForceDelete'])->name('users.bulk.force')->middleware('permission:users.delete');
-    Route::delete('/users/{id}/force', [UserController::class, 'forceDelete'])->name('users.force')->middleware('permission:users.delete');
+    // Bulk restore
+    Route::post('/users/{ids}/bulk/restore', [UserController::class, 'bulkRestore'])
+        ->name('users.bulk.restore')
+        ->middleware('permission:users.restore');
 
-    // Restore (один/несколько)
-    Route::post('/users/bulk/restore', [UserController::class, 'bulkRestore'])->name('users.bulk.restore');
-    Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
+
+    // 4. Resource — в самом конце, чтобы не «перехватывать» кастомные пути
+    Route::resource('users', UserController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update', 'show'])
+        ->middlewareFor('index', ['permission:users.view'])
+        ->middlewareFor('show', ['permission:users.view'])
+        ->middlewareFor(['create', 'store'], ['permission:users.create'])
+        ->middlewareFor(['edit', 'update'], ['permission:users.edit'])
+        ->withTrashed(['show']);
 });
-

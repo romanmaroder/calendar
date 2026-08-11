@@ -51,7 +51,7 @@ class ClientController extends Controller
         // Если поле не установлено в форме, мутатор не сработает
         $data['password'] = $data['password'] ?? '';
         Client::create($data);
-        return to_route('clients');
+        return to_route('clients.index');
     }
 
     /**

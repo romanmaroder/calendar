@@ -4,58 +4,58 @@ use App\Http\Controllers\Client\ClientController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
-    // 1. Сначала — все кастомные роуты, которые могут конфликтовать по URI (особенно с {client})
+    // --- Кастомные роуты (всегда ПЕРЕД resource) ---
 
-    // Bulk-операции (отдельный префикс, чтобы не пересекаться с resource)
-    Route::prefix('clients/bulk')->name('clients.bulk.')->group(function () {
-        Route::delete('soft', [ClientController::class, 'bulkSoftDelete'])
-            ->name('soft')
-            ->middleware('permission:clients.delete');
-
-        Route::delete('force', [ClientController::class, 'bulkForceDelete'])
-            ->name('force')
-            ->middleware('permission:clients.force-delete'); // отдельное разрешение
-
-        Route::post('restore', [ClientController::class, 'bulkRestore'])
-            ->name('restore')
-            ->middleware('permission:clients.restore'); // отдельное разрешение
-    });
-
-    // Операции над одной сущностью с параметром {client}
-    Route::prefix('clients/{client}')->name('clients.')->group(function () {
-        // Force delete одной записи
-        Route::delete('force', [ClientController::class, 'forceDelete'])
-            ->name('force-delete')
-            ->middleware('permission:clients.force-delete');
-
-        // Restore одной записи
-        Route::post('restore', [ClientController::class, 'restore'])
-            ->name('restore-single') // уникальное имя, чтобы не конфликтовать с bulk.restore
-            ->middleware('permission:clients.restore');
-
-        // Avatar
-        Route::put('avatar', [ClientController::class, 'avatar'])
-            ->name('avatar')
-            ->middleware('permission:clients.edit');
-    });
-
-    // Вспомогательные роуты без параметров
     Route::get('/clients/form-meta', [ClientController::class, 'formMeta'])
         ->name('clients.form-meta')
         ->middleware('permission:clients.view');
 
-    // Архив (не часть resource)
     Route::get('/clients/archive', [ClientController::class, 'archive'])
         ->name('clients.archive')
-        ->middleware('permission:clients.view');
+        ->middleware('permission:users.delete');
 
-    // 2. В конце — resource, чтобы он «добирал» оставшиеся стандартные пути
+    // Аватар
+    Route::put('/avatar/{client}', [ClientController::class, 'avatar'])
+        ->name('avatar')
+        ->middleware('permission:clients.edit');
+
+    // Soft delete (одна запись)
+    Route::delete('/clients/{id}', [ClientController::class, 'softDelete'])
+        ->name('clients.soft.delete')
+        ->middleware('permission:clients.delete');
+
+    // Bulk soft delete
+    Route::delete('/clients/bulk/soft', [ClientController::class, 'bulkSoftDelete'])
+        ->name('clients.bulk.soft')
+        ->middleware('permission:clients.delete');
+
+    // Force delete (одна запись)
+    Route::delete('/clients/{id}/force', [ClientController::class, 'forceDelete'])
+        ->name('clients.force')
+        ->middleware('permission:clients.force-delete');
+
+
+    // Bulk force delete
+    Route::delete('/clients/{ids}/bulk/force', [ClientController::class, 'bulkForceDelete'])
+        ->name('clients.bulk.force')
+        ->middleware('permission:clients.force-delete');
+
+    // Restore (одна запись)
+    Route::post('/clients/{id}/restore', [ClientController::class, 'restore'])
+        ->name('clients.restore')
+        ->middleware('permission:clients.restore');
+
+    // Bulk restore
+    Route::post('/clients/{ids}/bulk/restore', [ClientController::class, 'bulkRestore'])
+        ->name('clients.bulk.restore')
+        ->middleware('permission:clients.restore');
+
+    // 4. Resource — в самом конце, чтобы не «перехватывать» кастомные пути
     Route::resource('clients', ClientController::class)
-        ->middleware([
-                         'permission:clients.view',      // index, show
-                         'permission:clients.create',    // create, store
-                         'permission:clients.edit',       // edit, update
-                         'permission:clients.delete',    // destroy (soft)
-                     ])
-        ->withTrashed(['show']); // show работает и с trashed-записями
+        ->only(['index', 'create', 'store', 'edit', 'update', 'show'])
+        ->middlewareFor('index', ['permission:clients.view'])
+        ->middlewareFor('show', ['permission:clients.view'])
+        ->middlewareFor(['create', 'store'], ['permission:clients.create'])
+        ->middlewareFor(['edit', 'update'], ['permission:clients.edit'])
+        ->withTrashed(['show']);
 });

@@ -13,6 +13,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 <template>
     <Layout :breadcrumbs="breadcrumbs">
         <Head title="Создать разрешение" />
+        <div class="card">
+            <Message closable severity="warn" icon="pi pi-exclamation-triangle">«Compare names with the seed file
+                before creating.»</Message>
+        </div>
         <div class="sm:mx-auto sm:w-lg p-4">
             <PermissionForm @submit-success="() => {}" />
         </div>

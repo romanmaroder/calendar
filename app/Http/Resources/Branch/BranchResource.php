@@ -29,7 +29,7 @@ class BranchResource extends JsonResource
             'status' => $this->when(!empty($this->status), fn() => $this->status),
             'company_id' => $this->when(!empty($this->company_id), fn() => $this->company_id),
             'created_at' => $this->when(!empty($this->created_at),fn()=>$this->created_at?->format('Y-m-d')),
-            'deleted_at' => $this->when(!empty($this->deleted_at), fn() => $this->deleted_at->format('Y-m-d')),
+            'deleted_at' => $this->deleted_at,
             'users_count' => $this->when($this->users_count > 0, fn() => $this->users_count),
         ];
 

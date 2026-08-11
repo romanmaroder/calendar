@@ -24,6 +24,7 @@ class UserMinResource extends JsonResource
             'name' => $this->when(!empty($this->name), fn() => $this->name),
             'surname' => $this->when(!empty($this->surname), fn() => $this->surname),
             'phone' => $this->when(!empty($this->phone), fn() => $this->phone),
+            'deleted_at' => $this->deleted_at
         ];
     }
 }

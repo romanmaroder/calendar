@@ -16,18 +16,26 @@ class PermissionSeeder extends Seeder
             'companies.create',
             'companies.edit',
             'companies.delete',
+            'companies.force-delete',
+            'companies.restore',
             'branches.view',
             'branches.create',
             'branches.edit',
             'branches.delete',
+            'branches.force-delete',
+            'branches.restore',
             'users.view',
             'users.create',
             'users.edit',
             'users.delete',
+            'users.force-delete',
+            'users.restore',
             'clients.view',
             'clients.create',
             'clients.edit',
             'clients.delete',
+            'clients.force-delete',
+            'clients.restore',
             'roles.view',
             'roles.create',
             'roles.edit',
@@ -56,6 +64,8 @@ class PermissionSeeder extends Seeder
 
         // Права для менеджера
         $managerRole->givePermissionTo([
+                                           'companies.view',
+                                           'branches.view',
                                            'users.view',
                                            'users.create',
                                            'users.edit',
@@ -71,6 +81,8 @@ class PermissionSeeder extends Seeder
 
         // Права для мастера
         $masterRole->givePermissionTo([
+                                          'companies.view',
+                                          'branches.view',
                                           'users.view', // может видеть список мастеров/сотрудников
                                           'clients.view',
                                           'services.view',

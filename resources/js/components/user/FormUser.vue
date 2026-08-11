@@ -322,10 +322,14 @@ const cancel = () => {
             <template #right-column>
                 <ProfileCard>
                     <div class="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end md:justify-center">
-                        <Button :disabled="form.processing" class="cursor-pointer" @click.prevent="submit" raised>
+                        <Button size="small" :disabled="form.processing" class="cursor-pointer" @click.prevent="submit"
+                                raised>
                             {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
                         </Button>
-                        <Button severity="secondary" @click.prevent="cancel" class="cursor-pointer" raised> Отмена </Button>
+                        <Button size="small" severity="secondary" @click.prevent="cancel" class="cursor-pointer"
+                                raised>
+                            Отмена
+                        </Button>
                     </div>
                 </ProfileCard>
             </template>

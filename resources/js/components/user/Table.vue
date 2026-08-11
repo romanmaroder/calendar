@@ -83,6 +83,7 @@ const onDeleteItem = (id: User) => {
 };
 const onLoadItem = () => {
     items.value = props.entities;
+    console.log(items.value);
 };
 
 const onRestoreItem = (id: User) => {
@@ -151,7 +152,7 @@ const filterFields = () => {
                     </span>
                     <span class="hidden space-x-2 sm:flex">
                         <restore
-                            v-if="tools.restore"
+                            v-if="tools.restore && hasPermission('users.restore')"
                             :entity="selectedItems"
                             label="Восстановить"
                             icon-name="pi pi-replay"
@@ -327,7 +328,7 @@ const filterFields = () => {
                             </template>
                             <template #item>
                                 <restore
-                                    v-if="tools.restore"
+                                    v-if="tools.restore && hasPermission('users.restore')"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-replay"
                                     route="users.restore"
@@ -448,7 +449,7 @@ const filterFields = () => {
                             }"
                         />
                         <restore
-                            v-if="tools.restore"
+                            v-if="tools.restore && hasPermission('users.restore')"
                             :entity="slotProps.data"
                             icon-name="pi pi-replay"
                             route="users.restore"

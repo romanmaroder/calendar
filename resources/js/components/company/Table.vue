@@ -39,6 +39,11 @@ const emit = defineEmits(['count']);
 
 const page = usePage();
 
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
+
 const dt = ref();
 const items = ref();
 const count = ref();
@@ -130,7 +135,7 @@ const filterFields = () => {
                 <div class="flex flex-row items-start">
                     <span class="">
                         <form-drawer
-                            v-if="tools.create && !isLargeScreen"
+                            v-if="tools.create && !isLargeScreen && hasPermission('companies.create')"
                             @newCompany="onLoadItem"
                             icon-name="pi pi-building"
                             raised
@@ -138,7 +143,7 @@ const filterFields = () => {
                             title="New company"
                         />
                         <Button
-                            v-if="tools.create && isLargeScreen"
+                            v-if="tools.create && isLargeScreen && hasPermission('companies.create')"
                             as="a"
                             icon="pi pi-building"
                             label="New"
@@ -150,7 +155,7 @@ const filterFields = () => {
                     </span>
                     <span class="hidden space-x-2 sm:flex">
                         <restore
-                            v-if="tools.restore"
+                            v-if="tools.restore && hasPermission('companies.restore')"
                             :entity="selectedItems"
                             label="Восстановить"
                             icon-name="pi pi-replay"
@@ -160,6 +165,7 @@ const filterFields = () => {
                             @restore-items="onRestoreSelectedItems"
                         />
                         <delete-confirmation
+                            v-if="hasPermission('companies.delete')"
                             :entity="selectedItems"
                             icon-name="pi pi-trash"
                             type="multi"
@@ -181,7 +187,7 @@ const filterFields = () => {
                         <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
                     </IconField>
                     <Button
-                        v-if="page.url === '/company'"
+                        v-if="page.url === '/company' && hasPermission('companies.delete')"
                         as="a"
                         :href="route('company.archive')"
                         icon="pi pi-box"
@@ -217,6 +223,7 @@ const filterFields = () => {
             <template #empty><p class="text-center text-xl font-bold">No remote companies</p></template>
             <template #loading>Uploading user data. Please wait.</template>
             <Column
+                v-if="hasPermission('companies.delete')"
                 selectionMode="multiple"
                 :exportable="false"
                 :pt="{
@@ -349,14 +356,14 @@ const filterFields = () => {
                             </template>
                             <template #item>
                                 <restore
-                                    v-if="tools.restore"
+                                    v-if="tools.restore && hasPermission('companies.restore')"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-replay"
                                     route="company.restore"
                                     @restore-item="onRestoreItem"
                                 />
                                 <form-drawer
-                                    v-if="tools.update"
+                                    v-if="tools.update && hasPermission('companies.edit')"
                                     icon-name="pi pi-pencil"
                                     label=""
                                     :company="slotProps.data"
@@ -365,7 +372,7 @@ const filterFields = () => {
                                 />
                                 <show :company="slotProps.data" icon-name="pi pi-search" label="" route="" />
                                 <delete-confirmation
-                                    v-if="tools.remove"
+                                    v-if="tools.remove && hasPermission('companies.delete')"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-trash"
                                     :route="isDeleted ? 'company.force' : 'company.soft.delete'"
@@ -429,7 +436,7 @@ const filterFields = () => {
                 <template #body="slotProps">
                     <span class="flex flex-row flex-wrap items-start justify-start">
                         <Button
-                            v-if="tools.update"
+                            v-if="tools.update && hasPermission('companies.edit')"
                             as="a"
                             variant="link"
                             icon="pi pi-pencil"
@@ -456,14 +463,14 @@ const filterFields = () => {
                             }"
                         />
                         <restore
-                            v-if="tools.restore"
+                            v-if="tools.restore && hasPermission('companies.restore')"
                             :entity="slotProps.data"
                             icon-name="pi pi-replay"
                             route="company.restore"
                             @restore-item="onRestoreItem"
                         />
                         <delete-confirmation
-                            v-if="tools.remove"
+                            v-if="tools.remove && hasPermission('companies.delete')"
                             :entity="slotProps.data"
                             icon-name="pi pi-trash"
                             :route="isDeleted ? 'company.force' : 'company.soft.delete'"

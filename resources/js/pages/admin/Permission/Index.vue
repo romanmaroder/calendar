@@ -78,6 +78,10 @@ const goToEdit = (id: number) => {
     <Layout :breadcrumbs="breadcrumbs">
         <Head title="Permissions" />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div class="card">
+                <Message closable severity="warn" icon="pi pi-exclamation-triangle">«Configure create and edit
+                    permissions via seed files only manually editing rights may break access control and cause authorization errors.»</Message>
+            </div>
             <div class="grid auto-cols-fr">
                 <Toolbar class="mb-4">
                     <template #end>

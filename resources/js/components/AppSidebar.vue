@@ -83,7 +83,10 @@ const footerNavItems: NavItem[] = [
             </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-            <NavMain :items="mainNavItemCompany" group-label="Company" />
+            <template v-if="hasPermission('companies.view')">
+                <NavMain :items="mainNavItemCompany" group-label="Company" />
+            </template>
+
             <template v-if="hasPermission('users.view')">
                 <NavMain :items="mainNavItemsUser" group-label="Users" />
             </template>

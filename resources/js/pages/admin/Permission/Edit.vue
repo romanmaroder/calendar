@@ -15,6 +15,9 @@ defineProps<{ permission: { id: number; name: string } }>();
 <template>
     <Layout :breadcrumbs="breadcrumbs">
         <Head title="Редактировать разрешение" />
+        <div class="card">
+            <Message closable severity="warn" icon="pi pi-exclamation-triangle">«Compare names with the seed file before editing.»</Message>
+        </div>
         <div class="sm:mx-auto sm:w-lg p-4">
             <PermissionForm :permission="permission" @submit-success="() => {}" />
         </div>

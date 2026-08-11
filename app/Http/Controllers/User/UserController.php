@@ -59,14 +59,15 @@ class UserController extends Controller
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
         $data['password'] = $data['password'] ?? '';
+        unset($data['role_ids']);
         $user = User::create($data);
 
-        /*if ($request->has('role_ids')) {
+        if ($request->has('role_ids')) {
             $user->assignRole($request->role_ids); // массив ID ролей
-        }*/
+        }
 
 
-        return to_route('users');
+        return to_route('users.index');
     }
 
     /**
@@ -119,7 +120,7 @@ class UserController extends Controller
         }
 
 
-        return to_route('users');
+        return to_route('users.index');
     }
 
     public function avatar(AvatarUserRequest $request, User $user)

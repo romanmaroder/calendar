@@ -185,7 +185,6 @@ class BranchController extends Controller
     public function forceDelete(string $id)
     {
         $branch = Branch::withTrashed()->findOrFail($id);
-
         $extension = explode('/', $branch->avatar);
         $avatar = end($extension);
         Storage::disk('public')->delete('/avatars/' . $avatar);

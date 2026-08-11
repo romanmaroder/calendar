@@ -40,6 +40,12 @@ const emit = defineEmits(['count']);
 
 const page = usePage();
 
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
+
+
 const dt = ref();
 const items = ref();
 const count = ref();
@@ -148,7 +154,7 @@ const filterFields = () => {
                 <div class="flex flex-row items-start">
                     <span class="">
                         <form-drawer
-                            v-if="tools.create && !isLargeScreen"
+                            v-if="tools.create && !isLargeScreen && hasPermission('branches.create')"
                             @new-branch="onLoadItem"
                             icon-name="pi pi-map-marker"
                             raised
@@ -156,7 +162,7 @@ const filterFields = () => {
                             title="New branch"
                         />
                         <Button
-                            v-if="tools.create && isLargeScreen"
+                            v-if="tools.create && isLargeScreen && hasPermission('branches.create')"
                             as="a"
                             icon="pi pi-map-marker"
                             label="New"
@@ -168,7 +174,7 @@ const filterFields = () => {
                     </span>
                     <span class="hidden space-x-2 sm:flex">
                         <restore
-                            v-if="tools.restore"
+                            v-if="tools.restore && hasPermission('branches.restore')"
                             :entity="selectedItems"
                             label="Восстановить"
                             icon-name="pi pi-replay"
@@ -178,10 +184,11 @@ const filterFields = () => {
                             @restore-items="onRestoreSelectedItems"
                         />
                         <delete-confirmation
+                            v-if="hasPermission('branches.delete')"
                             :entity="selectedItems"
                             icon-name="pi pi-trash"
                             type="multi"
-                            text="will be deleted. Employees have been removed from the branch."
+                            text="will be moved to the basket. Employees have been removed from the branch."
                             delete-label-btn="Yes, delete branches"
                             :route="isDeleted ? 'branch.bulk.force' : 'branch.bulk.soft'"
                             :disabled="!selectedItems || !selectedItems.length"
@@ -199,7 +206,7 @@ const filterFields = () => {
                         <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
                     </IconField>
                     <Button
-                        v-if="page.url === '/branch'"
+                        v-if="page.url === '/branch' && hasPermission('branches.delete')"
                         as="a"
                         :href="route('branch.archive')"
                         icon="pi pi-box"
@@ -233,8 +240,9 @@ const filterFields = () => {
             :loading="loading"
         >
             <template #empty><p class="text-center text-xl font-bold">No remote branches</p></template>
-            <template #loading>Uploading user data. Please wait.</template>
+            <template #loading>Uploading branch data. Please wait.</template>
             <Column
+                v-if="hasPermission('branches.delete')"
                 selectionMode="multiple"
                 :exportable="false"
                 :pt="{
@@ -355,14 +363,14 @@ const filterFields = () => {
                             </template>
                             <template #item>
                                 <restore
-                                    v-if="tools.restore"
+                                    v-if="tools.restore && hasPermission('branches.restore')"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-replay"
                                     route="branch.restore"
                                     @restore-item="onRestoreItem"
                                 />
                                 <form-drawer
-                                    v-if="tools.update"
+                                    v-if="tools.update && hasPermission('branches.edit')"
                                     icon-name="pi pi-pencil"
                                     label=""
                                     :branch="slotProps.data"
@@ -371,7 +379,7 @@ const filterFields = () => {
                                 />
                                 <show :branch="slotProps.data" icon-name="pi pi-search" label="" route="" />
                                 <delete-confirmation
-                                    v-if="tools.remove"
+                                    v-if="tools.remove && hasPermission('branches.delete')"
                                     :entity="slotProps.data"
                                     icon-name="pi pi-trash"
                                     :route="isDeleted ? 'branch.force' : 'branch.soft.delete'"
@@ -439,7 +447,7 @@ const filterFields = () => {
                 <template #body="slotProps">
                     <span class="flex flex-row flex-wrap items-start justify-start">
                         <Button
-                            v-if="tools.update"
+                            v-if="tools.update && hasPermission('branches.edit')"
                             as="a"
                             variant="link"
                             icon="pi pi-pencil"
@@ -466,14 +474,14 @@ const filterFields = () => {
                             }"
                         />
                         <restore
-                            v-if="tools.restore"
+                            v-if="tools.restore && hasPermission('branches.restore')"
                             :entity="slotProps.data"
                             icon-name="pi pi-replay"
                             route="branch.restore"
                             @restore-item="onRestoreItem"
                         />
                         <delete-confirmation
-                            v-if="tools.remove"
+                            v-if="tools.remove && hasPermission('branches.delete')"
                             :entity="slotProps.data"
                             icon-name="pi pi-trash"
                             :route="isDeleted ? 'branch.force' : 'branch.soft.delete'"

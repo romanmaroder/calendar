@@ -4,14 +4,14 @@ import { Branch, BreadcrumbItem } from '@/types';
 import Table from '@/components/branch/Table.vue';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { PropType, ref } from 'vue';
+import { onMounted, PropType, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Branches', href: '/branch' },
     { title: 'Archive', href: '' },
 ];
 
-defineProps({
+const props =defineProps({
     branches: {
         type: Object as PropType<Branch>,
         required: true,
@@ -25,6 +25,10 @@ const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
+
+onMounted(()=>{
+    console.log(props.branches);
+});
 </script>
 
 <template>

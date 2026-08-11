@@ -168,7 +168,7 @@ const filterFields = () => {
                     </span>
                     <span class="hidden space-x-2 sm:flex">
                         <restore
-                            v-if="tools.restore"
+                            v-if="tools.restore && hasPermission('clients.restore')"
                             :entity="selectedItems"
                             label="Восстановить"
                             icon-name="pi pi-replay"

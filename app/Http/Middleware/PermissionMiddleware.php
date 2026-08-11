@@ -13,22 +13,25 @@ class PermissionMiddleware
      *
      * @param Closure(Request): (Response) $next
      */
+    //TODO Удалить вывод запрещающего разрешения
     public function handle(Request $request, Closure $next, string ...$permissions): Response
     {
         $user = $request->user();
 
-        // Если пользователя нет — редирект на логин
         if (!$user) {
             return redirect(route('login'));
         }
 
+        // Проверяем, что у пользователя есть ВСЕ указанные разрешения
+       // \Log::info('Проверяемые разрешения:', $permissions);
+        //\Log::info('Разрешения пользователя:', $user->getPermissionsViaRoles()->pluck('name')->toArray());
+        //\Log::info('Роли пользователя:', $user->roles()->pluck('name')->toArray());
         foreach ($permissions as $permission) {
-            if ($user->hasPermissionTo($permission)) {
-                return $next($request);
+            if (!$user->hasPermissionTo($permission)) {
+                abort(403, 'Недостаточно прав ' . $permission . '  ' . $user->surname );
             }
         }
-
-        abort(403, 'Недостаточно прав');
+        return $next($request);
     }
 
 }

@@ -33,6 +33,7 @@ class BranchMinResource extends JsonResource
             'avatar' => $this->when(!empty($this->avatar), fn() => $this->avatar),
             'status' => $this->when(!empty($this->status), fn() => $this->status),
             'company_id' => $this->when(!empty($this->company_id), fn() => $this->company_id),
+            'deleted_at' => $this->deleted_at ?? ''
         ];
     }
 }

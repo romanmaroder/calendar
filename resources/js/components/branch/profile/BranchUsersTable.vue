@@ -11,6 +11,7 @@ import { useRows } from '@/composables/workingWithTableItems';
 import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 import { getFullname } from '@/composables/useFullname';
 import { useMediaQuery } from '@vueuse/core';
+import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     branch: {
@@ -21,6 +22,14 @@ const props = defineProps({
         type: Object as PropType<User | null>,
     },
 });
+
+const page = usePage();
+
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
+
 
 const toast = useToast();
 
@@ -69,7 +78,7 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
         <template #content>
             <Toast />
             <Toolbar
-                v-if="isLargeScreen"
+                v-if="isLargeScreen && hasPermission('users.delete')"
                 class="mb-6"
                 :pt="{
                     end: 'w-full mt-3 sm:w-auto sm:mt-0',
@@ -106,6 +115,7 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                 <template #loading>Uploading user data. Please wait.</template>
                 <!-- Чекбокс для выбора (для массового удаления) -->
                 <Column
+                    v-if="hasPermission('users.delete')"
                     selectionMode="multiple"
                     :exportable="false"
                     :pt="{
@@ -146,7 +156,7 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                 </Column>
 
                 <!-- Действия (одиночное удаление) -->
-                <Column header="Tools" class="!text-center">
+                <Column header="Tools" class="!text-center" v-if="hasPermission('users.delete')">
                     <template #body="{ data }">
                         <unsubscribe-confirmation
                             :subscriber="data"

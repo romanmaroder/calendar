@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { User } from '@/types';
-import { PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 import FilesList from './FilesList.vue';
 import FinanceCard from './FinanceCard.vue';
 import InfoCard from './InfoCard.vue';
 import NotesList from './NotesList.vue';
 import ProfileCard from './ProfileCard.vue';
 import VisitsList from './VisitsList.vue';
+import { usePage } from '@inertiajs/vue3';
 
 const props =defineProps({
     user: {
@@ -15,6 +16,14 @@ const props =defineProps({
         required:true,
     },
 });
+
+const page = usePage();
+
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
+
 
 /* demo data */
 const patient = {
@@ -184,6 +193,7 @@ const items = ref([
     {
         label: 'Edit',
         icon: 'pi pi-pencil',
+        permission: 'companies.edit',
         command: () => {
             try {
                 window.location.href = route('users.edit', props.user.id);
@@ -195,15 +205,22 @@ const items = ref([
     {
         label: 'Users',
         icon: 'pi pi-users',
+        permission: null,
         command: () => {
             try {
-                window.location.href = route('users');
+                window.location.href = route('users.index');
             } catch (error) {
                 console.error('Маршрут не найден:', error);
             }
         },
     },
 ]);
+
+// Фильтруем: показываем только те пункты, у которых нет permission ИЛИ есть нужное право
+const filteredItems = computed(() =>
+    items.value.filter(item => item.permission === null || hasPermission(item.permission))
+);
+
 </script>
 
 <template>
@@ -224,7 +241,7 @@ const items = ref([
             <FinanceCard :data="salaryData" title="Зарплата" />
             <FilesList v-if="false" :files="files" title="Файлы" @download="downloadFile" @remove="removeFile" />
             <NotesList v-if="false" :notes="notes" title="Примечание" @download="downloadNote" />
-            <ContextMenu global :model="items" class="mobile-area"/>
+            <ContextMenu global :model="filteredItems" class="mobile-area"/>
         </template>
     </ProfileLayout>
 </template>

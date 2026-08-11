@@ -6,6 +6,7 @@ import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import { useMediaQuery } from '@vueuse/core';
 import BranchUsersTable from '@/components/branch/profile/BranchUsersTable.vue';
+import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     branch: {
@@ -13,6 +14,17 @@ const props = defineProps({
         required: true,
     },
 });
+
+
+const page = usePage();
+
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
+
+
+
 
 /* demo data */
 const patient = {
@@ -192,6 +204,7 @@ const items = ref([
     {
         label: 'Edit',
         icon: 'pi pi-pencil',
+        permission: 'branches.edit',
         command: () => {
             try {
                 window.location.href = route('branch.edit', props.branch.id);
@@ -203,6 +216,7 @@ const items = ref([
     {
         label: 'Branches',
         icon: 'pi pi-map-marker',
+        permission: null,
         command: () => {
             try {
                 window.location.href = route('branch.index');
@@ -212,6 +226,12 @@ const items = ref([
         },
     },
 ]);
+
+// Фильтруем: показываем только те пункты, у которых нет permission ИЛИ есть нужное право
+const filteredItems = computed(() =>
+    items.value.filter(item => item.permission === null || hasPermission(item.permission))
+);
+
 </script>
 
 <template>
@@ -222,7 +242,7 @@ const items = ref([
 
         <template #right-center-column>
             <InfoCard :branch="branch" title="Общая информация" />
-            <ContextMenu global :model="items" class="mobile-area" />
+            <ContextMenu global :model="filteredItems" class="mobile-area" />
         </template>
         <!--        <template #right-column>
             <CountryCard :branch="branch" title="Country" />

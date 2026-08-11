@@ -6,6 +6,7 @@ import FinanceCard from './FinanceCard.vue';
 import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import VisitsList from './VisitsList.vue';
+import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     client: {
@@ -13,6 +14,14 @@ const props = defineProps({
         required:true,
     },
 });
+
+const page = usePage();
+
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
+
 
 /* demo data */
 const patient = {
@@ -194,6 +203,7 @@ const items = ref([
     {
         label: 'Edit',
         icon: 'pi pi-pencil',
+        permission: 'companies.edit',
         command: () => {
             try {
                 window.location.href = route('clients.edit', props.client.id);
@@ -205,15 +215,22 @@ const items = ref([
     {
         label: 'Clients',
         icon: 'pi pi-users',
+        permission: null,
         command: () => {
             try {
-                window.location.href = route('clients');
+                window.location.href = route('clients.index');
             } catch (error) {
                 console.error('Маршрут не найден:', error);
             }
         },
     },
 ]);
+
+// Фильтруем: показываем только те пункты, у которых нет permission ИЛИ есть нужное право
+const filteredItems = computed(() =>
+    items.value.filter(item => item.permission === null || hasPermission(item.permission))
+);
+
 </script>
 
 <template>
@@ -232,7 +249,7 @@ const items = ref([
 
         <template #right-column>
             <FinanceCard :data="{ total: client?.total, records: client?.records, aov: aov }" title="Доходность" />
-            <ContextMenu global :model="items" class="mobile-area"/>
+            <ContextMenu global :model="filteredItems" class="mobile-area"/>
         </template>
     </ProfileLayout>
 </template>

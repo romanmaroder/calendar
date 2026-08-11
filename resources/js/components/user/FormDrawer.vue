@@ -53,7 +53,7 @@ watch(isLargeScreen, () => {
 const form = ref<Data>({});
 
 const previewOfUserData = (data: Data) => {
-    console.log(data);
+   // console.log(data);
     return form.value = {
         name: data.name,
         surname: data.surname,

@@ -37,6 +37,7 @@ class User extends Authenticatable
         'email',
         'branch_id',
         'password',
+        'role_ids'
     ];
     protected $guarded = [];
 
