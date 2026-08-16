@@ -11,7 +11,7 @@ import { User } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
+import { computed, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 
 const props = defineProps({
@@ -118,6 +118,9 @@ const filterFields = () => {
        });
    }
 };*/
+onMounted(() => {
+    console.log(props.entities);
+});
 </script>
 
 <template>
@@ -281,6 +284,18 @@ const filterFields = () => {
                     </div>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
+                    </p>
+                    <p>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">
+                            Roles:
+                            <span v-if="slotProps.data.roles && slotProps.data.roles.length">
+                                <template v-for="(role, idx) in slotProps.data.roles" :key="role.id">
+                                    <span class="text-sky-500 dark:text-sky-300"> {{ role.name }}</span>
+                                    <span v-if="idx < slotProps.data.roles.length - 1">,</span>
+                                </template>
+                            </span>
+                            <span v-else class="text-gray-400 italic">No roles</span>
+                        </small>
                     </p>
                     <p class="sm:hidden">
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.branch?.name }}</small>
