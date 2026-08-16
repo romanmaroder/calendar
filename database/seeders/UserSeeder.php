@@ -17,6 +17,6 @@ class UserSeeder extends Seeder
             ->admin()
             ->create()
             ->assignRole('admin');
-        User::factory(3)->create();
+        User::factory(3)->temporaryEmail()->requiresPasswordChange()->create();
     }
 }

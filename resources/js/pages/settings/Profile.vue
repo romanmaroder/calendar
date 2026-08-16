@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
+import Heading from '@/components/Heading.vue';
 
 interface Props {
     mustVerifyEmail: boolean;
@@ -27,6 +28,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const page = usePage<SharedData>();
 const user = page.props.auth.user as User;
+const warning = page.props.session?.profile_warning;
 
 const form = useForm({
     name: user.name,
@@ -46,7 +48,11 @@ const submit = () => {
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Profile information" description="Update your name and email address" />
+                <div v-if="warning" class="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+                    <Heading title="Profile information" :description="warning.message" />
+                </div>
+
+                <HeadingSmall v-else title="Profile information" description="Update your name and email address" />
 
                 <form @submit.prevent="submit" class="space-y-6">
                     <div class="grid gap-2">
@@ -70,7 +76,7 @@ const submit = () => {
                     </div>
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">
-                        <p class="-mt-4 text-sm text-muted-foreground">
+                        <p class="text-muted-foreground -mt-4 text-sm">
                             Your email address is unverified.
                             <Link
                                 :href="route('verification.send')"

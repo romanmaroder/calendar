@@ -17,7 +17,11 @@ class PasswordController extends Controller
      */
     public function edit(): Response
     {
-        return Inertia::render('settings/Password');
+        return Inertia::render('settings/Password',[
+            'session' => [
+                'profile_warning' => session('profile_warning'),
+            ],
+        ]);
     }
 
     /**
@@ -25,14 +29,16 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
+
         $validated = $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
+            'password' => ['required', Password::defaults()->letters()->numbers(), 'confirmed'],
         ]);
 
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
+        $request->user()->forceFill(['requires_password_change' => false])->save();
 
         return back();
     }

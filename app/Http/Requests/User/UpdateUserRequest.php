@@ -8,6 +8,7 @@ use App\Services\PhoneContextService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class UpdateUserRequest extends FormRequest
@@ -66,6 +67,7 @@ class UpdateUserRequest extends FormRequest
                 ->ignore($this->user)]),
             'role_ids' => ['sometimes', 'array'],
             'role_ids.*' => ['integer','exists:roles,id'],
+            'password'      => ['nullable', Password::defaults(), 'confirmed'], // nullable, чтобы можно было не менять
         ];
     }
 

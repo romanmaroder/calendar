@@ -37,7 +37,8 @@ class User extends Authenticatable
         'email',
         'branch_id',
         'password',
-        'role_ids'
+        'role_ids',
+        'requires_password_change'
     ];
     protected $guarded = [];
 
@@ -64,14 +65,14 @@ class User extends Authenticatable
      * Если значение не передано или пусто — используем дефолтное
      * @param $value
      */
-    public function setPasswordAttribute($value): void
+    /*public function setPasswordAttribute($value): void
     {
         $default = config('auth.defaults.password', 'password');
         $hashed = Hash::make(empty($value) ? $default : $value);
 
         $this->attributes['password'] = $hashed;
         $this->syncOriginal('password'); // важно для сохранения
-    }
+    }*/
 
     /**
      * Get the attributes that should be cast.
@@ -82,7 +83,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            //'password' => 'hashed',
             'created_at' => 'datetime:Y/m/d H:i',
             'birthday' => 'date:Y-m-d',
             'name' => Ucfirst::class,

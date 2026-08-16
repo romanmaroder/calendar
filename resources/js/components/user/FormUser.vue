@@ -5,19 +5,26 @@ import AvatarUploader from '@/components/AvatarUploader.vue';
 import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/user/profile/InfoCard.vue';
 import ProfileCard from '@/components/user/profile/ProfileCard.vue';
+import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
+import { useDateField } from '@/composables/utils/useDateField';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch, User } from '@/types';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, ref, Ref, watch } from 'vue';
-import { useDateField } from '@/composables/utils/useDateField';
-import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 
 const props = defineProps({
     user: Object as PropType<User | null>,
 });
+
+const page = usePage();
+
+const hasPermission = (permission: string) => {
+    const userPermissions = page.props.auth?.user?.permissions ?? [];
+    return userPermissions.includes(permission);
+};
 
 const toast = useToast();
 
@@ -250,10 +257,14 @@ const cancel = () => {
                                     class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                     aria-labelledby="email"
                                     size="small"
+                                    placeholder="user@admincreate.com"
                                 />
                                 <label for="email" class="bg-transparent! font-light!">Email:</label>
                             </FloatLabel>
                             <InputError :message="form.errors.email" />
+                            <Message v-if="!form.email" severity="secondary" variant="simple" size="small"
+                                >If the email is set by an admin/manager, use the @admincreate.com domain; otherwise, use the user’s real email.
+                            </Message>
                             <FloatLabel variant="on">
                                 <DatePicker
                                     id="birthday"
@@ -282,20 +293,22 @@ const cancel = () => {
                                 <label class="bg-transparent! font-light!" for="birthday1">{{ 'ДР' }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.birthday" />
-                            <FloatLabel variant="on">
-                                <MultiSelect
-                                    v-model="form.role_ids"
-                                    id="role_ids"
-                                    :options="roles"
-                                    option-value="id"
-                                    option-label="name"
-                                    display="chip"
-                                    size="small"
-                                    class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
-                                />
-                                <label for="roles">Роли</label>
-                            </FloatLabel>
-                            <InputError :message="form.errors.role_ids" />
+                            <div v-if="hasPermission('users.assign-role')">
+                                <FloatLabel variant="on">
+                                    <MultiSelect
+                                        v-model="form.role_ids"
+                                        id="role_ids"
+                                        :options="roles"
+                                        option-value="id"
+                                        option-label="name"
+                                        display="chip"
+                                        size="small"
+                                        class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
+                                    />
+                                    <label for="roles">Роли</label>
+                                </FloatLabel>
+                                <InputError :message="form.errors.role_ids" />
+                            </div>
                         </div>
                     </InfoCard>
                 </div>
@@ -322,14 +335,10 @@ const cancel = () => {
             <template #right-column>
                 <ProfileCard>
                     <div class="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end md:justify-center">
-                        <Button size="small" :disabled="form.processing" class="cursor-pointer" @click.prevent="submit"
-                                raised>
+                        <Button size="small" :disabled="form.processing" class="cursor-pointer" @click.prevent="submit" raised>
                             {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
                         </Button>
-                        <Button size="small" severity="secondary" @click.prevent="cancel" class="cursor-pointer"
-                                raised>
-                            Отмена
-                        </Button>
+                        <Button size="small" severity="secondary" @click.prevent="cancel" class="cursor-pointer" raised> Отмена </Button>
                     </div>
                 </ProfileCard>
             </template>

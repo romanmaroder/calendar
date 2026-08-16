@@ -16,6 +16,7 @@ use App\Traits\HasControllerRoutes;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
@@ -58,8 +59,10 @@ class UserController extends Controller
         $data = $request->validated();
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
-        $data['password'] = $data['password'] ?? '';
+       //$data['password'] = $data['password'] ?? '';
         unset($data['role_ids']);
+        $data['password'] = \Hash::make('password');
+        $data['requires_password_change']= true;
         $user = User::create($data);
 
         if ($request->has('role_ids')) {
@@ -113,7 +116,18 @@ class UserController extends Controller
         $data = $request->validated();
         $roleIds = $validated['role_ids'] ?? [];
         unset($data['role_ids']);
-        $user->update($data);
+
+        // Обновляем только если пароль передан
+        if (!empty($validated['password'])) {
+            $user->update([
+                              'password'                 => Hash::make($validated['password']),
+                              'requires_password_change' => true, // если админ сам задал пароль — требование снимается
+                          ]);
+        } else {
+            $user->update($data);
+        }
+
+
 
         if ($request->has('role_ids')) {
             $user->syncRoles($request->role_ids); // синхронизация: старые роли уберутся, новые добавятся

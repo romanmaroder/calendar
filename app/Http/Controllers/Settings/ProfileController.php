@@ -21,6 +21,10 @@ class ProfileController extends Controller
         return Inertia::render('settings/Profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            // session автоматически не передаётся в props, поэтому берём вручную
+            'session' => [
+                'profile_warning' => session('profile_warning'),
+            ],
         ]);
     }
 

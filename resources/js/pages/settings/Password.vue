@@ -2,14 +2,15 @@
 import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import Heading from '@/components/Heading.vue';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -17,7 +18,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
         href: '/settings/password',
     },
 ];
-
+const page = usePage<SharedData>();
+const warning = page.props.session?.profile_warning;
 const passwordInput = ref<HTMLInputElement | null>(null);
 const currentPasswordInput = ref<HTMLInputElement | null>(null);
 
@@ -56,6 +58,9 @@ const updatePassword = () => {
 
         <SettingsLayout>
             <div class="space-y-6">
+                <div v-if="warning" class="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+                    <Heading title="Information" :description="warning.message" />
+                </div>
                 <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
 
                 <form @submit.prevent="updatePassword" class="space-y-6">

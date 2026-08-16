@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('comment',1000)->nullable()->after('phone');
             $table->date('birthday')->nullable()->after('comment');
             $table->string('avatar')->nullable()->after('birthday');
+            $table->boolean('requires_password_change')->default(false)->after('password');
             $table->softDeletes();
         });
     }

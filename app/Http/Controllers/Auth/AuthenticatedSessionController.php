@@ -30,8 +30,43 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
+        // Получаем аутентифицированного пользователя
+        $user = Auth::user();
+        if (!$user->roles()->exists()) {
+            // Разлогиниваем, чтобы сессия не считалась валидной
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')
+                ->with('status', 'Нет права доступа.'); //TODO файл перевода
+        }
 
         $request->session()->regenerate();
+
+        // Проверка: не подтверждён email И домен временный
+        if ($user->email === null || str_ends_with( $user->email,'@admincreate.com'))
+        {
+            // Добавляем сообщение в сессию (оно пропадёт после показа)
+            session()->flash('profile_warning', [
+                'type' => 'warning',
+                'message' => 'Please provide your real email address.', //TODO файл перевода
+            ]);
+
+            return redirect()->route('profile.update');
+        }
+
+        if ( $user->requires_password_change === 1)
+        {
+            // Добавляем сообщение в сессию (оно пропадёт после показа)
+            session()->flash('profile_warning', [
+                'type' => 'warning',
+                'message' => 'Please set a permanent password.', //TODO файл перевода
+            ]);
+
+            return redirect()->route('password.update');
+        }
+
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

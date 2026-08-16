@@ -62,7 +62,7 @@ class StoreUserRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user)
             ],
             'branch_id' => 'required|integer',
-            'password' => 'nullable|string|min:8',
+            //'password' => 'nullable|string|min:8',
             'phone' =>array_merge(PhoneContextService::rulesForCountry($this->country),[Rule::unique(User::class)
                 ->ignore($this->user)]),
             'role_ids' => ['sometimes', 'array'],
