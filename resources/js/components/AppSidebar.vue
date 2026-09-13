@@ -10,38 +10,39 @@ import AppLogo from './AppLogo.vue';
 
 const page = usePage();
 const userPermissions = page.props.auth?.user?.permissions ?? [];
+const translations = page.props.appSidebarTranslations as Record<string, string>
 
 const hasPermission = (perm: string): boolean => userPermissions.includes(perm);
 
 const mainNavItemCompany: NavItem[] = [
     {
-        title: 'Company',
+        title: translations.nav_company,
         href: '/company',
         icon: Building2Icon,
     },
     {
-        title: 'Branches ',
+        title: translations.nav_branches,
         href: '/branch',
         icon: MapPinHouse,
     },
 ];
 const mainNavItemsUser: NavItem[] = [
     {
-        title: 'Users',
+        title: translations.nav_users,
         href: '/users',
         icon: UsersIcon,
     },
 ];
 const mainNavItemsClient: NavItem[] = [
     {
-        title: 'Clients',
+        title: translations.nav_clients,
         href: '/clients',
         icon: Users2,
     },
 ];
 const mainNavItemsRoles: NavItem[] = [
     {
-        title: 'Roles',
+        title: translations.nav_roles,
         href: route('admin.roles.index'),
         icon: Shield,
     },
@@ -49,7 +50,7 @@ const mainNavItemsRoles: NavItem[] = [
 
 const mainNavItemsPermissions: NavItem[] = [
     {
-        title: 'Permissions',
+        title: translations.nav_permissions,
         href: route('admin.permissions.index'),
         icon: ShieldAlert,
     },
@@ -84,23 +85,23 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
         <SidebarContent>
             <template v-if="hasPermission('companies.view')">
-                <NavMain :items="mainNavItemCompany" group-label="Company" />
+                <NavMain :items="mainNavItemCompany" :group-label="translations.group_company" />
             </template>
 
             <template v-if="hasPermission('users.view')">
-                <NavMain :items="mainNavItemsUser" group-label="Users" />
+                <NavMain :items="mainNavItemsUser" :group-label="translations.group_users" />
             </template>
             <template v-if="hasPermission('clients.view')">
-                <NavMain :items="mainNavItemsClient" group-label="Clients" />
+                <NavMain :items="mainNavItemsClient" :group-label="translations.group_clients" />
             </template>
             <!-- Показываем только при наличии разрешения roles.view -->
             <template v-if="hasPermission('roles.view')">
-                <NavMain :items="mainNavItemsRoles" group-label="Roles" />
+                <NavMain :items="mainNavItemsRoles" :group-label="translations.group_roles" />
             </template>
 
             <!-- Показываем только при наличии разрешения permissions.view -->
             <template v-if="hasPermission('permissions.view')">
-                <NavMain :items="mainNavItemsPermissions" group-label="Permissions" />
+                <NavMain :items="mainNavItemsPermissions" :group-label="translations.group_permissions" />
             </template>
         </SidebarContent>
 

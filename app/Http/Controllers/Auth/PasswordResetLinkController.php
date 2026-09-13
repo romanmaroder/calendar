@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\TranslationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -18,6 +19,7 @@ class PasswordResetLinkController extends Controller
     {
         return Inertia::render('auth/ForgotPassword', [
             'status' => $request->session()->get('status'),
+            'translations' => TranslationService::forForgotPasswordPage(),
         ]);
     }
 
@@ -35,7 +37,8 @@ class PasswordResetLinkController extends Controller
         Password::sendResetLink(
             $request->only('email')
         );
+        $status = TranslationService::forForgotPasswordPage();
 
-        return back()->with('status', __('A reset link will be sent if the account exists.'));
+        return back()->with('status', $status['forgot_status']);
     }
 }

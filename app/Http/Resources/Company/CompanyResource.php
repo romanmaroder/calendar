@@ -48,6 +48,7 @@ class CompanyResource extends JsonResource
                 });
             }),
             'created_at' => $this->created_at?->format('Y-m-d'),
+            'deleted_at' => $this->deleted_at?->format('Y-m-d')
         ];
     }
 }

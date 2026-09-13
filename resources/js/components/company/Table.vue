@@ -7,11 +7,12 @@ import { getInitials } from '@/composables/useInitials';
 import { usePhoneLink } from '@/composables/utils/phone/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Company } from '@/types';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
+import { computed, inject, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
+import { CompanyTranslations } from '@/types/translations';
 
 const props = defineProps({
     companies: {
@@ -34,6 +35,8 @@ const props = defineProps({
         },
     },
 });
+
+const translations = inject<CompanyTranslations>('translations');
 
 const emit = defineEmits(['count']);
 
@@ -70,7 +73,7 @@ watch(items, () => {
 });
 
 watch(count, () => {
-    emit('count', count);
+    emit('count', count.value);
 });
 
 const isDeleted = computed(() => {
@@ -139,25 +142,24 @@ const filterFields = () => {
                             @newCompany="onLoadItem"
                             icon-name="pi pi-building"
                             raised
-                            label="New"
-                            title="New company"
+                            :label="translations?.button.create"
+                            :title="translations?.button.create"
                         />
                         <Button
                             v-if="tools.create && isLargeScreen && hasPermission('companies.create')"
-                            as="a"
                             icon="pi pi-building"
-                            label="New"
+                            :label="translations?.button.create"
                             raised
-                            :href="route('company.create')"
                             size="small"
                             class="mx-2"
+                            @click="router.visit(route('company.create'))"
                         />
                     </span>
                     <span class="hidden space-x-2 sm:flex">
                         <restore
                             v-if="tools.restore && hasPermission('companies.restore')"
                             :entity="selectedItems"
-                            label="Восстановить"
+                            :label="translations?.button.restore"
                             icon-name="pi pi-replay"
                             type="multi"
                             route="company.bulk.restore"
@@ -184,19 +186,24 @@ const filterFields = () => {
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
+                        <InputText
+                            v-model="filters['global'].value"
+                            name="search"
+                            class="w-full sm:w-auto"
+                            :placeholder="translations?.toolbar.search"
+                            size="small"
+                        />
                     </IconField>
                     <Button
                         v-if="page.url === '/company' && hasPermission('companies.delete')"
-                        as="a"
-                        :href="route('company.archive')"
                         icon="pi pi-box"
                         size="small"
                         severity="warn"
                         raised
                         variant="text"
-                        v-tooltip.bottom="'Archive'"
-                        label="ARC"
+                        v-tooltip.bottom="translations?.label.archive"
+                        :label="translations?.toolbar.archive"
+                        @click="router.visit(route('company.archive'))"
                     />
                 </div>
             </template>
@@ -215,13 +222,15 @@ const filterFields = () => {
             :globalFilterFields="['name', 'phone', 'description', 'contact', 'created_at', 'info', 'country_code', 'currency_code']"
             sortMode="multiple"
             removable-sort
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink  RowsPerPageDropdown"
             :rowsPerPageOptions="[5, 10]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
+            currentPageReportTemplate="{first} - {last} / {totalRecords}"
             :loading="loading"
         >
-            <template #empty><p class="text-center text-xl font-bold">No remote companies</p></template>
-            <template #loading>Uploading user data. Please wait.</template>
+            <template #empty
+                ><p class="text-center text-xl font-bold">{{ translations?.table.empty_text }}</p></template
+            >
+            <template #loading>{{ translations?.table.loading }}</template>
             <Column
                 v-if="hasPermission('companies.delete')"
                 selectionMode="multiple"
@@ -242,7 +251,7 @@ const filterFields = () => {
             ></Column>
             <Column
                 field="avatar"
-                header="Avatar"
+                :header="translations?.table.avatar"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell',
@@ -270,7 +279,7 @@ const filterFields = () => {
                     />
                 </template>
             </Column>
-            <Column field="name" header="Name" :sortable="true">
+            <Column field="name" :header="translations?.table.name_" :sortable="true">
                 <template #body="slotProps">
                     <div class="w-24 text-sm font-medium text-wrap break-words text-gray-900 sm:w-auto sm:break-normal dark:text-white">
                         {{ slotProps.data.name }}
@@ -279,8 +288,9 @@ const filterFields = () => {
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
                     </p>
                     <p v-if="slotProps.data.branches_count" class="lg:hidden">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">Branches:
-                            <span class="text-green-500" >{{slotProps.data.branches_count}}</span>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300"
+                            >Branches:
+                            <span class="text-green-500">{{ slotProps.data.branches_count }}</span>
                         </small>
                     </p>
                     <p>
@@ -290,7 +300,8 @@ const filterFields = () => {
             </Column>
             <Column
                 field="phone"
-                header="Phone/Country"
+                :header="translations?.table.phone_country"
+                :sortable="true"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -306,26 +317,24 @@ const filterFields = () => {
                         :href="'tel:' + getPhone(slotProps.data.phone)"
                         rel="noopener"
                     />
-                    <div v-if="slotProps.data.country"
-                        class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
-                                slotProps.data.country?.code }}</small>
+                    <div
+                        v-if="slotProps.data.country"
+                        class="hidden flex-row flex-wrap text-xs font-normal text-gray-900 md:flex 2xl:hidden dark:text-gray-300"
+                    >
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country?.code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
-                                slotProps.data.country?.iso_code }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country?.iso_code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
-                                slotProps.data.country?.phone_code }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country?.phone_code }}</small>
                         <Divider layout="vertical" />
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{
-                                slotProps.data.country?.currency }}</small>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">{{ slotProps.data.country?.currency }}</small>
                     </div>
                 </template>
             </Column>
             <Column
                 field=""
-                header="Info"
-                :sortable="true"
+                :header="translations?.table.info"
+                :sortable="false"
                 :pt="{
                     root: {
                         class: 'sm:hidden',
@@ -385,8 +394,8 @@ const filterFields = () => {
             </Column>
             <Column
                 field="info"
-                header="Info"
-                :sortable="true"
+                :header="translations?.table.info"
+                :sortable="false"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell lg:max-w-[250px] lg:truncate',
@@ -399,8 +408,8 @@ const filterFields = () => {
             </Column>
             <Column
                 field="contact"
-                header="Contact"
-                :sortable="true"
+                :header="translations?.table.contact"
+                :sortable="false"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell lg:max-w-[250px] lg:truncate',
@@ -413,7 +422,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="description"
-                header="Description"
+                :header="translations?.table.description"
                 :pt="{
                     root: {
                         class: 'hidden xl:table-cell xl:max-w-[250px] xl:truncate',
@@ -426,7 +435,7 @@ const filterFields = () => {
             </Column>
             <Column
                 :exportable="false"
-                header="Tools"
+                :header="translations?.table.actions"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -437,12 +446,11 @@ const filterFields = () => {
                     <span class="flex flex-row flex-wrap items-start justify-start">
                         <Button
                             v-if="tools.update && hasPermission('companies.edit')"
-                            as="a"
                             variant="link"
                             icon="pi pi-pencil"
                             label=""
-                            :href="route('company.edit', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('company.edit', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
@@ -450,12 +458,11 @@ const filterFields = () => {
                             }"
                         />
                         <Button
-                            as="a"
                             variant="link"
                             icon="pi pi-search"
                             label=""
-                            :href="route('company.show', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('company.show', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
@@ -474,8 +481,8 @@ const filterFields = () => {
                             :entity="slotProps.data"
                             icon-name="pi pi-trash"
                             :route="isDeleted ? 'company.force' : 'company.soft.delete'"
-                            text="will be moved to the basket."
-                            delete-label-btn="Yes, delete company!"
+                            text=""
+                            :delete-label-btn="translations?.button.confirm"
                             @delete-item="onDeleteItem"
                         />
                     </span>

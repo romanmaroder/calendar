@@ -5,8 +5,7 @@ import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
 import { PropType, provide, ref } from 'vue';
 import Table from '@/components/user/Table.vue';
-
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Users', href: '/users' }];
+import { UserTranslations } from '@/types/translations';
 
 const props = defineProps({
     users: {
@@ -22,7 +21,15 @@ const props = defineProps({
     count: {
         type: Number,
     },
+    translations:{
+        type: Object as PropType<UserTranslations>,
+        required: true,
+    }
 });
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: props.translations?.title, href: '/users' }];
+
+provide('translations', props.translations);
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
 const listOfBranches: object = ref(props.branch);
@@ -36,8 +43,9 @@ const counter = (num: number) => {
     total.value = num;
 };
 </script>
+
 <template>
-    <Head title="Users" />
+    <Head :title="translations?.title" />
     <Layout :breadcrumbs="breadcrumbs">
         <Toast
             :pt="{

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { inject, PropType } from 'vue';
 import { Branch } from '@/types';
 import { useStatus } from '@/composables/useStatus';
+import { BranchTranslations } from '@/types/translations';
 
 const props = defineProps({
     branch: { type: Object as PropType<Branch | null> },
@@ -9,7 +10,7 @@ const props = defineProps({
 });
 
 const { label, severity } = useStatus(props.branch?.status);
-
+const translations = inject<BranchTranslations>('translations');
 </script>
 
 <template>
@@ -22,17 +23,17 @@ const { label, severity } = useStatus(props.branch?.status);
             <slot>
                 <div class="mt-3 space-y-4 text-sm text-slate-700 dark:text-slate-200">
                     <div class="flex flex-wrap">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Контакты:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">{{translations?.label?.contact}}</div>
                         <div class="font-medium">{{ branch?.contact }}</div>
                     </div>
                     <div v-if="branch?.status" class="flex flex-wrap">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Статус:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">{{translations?.label?.status}}</div>
                         <div class="font-medium">
                             <Tag :value="label" :severity="severity" />
                         </div>
                     </div>
                     <div v-if="branch?.description" class="flex flex-wrap">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Заметки:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">{{translations?.label?.description}}</div>
                         <div class="font-medium">{{ branch?.description }}</div>
                     </div>
                 </div>

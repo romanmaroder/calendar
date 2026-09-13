@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePermissionRequest;
 use App\Http\Requests\Admin\UpdatePermissionRequest;
 use App\Services\Admin\Permission\PermissionService;
+use App\Services\TranslationService;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 
@@ -24,12 +25,15 @@ class PermissionController extends Controller
 
         return Inertia::render('admin/Permission/Index', [
             'permissions' => $permissions,
+            'translations'=> TranslationService::forPermissionsPage()
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('admin/Permission/Create');
+        return Inertia::render('admin/Permission/Create',[
+            'translations'=> TranslationService::forPermissionsCreatePage()
+        ]);
     }
 
     public function store(StorePermissionRequest $request)
@@ -44,6 +48,7 @@ class PermissionController extends Controller
     {
         return Inertia::render('admin/Permission/Edit', [
             'permission' => $permission->only('id', 'name'),
+            'translations'=> TranslationService::forPermissionsUpdatePage()
         ]);
     }
 

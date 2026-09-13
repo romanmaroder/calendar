@@ -38,7 +38,7 @@ export default defineConfig({
         strictPort: true,
         cors: true, // включить CORS
         hmr: {
-            host: '192.168.0.115', // IP вашего сервера
+            host: '192.168.0.117', // IP вашего сервера
             protocol: 'http',
             clientPort: 5173
         }

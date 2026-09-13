@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Company } from '@/types';
-import { computed, PropType, ref } from 'vue';
+import { computed, inject, PropType, ref } from 'vue';
 import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import BranchCard from '@/components/company/profile/BranchCard.vue';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
+import { CompanyTranslations } from '@/types/translations';
+import { route } from 'ziggy-js';
 
 const props = defineProps({
     company: {
@@ -13,6 +15,8 @@ const props = defineProps({
         required: true,
     },
 });
+
+const translations = inject<CompanyTranslations>('translations');
 
 const page = usePage();
 
@@ -23,36 +27,33 @@ const hasPermission = (permission: string) => {
 
 const items = ref([
     {
-        label: 'Edit',
+        label: translations?.button.edit,
         icon: 'pi pi-pencil',
         permission: 'companies.edit',
         command: () => {
             try {
-                window.location.href = route('company.edit', props.company.id);
+                router.visit(route('company.edit', props.company.id));
             } catch (error) {
-                console.error('Маршрут не найден:', error);
+                console.error(translations?.toast?.route_not_found, error);
             }
         },
     },
     {
-        label: 'Companies',
+        label: translations?.companies,
         icon: 'pi pi-building',
         permission: null,
         command: () => {
             try {
-                window.location.href = route('company.index');
+                router.visit(route('company.index'));
             } catch (error) {
-                console.error('Маршрут не найден:', error);
+                console.error(translations?.toast?.route_not_found, error);
             }
         },
     },
 ]);
 
 // Фильтруем: показываем только те пункты, у которых нет permission ИЛИ есть нужное право
-const filteredItems = computed(() =>
-    items.value.filter(item => item.permission === null || hasPermission(item.permission))
-);
-
+const filteredItems = computed(() => items.value.filter((item) => item.permission === null || hasPermission(item.permission)));
 </script>
 
 <template>
@@ -62,11 +63,11 @@ const filteredItems = computed(() =>
         </template>
 
         <template #right-center-column>
-            <InfoCard :company="company" title="Общая информация" />
+            <InfoCard :company="company" title="" />
             <ContextMenu global :model="filteredItems" class="mobile-area" />
         </template>
         <template #center-column v-if="company.branches?.length > 0">
-            <BranchCard :branches="company.branches" title="Филиалы" />
+            <BranchCard :branches="company.branches" :title="translations?.label.branches" />
         </template>
     </ProfileLayout>
 </template>

@@ -1,14 +1,13 @@
 <script setup lang="ts">
+import Table from '@/components/client/Table.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, Client } from '@/types';
-import Table from '@/components/client/Table.vue';
+import { ClientTranslations } from '@/types/translations';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { PropType, ref } from 'vue';
+import { PropType, provide, ref } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' },{ title: 'Archive', href: '' }];
-
-defineProps({
+const props=defineProps({
     clients: {
         type: Object as PropType<Client>,
         required: true,
@@ -16,16 +15,27 @@ defineProps({
     count: {
         type: Number,
     },
+    translations: {
+        type: Object as PropType<ClientTranslations>,
+        required: true,
+    },
 });
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: props.translations.title, href: '/clients' },
+    { title: props.translations.label.archive, href: '' },
+];
 
 const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
+provide('translations',props.translations);
+
 </script>
 
 <template>
-    <Head title="Archive" />
+    <Head :title="translations?.label?.archive" />
     <Layout :breadcrumbs="breadcrumbs">
         <Toast
             :pt="{
@@ -47,7 +57,7 @@ const counter = (num: number) => {
                         delete: 'clients.trash',
                         multiDestroy: 'trash',
                         restore: 'clients.restore',
-                        multiRestore: 'multiRestore',
+                        multiRestore: 'multiRestore'
                     }"
                     @count="counter"
                 />

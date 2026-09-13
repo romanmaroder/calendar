@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { inject, PropType } from 'vue';
 import { Company } from '@/types';
 import { useStatus } from '@/composables/useStatus';
+import { CompanyTranslations } from '@/types/translations';
+
+const translations = inject<CompanyTranslations>('translations');
 
 const props = defineProps({
     company: { type: Object as PropType<Company | null> },
@@ -21,19 +24,19 @@ const { severity } = useStatus(props.company?.status);
             <slot>
                 <div class="mt-3 space-y-4 text-sm text-slate-700 dark:text-slate-200">
                     <div class="flex flex-wrap justify-between">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Контакты:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">{{translations?.label.contact}}</div>
                         <div class="font-medium">{{ company?.contact }}</div>
                     </div>
                     <div v-if="company?.description" class="flex flex-wrap justify-between">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Описание:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">{{translations?.label.description}}</div>
                         <div class="font-medium">{{ company?.description }}</div>
                     </div>
                     <div v-if="company?.info" class="flex flex-wrap justify-between">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Инфо:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">{{translations?.label.info}}</div>
                         <div class="font-medium">{{ company?.info }}</div>
                     </div>
                     <div v-if="company?.branches_count" class="flex flex-wrap justify-between">
-                        <div class="w-44 text-slate-500 dark:text-slate-300">Филиалы:</div>
+                        <div class="w-44 text-slate-500 dark:text-slate-300">{{translations?.label.branches}}</div>
                         <div class="font-medium">
                             <Tag :value="company?.branches_count" :severity="severity"/>
                         </div>

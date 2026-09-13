@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import Layout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { PropType, provide, ref } from 'vue';
 import { BreadcrumbItem, Company } from '@/types';
 import Table from '@/components/company/Table.vue';
-
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Company', href: '/company' }];
+import { CompanyTranslations } from '@/types/translations';
+import { PropType, provide, ref } from 'vue';
 
 const props = defineProps({
     companies: {
@@ -15,14 +14,25 @@ const props = defineProps({
     countries: {
         type: Object,
     },
+    translations: {
+        type: Object as PropType<CompanyTranslations>,
+        required: true,
+    },
 });
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: props.translations?.title, href: '/company' }];
+
+provide('translations', props.translations);
+
 const countries: object = ref(props.countries);
 provide('countries', countries);
+
+//onMounted(()=>{console.log('INDEX',tableTranslations)});
 </script>
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head title="Company" />
+        <Head :title="translations.title" />
         <Toast
             :pt="{
                 root: {

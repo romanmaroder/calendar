@@ -8,11 +8,12 @@ import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 import { useStatus } from '@/composables/useStatus';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Branch } from '@/types';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, inject, onBeforeMount, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
+import { BranchTranslations } from '@/types/translations';
 
 const props = defineProps({
     branches: {
@@ -36,6 +37,8 @@ const props = defineProps({
     },
 });
 
+const translations = inject<BranchTranslations>('translations');
+
 const emit = defineEmits(['count']);
 
 const page = usePage();
@@ -44,7 +47,6 @@ const hasPermission = (permission: string) => {
     const userPermissions = page.props.auth?.user?.permissions ?? [];
     return userPermissions.includes(permission);
 };
-
 
 const dt = ref();
 const items = ref();
@@ -71,7 +73,7 @@ watch(items, () => {
 });
 
 watch(count, () => {
-    emit('count', count);
+    emit('count', count.value);
 });
 
 const isDeleted = computed(() => {
@@ -158,25 +160,24 @@ const filterFields = () => {
                             @new-branch="onLoadItem"
                             icon-name="pi pi-map-marker"
                             raised
-                            label="New"
-                            title="New branch"
+                            :label="translations?.button?.create"
+                            title=""
                         />
                         <Button
                             v-if="tools.create && isLargeScreen && hasPermission('branches.create')"
-                            as="a"
                             icon="pi pi-map-marker"
-                            label="New"
+                            :label="translations?.button?.create"
                             raised
-                            :href="route('branch.create')"
                             size="small"
                             class="mx-2"
+                            @click="router.visit(route('branch.create'))"
                         />
                     </span>
                     <span class="hidden space-x-2 sm:flex">
                         <restore
                             v-if="tools.restore && hasPermission('branches.restore')"
                             :entity="selectedItems"
-                            label="Восстановить"
+                            :label="translations?.button?.restore"
                             icon-name="pi pi-replay"
                             type="multi"
                             route="branch.bulk.restore"
@@ -188,8 +189,8 @@ const filterFields = () => {
                             :entity="selectedItems"
                             icon-name="pi pi-trash"
                             type="multi"
-                            text="will be moved to the basket. Employees have been removed from the branch."
-                            delete-label-btn="Yes, delete branches"
+                            :text="translations?.dialog?.branches_warning_text_dialog"
+                            :delete-label-btn="translations?.button?.confirm"
                             :route="isDeleted ? 'branch.bulk.force' : 'branch.bulk.soft'"
                             :disabled="!selectedItems || !selectedItems.length"
                             @delete-items="onDeleteSelectedItems"
@@ -203,19 +204,24 @@ const filterFields = () => {
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
+                        <InputText
+                            v-model="filters['global'].value"
+                            name="search"
+                            class="w-full sm:w-auto"
+                            :placeholder="translations?.toolbar?.search"
+                            size="small"
+                        />
                     </IconField>
                     <Button
                         v-if="page.url === '/branch' && hasPermission('branches.delete')"
-                        as="a"
-                        :href="route('branch.archive')"
                         icon="pi pi-box"
                         size="small"
                         severity="warn"
                         raised
                         variant="text"
-                        v-tooltip.bottom="'Archive'"
-                        label="ARC"
+                        v-tooltip.bottom="translations?.label.archive"
+                        :label="translations?.toolbar.archive"
+                        @click="router.visit(route('branch.archive'))"
                     />
                 </div>
             </template>
@@ -234,13 +240,13 @@ const filterFields = () => {
             :globalFilterFields="['name', 'phone', 'status', 'description', 'contact', 'created_at']"
             sortMode="multiple"
             removable-sort
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink  RowsPerPageDropdown"
             :rowsPerPageOptions="[5, 10]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
+            currentPageReportTemplate="{first} - {last} / {totalRecords}"
             :loading="loading"
         >
-            <template #empty><p class="text-center text-xl font-bold">No remote branches</p></template>
-            <template #loading>Uploading branch data. Please wait.</template>
+            <template #empty><p class="text-center text-xl font-bold">{{translations?.table?.empty_text}}</p></template>
+            <template #loading>{{translations?.table?.loading}}</template>
             <Column
                 v-if="hasPermission('branches.delete')"
                 selectionMode="multiple"
@@ -261,7 +267,7 @@ const filterFields = () => {
             ></Column>
             <Column
                 field="avatar"
-                header="Avatar"
+                :header="translations?.table?.avatar"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell',
@@ -289,17 +295,21 @@ const filterFields = () => {
                     />
                 </template>
             </Column>
-            <Column field="name" header="Name" :sortable="true">
+            <Column field="name" :header="translations?.table?.name_" :sortable="true">
                 <template #body="slotProps">
                     <div
                         class="w-24 text-sm font-medium text-wrap break-words text-gray-900 sm:w-auto sm:break-normal dark:text-white"
-                        :class="{ 'text-red-400!': !slotProps.data.status }">{{ slotProps.data.name }}</div>
+                        :class="{ 'text-red-400!': !slotProps.data.status }"
+                    >
+                        {{ slotProps.data.name }}
+                    </div>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">ID: {{ slotProps.data.id }}</small>
                     </p>
                     <p v-if="slotProps.data.users_count" class="lg:hidden">
-                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300">Users:
-                            <span class="text-green-500" :class="{ 'text-red-400!': !slotProps.data.status }">{{slotProps.data.users_count}}</span>
+                        <small class="text-xs font-normal text-gray-900 dark:text-gray-300"
+                            >Users:
+                            <span class="text-green-500" :class="{ 'text-red-400!': !slotProps.data.status }">{{ slotProps.data.users_count }}</span>
                         </small>
                     </p>
                     <p>
@@ -309,7 +319,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="phone"
-                header="Phone"
+                :header="translations?.table?.phone"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -331,7 +341,7 @@ const filterFields = () => {
 
             <Column
                 field=""
-                header="Info"
+                :header="translations?.table?.info"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -392,7 +402,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="status"
-                header="Status| Users"
+                :header="translations?.table?.status_users"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -423,7 +433,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="contact"
-                header="Contact"
+                :header="translations?.table?.contact"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -437,7 +447,7 @@ const filterFields = () => {
             </Column>
             <Column
                 :exportable="false"
-                header="Tools"
+                :header="translations?.table?.actions"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -448,12 +458,11 @@ const filterFields = () => {
                     <span class="flex flex-row flex-wrap items-start justify-start">
                         <Button
                             v-if="tools.update && hasPermission('branches.edit')"
-                            as="a"
                             variant="link"
                             icon="pi pi-pencil"
                             label=""
-                            :href="route('branch.edit', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('branch.edit', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
@@ -461,12 +470,11 @@ const filterFields = () => {
                             }"
                         />
                         <Button
-                            as="a"
                             variant="link"
                             icon="pi pi-search"
                             label=""
-                            :href="route('branch.show', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('branch.show', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
@@ -485,7 +493,7 @@ const filterFields = () => {
                             :entity="slotProps.data"
                             icon-name="pi pi-trash"
                             :route="isDeleted ? 'branch.force' : 'branch.soft.delete'"
-                            text="will be moved to the basket. Employees will be removed from the branch"
+                            :text="translations?.dialog?.branches_warning_text_dialog"
                             delete-label-btn="Yes, delete branch!"
                             @delete-item="onDeleteItem"
                         />

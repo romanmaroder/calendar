@@ -5,14 +5,15 @@ import DeleteConfirmation from '@/components/common/DeleteConfirmation.vue';
 import Restore from '@/components/common/Restore.vue';
 import { getFullname } from '@/composables/useFullname';
 import { getInitials } from '@/composables/useInitials';
-import { useMediaQuery } from '@vueuse/core';
 import { usePhoneLink } from '@/composables/utils/phone/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { Client } from '@/types';
+import { ClientTranslations } from '@/types/translations';
+import { router, usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
-import { computed, onBeforeMount, PropType, ref, watch } from 'vue';
+import { useMediaQuery } from '@vueuse/core';
+import { computed, inject, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
-import { usePage } from '@inertiajs/vue3';
 
 //Типизация клиента
 
@@ -39,6 +40,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['count']);
+
+const translations = inject<ClientTranslations>('translations');
 
 const page = usePage();
 
@@ -76,7 +79,7 @@ watch(items, () => {
 });
 
 watch(count, () => {
-    emit('count', count);
+    emit('count', count.value);
 });
 
 const isDeleted = computed(() => {
@@ -152,25 +155,24 @@ const filterFields = () => {
                             @new-user="onLoadItem"
                             icon-name="pi pi-user-plus"
                             raised
-                            label="New"
+                            :label="translations?.button?.create"
                             title="New client"
                         />
                         <Button
                             v-if="tools.create && isLargeScreen && hasPermission('clients.create')"
-                            as="a"
                             icon="pi pi-user-plus"
-                            label="New"
+                            :label="translations?.button?.create"
                             raised
-                            :href="route('clients.create')"
                             size="small"
                             class="mx-2"
+                            @click="router.visit(route('clients.create'))"
                         />
                     </span>
                     <span class="hidden space-x-2 sm:flex">
                         <restore
                             v-if="tools.restore && hasPermission('clients.restore')"
                             :entity="selectedItems"
-                            label="Восстановить"
+                            :label="translations?.button?.restore"
                             icon-name="pi pi-replay"
                             type="multi"
                             route="clients.bulk.restore"
@@ -190,19 +192,30 @@ const filterFields = () => {
                 </div>
             </template>
             <template #end>
-                <div class="flex space-x-2 w-full">
+                <div class="flex w-full space-x-2">
                     <IconField class="w-full rounded-md shadow-sm sm:w-auto">
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
-                    </IconField>
-                    <Button v-if="page.url === '/clients'  && hasPermission('clients.delete')"
-                            as="a"
-                            :href="route('clients.archive')"
-                            icon="pi pi-box"
+                        <InputText
+                            v-model="filters['global'].value"
+                            name="search"
+                            class="w-full sm:w-auto"
+                            :placeholder="translations?.toolbar.search"
                             size="small"
-                            severity="warn" raised variant="text" v-tooltip.bottom="'Archive'" label="ARC" />
+                        />
+                    </IconField>
+                    <Button
+                        v-if="page.url === '/clients' && hasPermission('clients.delete')"
+                        icon="pi pi-box"
+                        size="small"
+                        severity="warn"
+                        raised
+                        variant="text"
+                        v-tooltip.bottom="translations?.label.archive"
+                        :label="translations?.toolbar.archive"
+                        @click="router.visit(route('clients.archive'))"
+                    />
                 </div>
             </template>
         </Toolbar>
@@ -220,13 +233,15 @@ const filterFields = () => {
             :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'source', 'created_at', 'total']"
             sortMode="multiple"
             removable-sort
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            :rowsPerPageOptions="[5, 10, 15, 20, 25]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
+            paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink  RowsPerPageDropdown"
+            :rowsPerPageOptions="[5, 10]"
+            currentPageReportTemplate="{first} - {last} / {totalRecords}"
             :loading="loading"
         >
-            <template #empty><p class="text-center text-xl font-bold">Add clients</p></template>
-            <template #loading> Loading items data. Please wait.</template>
+            <template #empty
+                ><p class="text-center text-xl font-bold">{{ translations?.table?.empty_text }}</p>
+            </template>
+            <template #loading>{{ translations?.table?.loading }}</template>
             <Column
                 v-if="hasPermission('clients.delete')"
                 selectionMode="multiple"
@@ -247,7 +262,7 @@ const filterFields = () => {
             ></Column>
             <Column
                 field="avatar"
-                header="Avatar"
+                :header="translations?.table.avatar"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell',
@@ -279,7 +294,7 @@ const filterFields = () => {
                     />
                 </template>
             </Column>
-            <Column field="name" header="Name" :sortable="true">
+            <Column field="name" :header="translations?.table?.name" :sortable="true">
                 <template #body="slotProps">
                     <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
                         {{
@@ -300,7 +315,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="phone"
-                header="Info"
+                :header="translations?.table.info"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -365,7 +380,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="phone"
-                header="Phone/Email"
+                :header="translations?.table?.phone_email"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -388,7 +403,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="discount"
-                header="Discount"
+                :header="translations?.table?.discount"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -398,7 +413,7 @@ const filterFields = () => {
             ></Column>
             <Column
                 field="total"
-                header="Total"
+                :header="translations?.table?.total"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell',
@@ -411,7 +426,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="email"
-                header="Email"
+                :header="translations?.table?.email"
                 :pt="{
                     root: {
                         class: 'hidden 2xl:table-cell',
@@ -420,7 +435,7 @@ const filterFields = () => {
             ></Column>
             <Column
                 field="blacklist"
-                header="Blacklist"
+                :header="translations?.table?.blacklist"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -434,7 +449,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="prepayment"
-                header="Prepayment"
+                :header="translations?.table?.prepayment"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -448,7 +463,7 @@ const filterFields = () => {
             </Column>
             <Column
                 field="comment"
-                header="Comment"
+                :header="translations?.table?.comment"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell max-w-[250px] lg:truncate',
@@ -457,7 +472,7 @@ const filterFields = () => {
             ></Column>
             <Column
                 field="source"
-                header="Source"
+                :header="translations?.table?.source"
                 :pt="{
                     root: {
                         class: 'hidden 2xl:table-cell',
@@ -466,7 +481,7 @@ const filterFields = () => {
             ></Column>
             <Column
                 :exportable="false"
-                header="Tools"
+                :header="translations?.table?.actions"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -477,12 +492,11 @@ const filterFields = () => {
                     <span class="flex flex-row flex-wrap items-start justify-start">
                         <Button
                             v-if="tools.update && hasPermission('clients.edit')"
-                            as="a"
                             variant="link"
                             icon="pi pi-user-edit"
                             label=""
-                            :href="route('clients.edit', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('clients.edit', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
@@ -490,12 +504,11 @@ const filterFields = () => {
                             }"
                         />
                         <Button
-                            as="a"
                             variant="link"
                             icon="pi pi-user"
                             label=""
-                            :href="route('clients.show', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('clients.show', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',

@@ -11,6 +11,7 @@ use App\Http\Resources\Country\CountryResource;
 use App\Models\Company\Company;
 use App\Models\Country\Country;
 use App\Repositories\Contracts\CompanyRepositoryInterface;
+use App\Services\TranslationService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,7 +36,8 @@ class CompanyController extends Controller
             'company/Index',
             [
                 'companies' => CompanyResource::collection($companies)->resolve(),
-                'countries' => $this->getCountries()
+                'countries' => $this->getCountries(),
+                'translations'=>TranslationService::forCompanyPage()
             ]
         );
     }
@@ -45,7 +47,11 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        return Inertia::render('company/Create', ['countries' => $this->getCountries()]);
+        return Inertia::render('company/Create',
+                               ['countries' => $this->getCountries(),
+                                   'translations'=>TranslationService::forCompanyCreatePage()
+                               ]
+        );
     }
 
     /**
@@ -69,12 +75,16 @@ class CompanyController extends Controller
         if ($company->trashed()) {
             return Inertia::render('company/Show', [
                 'company' => (new CompanyResource($company))->resolve(),
-                'isDeleted' => true
+                'isDeleted' => true,
+                'translations'=>TranslationService::forCompanyShowPage()
             ]);
         }
         return Inertia::render(
             'company/Show',
-            ['company' => (new CompanyResource($company))->resolve(), 'isDeleted' => false]
+            ['company' => (new CompanyResource($company))->resolve(),
+                'isDeleted' => false,
+                'translations'=>TranslationService::forCompanyShowPage()
+                ]
         );
     }
 
@@ -86,6 +96,7 @@ class CompanyController extends Controller
         return Inertia::render('company/Edit', [
             'company' => (new CompanyResource($company))->resolve(),
             'countries' => $this->getCountries(),
+            'translations'=>TranslationService::forCompanyUpdatePage()
         ]);
     }
 
@@ -123,6 +134,7 @@ class CompanyController extends Controller
         return Inertia::render('company/Archive', [
             'companies' => CompanyResource::collection($companies)->resolve(),
             'count' => $companies->total(),
+            'translations'=>TranslationService::forCompanyPage()
         ]);
     }
 
@@ -132,7 +144,7 @@ class CompanyController extends Controller
 
         return response()->json([
                                     'success' => true,
-                                    'message' => 'Company has been deleted',
+                                    'message' => __('toast.has_been_deleted'),
                                     'code' => 200
                                 ]);
     }
@@ -147,7 +159,7 @@ class CompanyController extends Controller
             [
                 'success' => true,
                 'count' => count($ids),
-                'message' => 'Move to the basket.',
+                'message' => __('toast.move_to_the_basket'),
                 'code' => 200
             ]
         );
@@ -163,7 +175,7 @@ class CompanyController extends Controller
         $company->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $company->id . ' ' . $company->name . ' deleted',
+                                    'message' => 'ID:' . $company->id . ' ' . $company->name . __('toast.has_been_deleted'),
                                     'code' => 200
                                 ]);
     }
@@ -184,7 +196,7 @@ class CompanyController extends Controller
         Company::withTrashed()->whereIn('id', $ids)->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'Companies have been deleted',
+                                    'message' => __('toast.has_been_deleted'),
                                     'count' => count($ids)
                                 ]);
     }
@@ -195,7 +207,7 @@ class CompanyController extends Controller
         $company->restore();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $company->id . ' ' . $company->name . ' restored.',
+                                    'message' => 'ID:' . $company->id . ' ' . $company->name . __('toast.has_been_restored'),
                                     'code' => 200
                                 ]);
     }

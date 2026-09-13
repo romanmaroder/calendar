@@ -4,9 +4,8 @@ import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, Client } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { PropType, ref } from 'vue';
-
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: '/clients' }];
+import { PropType, provide, ref } from 'vue';
+import { ClientTranslations } from '@/types/translations';
 
 const props = defineProps({
     clients: {
@@ -16,7 +15,14 @@ const props = defineProps({
     count: {
         type: Number,
     },
+    translations:{
+        type: Object as PropType<ClientTranslations>,
+        required:true,
+    }
 });
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: props.translations?.title, href: '/clients' }];
+provide('translations',props.translations);
 
 const total = ref();
 
@@ -26,7 +32,7 @@ const counter = (num: number) => {
 </script>
 
 <template>
-    <Head title="Clients" />
+    <Head :title="translations?.title" />
     <Layout :breadcrumbs="breadcrumbs">
         <Toast
             :pt="{

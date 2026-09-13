@@ -3,11 +3,9 @@ import RoleForm from '@/components/admin/role/RoleForm.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import { RolesTranslations } from '@/types/translations';
+import { provide, ref } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Roles', href: '/admin/roles' },
-    { title: 'Edit role', href: '' },
-];
 
 // Контроллер должен отдавать role, assignedPermissions, permissions
 // Пример:
@@ -17,11 +15,26 @@ const breadcrumbs: BreadcrumbItem[] = [
 //   'assignedPermissions' => $role->permissions->pluck('id')->toArray(),
 //   'permissions' => Permission::all(['id','name'])->toArray(),
 // ]);
-defineProps<{
+const props=defineProps<{
     role: { id: number; name: string };
     assignedPermissions: number[];
     permissions: Array<{ id: number; name: string }>;
+    translations: RolesTranslations;
 }>();
+
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: props.translations.roles, href: '/admin/roles' },
+    { title: props.translations.title, href: '' },
+];
+
+
+const formTranslations = ref({
+    button: props.translations.button,
+});
+
+provide('formTranslations', formTranslations);
+
 </script>
 
 <template>

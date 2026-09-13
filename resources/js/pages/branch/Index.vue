@@ -4,8 +4,7 @@ import Layout from '@/layouts/AppLayout.vue';
 import { Branch, BreadcrumbItem, Company } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { onMounted, PropType, provide, ref } from 'vue';
-
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Branches', href: '/branch' }];
+import { BranchTranslations } from '@/types/translations';
 
 const props = defineProps({
     branches: {
@@ -15,9 +14,17 @@ const props = defineProps({
         type: Number,
     },
     companies: {
-        type: Object as PropType<Company>
-    }
+        type: Object as PropType<Company>,
+    },
+    translations: {
+        type: Object as PropType<BranchTranslations>,
+        required: true,
+    },
 });
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: props.translations?.title, href: '/branch' }];
+
+provide('translations', props.translations);
 
 const companies: object = ref(props.companies);
 provide('companies', companies);
@@ -26,15 +33,16 @@ const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
-onMounted(()=>{
-    console.log('INDEX-PAGE-BRANCHES',props.branches);
-    console.log('INDEX-PAGE-COMPANIES',props.companies);
+onMounted(() => {
+    //console.log('INDEX-PAGE-BRANCHES', props.branches);
+    //console.log('INDEX-PAGE-COMPANIES', props.companies);
+    console.log('INDEX-PAGE-TR', props.translations);
 });
 </script>
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head title="Branches" />
+        <Head :title="translations?.title" />
         <Toast
             :pt="{
                 root: {

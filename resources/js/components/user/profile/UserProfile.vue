@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { User } from '@/types';
-import { computed, PropType, ref } from 'vue';
+import { computed, inject, PropType, ref } from 'vue';
 import FilesList from './FilesList.vue';
 import FinanceCard from './FinanceCard.vue';
 import InfoCard from './InfoCard.vue';
 import NotesList from './NotesList.vue';
 import ProfileCard from './ProfileCard.vue';
 import VisitsList from './VisitsList.vue';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
+import { UserTranslations } from '@/types/translations';
+import { route } from 'ziggy-js';
 
 const props =defineProps({
     user: {
@@ -17,6 +19,8 @@ const props =defineProps({
     },
 });
 
+const translations = inject<UserTranslations>('translations');
+const isDeleted = inject('isDeleted')
 const page = usePage();
 
 const hasPermission = (permission: string) => {
@@ -191,26 +195,26 @@ function downloadNote(note: any) {
 }
 const items = ref([
     {
-        label: 'Edit',
+        label: translations?.button.edit,
         icon: 'pi pi-pencil',
         permission: 'companies.edit',
         command: () => {
             try {
-                window.location.href = route('users.edit', props.user.id);
+                router.visit(route('users.edit',props.user.id));
             } catch (error) {
-                console.error('Маршрут не найден:', error);
+                console.error(translations?.toast?.route_not_found, error);
             }
         },
     },
     {
-        label: 'Users',
+        label: translations?.users,
         icon: 'pi pi-users',
         permission: null,
         command: () => {
             try {
-                window.location.href = route('users.index');
+                router.visit(route('users.index'));
             } catch (error) {
-                console.error('Маршрут не найден:', error);
+                console.error(translations?.toast?.route_not_found, error);
             }
         },
     },
@@ -218,7 +222,7 @@ const items = ref([
 
 // Фильтруем: показываем только те пункты, у которых нет permission ИЛИ есть нужное право
 const filteredItems = computed(() =>
-    items.value.filter(item => item.permission === null || hasPermission(item.permission))
+    items.value.filter((item) => item.permission === null || (hasPermission(item.permission) && !(isDeleted && item.icon === 'pi pi-pencil'))),
 );
 
 </script>
@@ -230,7 +234,7 @@ const filteredItems = computed(() =>
         </template>
 
         <template #right-center-column>
-            <InfoCard :user="user" title="Общая информация" />
+            <InfoCard :user="user" title="" />
         </template>
 
         <template #center-column>
@@ -238,7 +242,7 @@ const filteredItems = computed(() =>
         </template>
 
         <template #right-column>
-            <FinanceCard :data="salaryData" title="Зарплата" />
+            <FinanceCard :data="salaryData" title="" />
             <FilesList v-if="false" :files="files" title="Файлы" @download="downloadFile" @remove="removeFile" />
             <NotesList v-if="false" :notes="notes" title="Примечание" @download="downloadNote" />
             <ContextMenu global :model="filteredItems" class="mobile-area"/>

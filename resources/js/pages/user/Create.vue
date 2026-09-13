@@ -4,11 +4,7 @@ import Layout from '@/layouts/AppLayout.vue';
 import { Branch, BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, provide, ref } from 'vue';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Users', href: '/users' },
-    { title: 'Create user', href: '' },
-];
+import { UserTranslations } from '@/types/translations';
 
 const props = defineProps({
     branch: {
@@ -17,7 +13,17 @@ const props = defineProps({
     roles: {
         type: Array as PropType<{ id: number; name: string }[]>
     }, // <-- передаём роли из Inertia
+    translations:{
+        type: Object as PropType<UserTranslations>,
+        required:true,
+    }
 });
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: props.translations?.users, href: '/users' },
+    { title: props.translations?.title, href: '' },
+];
+
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
 const listOfBranches: object = ref(props.branch);
@@ -25,6 +31,8 @@ const roles = ref(props.roles);
 
 provide('listOfBranches', listOfBranches);
 provide('roles', roles);
+provide('translations', props.translations);
+
 </script>
 <template>
     <Head title="Create user" />

@@ -3,19 +3,35 @@ import { Head } from '@inertiajs/vue3';
 import Layout from '@/layouts/AppLayout.vue';
 import PermissionForm from '@/components/admin/permission/PermissionForm.vue';
 import { BreadcrumbItem } from '@/types';
+import { PermissionTranslations } from '@/types/translations';
+import { provide, ref } from 'vue';
+
+const props = defineProps<{
+    translations: PermissionTranslations;
+}>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Permissions', href: '/admin/permissions' },
-    { title: 'Create permission', href: '' },
+    { title: props.translations.permissions, href: '/admin/permissions' },
+    { title: props.translations.title, href: '' },
 ];
+
+const formTranslations = ref({
+    button: props.translations.button,
+    placeholder: props.translations.placeholder,
+    toast:props.translations.toast
+});
+
+provide('formTranslations', formTranslations);
+
 </script>
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head title="Создать разрешение" />
+        <Head :title="translations.title" />
+        <div class="flex flex-col gap-4 rounded-xl p-4">
         <div class="card">
-            <Message closable severity="warn" icon="pi pi-exclamation-triangle">«Compare names with the seed file
-                before creating.»</Message>
+            <Message closable severity="warn" icon="pi pi-exclamation-triangle">{{translations.message}}</Message>
+        </div>
         </div>
         <div class="sm:mx-auto sm:w-lg p-4">
             <PermissionForm @submit-success="() => {}" />

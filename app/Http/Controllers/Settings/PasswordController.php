@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Services\TranslationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +22,7 @@ class PasswordController extends Controller
             'session' => [
                 'profile_warning' => session('profile_warning'),
             ],
+            'translations' => TranslationService::forSettingsPasswordPage(),
         ]);
     }
 

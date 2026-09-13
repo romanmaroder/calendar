@@ -7,12 +7,16 @@ import InfoCard from '@/components/company/profile/InfoCard.vue';
 import ProfileCard from '@/components/company/profile/ProfileCard.vue';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Company, Country } from '@/types';
-import { useForm } from '@inertiajs/vue3';
+import { router,useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, Ref, watch } from 'vue';
 import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
+import { CompanyTranslations } from '@/types/translations';
 
 const { meta,load } = usePhoneMeta('/company/form-meta');
+
+
+const translations = inject<CompanyTranslations>('translations');
 
 const emit = defineEmits(['createCompany', 'updateCompany', 'drawerData']);
 const countries: Ref<Country[]> | undefined = inject('countries');
@@ -69,7 +73,7 @@ const submit = () => {
                 toast.add({
                     severity: 'info',
                     summary: 'Info',
-                    detail: form.name + ' - update successfully.',
+                    detail: form.name + translations?.toast.update,
                     life: 3000,
                 });
                 emit('updateCompany');
@@ -90,7 +94,7 @@ const submit = () => {
                 toast.add({
                     severity: 'info',
                     summary: 'Info',
-                    detail: form.name + ' - add successfully.',
+                    detail: form.name + translations?.toast.create,
                     life: 3000,
                 });
                 emit('createCompany');
@@ -139,7 +143,7 @@ const onDeleteAvatar = () => {
 const cancel = () => {
     form.clearErrors();
     form.reset();
-    window.history.back();
+    router.visit(route('company.index'))
 };
 </script>
 
@@ -160,7 +164,7 @@ const cancel = () => {
                                 size="small"
                                 pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
-                            <label for="name" class="bg-transparent! font-light!">{{ 'Название:' }}</label>
+                            <label for="name" class="bg-transparent! font-light!">{{ translations?.label.name }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.name" />
                     </div>
@@ -168,7 +172,7 @@ const cancel = () => {
             </template>
             <template #right-center-column>
                 <div class="mb-2 space-y-4">
-                    <InfoCard title="Общая информация">
+                    <InfoCard title="">
                         <div class="flex flex-col flex-wrap space-y-4">
                             <div class="">
                                 <FloatLabel variant="on" class="">
@@ -181,7 +185,8 @@ const cancel = () => {
                                         size="small"
                                         pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                                     />
-                                    <label for="contact" class="bg-transparent! font-light!">{{ 'Контакты:' }}</label>
+                                    <label for="contact" class="bg-transparent! font-light!">{{
+                                            translations?.label.contact }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.contact" />
                             </div>
@@ -196,7 +201,8 @@ const cancel = () => {
                                         size="small"
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                                     />
-                                    <label class="bg-transparent! font-light!" for="description">Инфо</label>
+                                    <label class="bg-transparent! font-light!" for="description">{{translations
+                                        ?.label.info}}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.info" />
                             </div>
@@ -213,7 +219,9 @@ const cancel = () => {
                                         size="small"
                                         fluid
                                     />
-                                    <label for="on_label" class="bg-transparent! font-light!">{{ 'Страна' }}</label>
+                                    <label for="on_label" class="bg-transparent! font-light!">{{
+                                            translations?.label.country
+                                        }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.country_id" />
                             </div>
@@ -230,13 +238,15 @@ const cancel = () => {
                                         :mask="meta?.phone_mask"
                                         :aria-autocomplete="form.phone"
                                     />
-                                    <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? 'Телефон' }}</label>
+                                    <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ??
+                                    translations?.label.phone
+                                        }}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.phone" />
                             </div>
                             <div class="flex items-center gap-2">
                                 <Checkbox v-model="form.is_primary" inputId="is_primary" name="is_primary" size="small" binary />
-                                <label for="active">Основная </label>
+                                <label for="active">{{translations?.label.main}} </label>
                             </div>
                                 <InputError :message="form.errors.is_primary" />
                         </div>
@@ -256,7 +266,8 @@ const cancel = () => {
                                 size="small"
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                             />
-                            <label class="bg-transparent! font-light!" for="description">Описание</label>
+                            <label class="bg-transparent! font-light!" for="description">{{translations?.label
+                                .description}}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.description" />
                     </div>
@@ -267,11 +278,11 @@ const cancel = () => {
                     <div class="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end md:justify-center">
                         <Button size="small" :disabled="form.processing" class="cursor-pointer" @click.prevent="submit"
                                 raised>
-                            {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
+                            {{ form.processing ? translations?.button.saving : translations?.button.save }}
                         </Button>
                         <Button size="small" severity="secondary" @click.prevent="cancel" class="cursor-pointer"
                                 raised>
-                            Отмена
+                            {{translations?.button.cancel}}
                         </Button>
                     </div>
                 </ProfileCard>

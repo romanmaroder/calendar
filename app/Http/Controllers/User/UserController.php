@@ -12,6 +12,7 @@ use App\Http\Resources\User\UserResource;
 use App\Models\Branch\Branch;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Services\TranslationService;
 use App\Traits\HasControllerRoutes;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -39,30 +40,33 @@ class UserController extends Controller
                 'count' => $this->userRepository->countAll(),
                 'branch' => $this->getBranches(),
                 'roles' => Role::all(['id', 'name'])->toArray(),
+                'translations' => TranslationService::forUserPage(),
             ]
         );
     }
 
     public function create()
     {
-
-        return Inertia::render('user/Create', ['branch' => $this->getBranches(),
-            'roles' => Role::all(['id', 'name'])->toArray()]);
+        return Inertia::render('user/Create', [
+            'branch' => $this->getBranches(),
+            'roles' => Role::all(['id', 'name'])->toArray(),
+            'translations'=>TranslationService::forUserCreatePage(),
+        ]);
     }
 
     public function store(StoreUserRequest $request)
     {
-        if (! $request->user()->can('users.create')) {
-            abort(403, 'Недостаточно прав для создания пользователя');
+        if (!$request->user()->can('users.create')) {
+            abort(403, __('toast.insufficient_rights_to_create_a_user'));
         }
 
         $data = $request->validated();
         // Гарантируем наличие ключа 'password' (даже если он пустой)
         // Если поле не установлено в форме, мутатор не сработает
-       //$data['password'] = $data['password'] ?? '';
+        //$data['password'] = $data['password'] ?? '';
         unset($data['role_ids']);
         $data['password'] = \Hash::make('password');
-        $data['requires_password_change']= true;
+        $data['requires_password_change'] = true;
         $user = User::create($data);
 
         if ($request->has('role_ids')) {
@@ -83,13 +87,15 @@ class UserController extends Controller
         if ($user->trashed()) {
             return Inertia::render('user/Show', [
                 'user' => (new UserResource($user))->resolve(),
-                'isDeleted' => true
+                'isDeleted' => true,
+                'translations'=>TranslationService::forUserShowPage(),
             ]);
         }
         // Обычная модель (не удалена)
         return Inertia::render('user/Show', [
             'user' => (new UserResource($user))->resolve(),
-            'isDeleted' => false
+            'isDeleted' => false,
+            'translations'=>TranslationService::forUserShowPage(),
         ]);
     }
 
@@ -101,6 +107,7 @@ class UserController extends Controller
             'user' => (new UserResource($user))->resolve(),
             'branches' => $this->getBranches(),
             'roles' => Role::all(['id', 'name'])->toArray(),
+            'translations'=>TranslationService::forUserUpdatePage(),
         ]);
     }
 
@@ -109,8 +116,8 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        if (! $request->user()->can('users.edit')) {
-            abort(403, 'Недостаточно прав для создания пользователя');
+        if (!$request->user()->can('users.edit')) {
+            abort(403, __('toast.insufficient_rights_to_create_a_user'));
         }
 
         $data = $request->validated();
@@ -120,13 +127,12 @@ class UserController extends Controller
         // Обновляем только если пароль передан
         if (!empty($validated['password'])) {
             $user->update([
-                              'password'                 => Hash::make($validated['password']),
+                              'password' => Hash::make($validated['password']),
                               'requires_password_change' => true, // если админ сам задал пароль — требование снимается
                           ]);
         } else {
             $user->update($data);
         }
-
 
 
         if ($request->has('role_ids')) {
@@ -153,6 +159,7 @@ class UserController extends Controller
             'users' => UserResource::collection($users)->resolve(),
             'count' => $this->userRepository->countAll(),
             'branch' => $this->getBranches(),
+            'translations'=>TranslationService::forUserPage(),
         ]);
     }
 
@@ -160,7 +167,7 @@ class UserController extends Controller
     {
         $resource = $this->userRepository->find($id);
         $resource->delete();
-        return response()->json(['success' => true, 'message' => 'User has been deleted', 'code' => 200]);
+        return response()->json(['success' => true, 'message' =>  __('toast.has_been_deleted'), 'code' => 200]);
     }
 
     public function bulkSoftDelete(Request $request)
@@ -171,7 +178,7 @@ class UserController extends Controller
             [
                 'success' => true,
                 'count' => count($ids),
-                'message' => 'Move to the basket.',
+                'message' =>  __('toast.move_to_the_basket'),
                 'code' => 200
             ]
         );
@@ -186,7 +193,7 @@ class UserController extends Controller
         $user->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $user->id . ' ' . $user->surname . ' deleted',
+                                    'message' => 'ID:' . $user->id . ' ' . $user->surname . __('toast.has_been_deleted'),
                                     'code' => 200
                                 ]);
     }
@@ -207,7 +214,7 @@ class UserController extends Controller
         User::withTrashed()->whereIn('id', $ids)->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'Users have been deleted',
+                                    'message' => __('toast.has_been_deleted'),
                                     'count' => count($ids)
                                 ]);
     }
@@ -218,7 +225,7 @@ class UserController extends Controller
         $user->restore();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $user->id . ' ' . $user->surname . ' restored.',
+                                    'message' => 'ID:' . $user->id . ' ' . $user->surname .  __('toast.has_been_restored'),
                                     'code' => 200
                                 ]);
     }
@@ -230,7 +237,7 @@ class UserController extends Controller
         return response()->json([
                                     'success' => true,
                                     'code' => 200,
-                                    'message' => 'Users restored'
+                                    'message' =>  __('toast.has_been_restored')
                                 ]);
     }
 

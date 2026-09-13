@@ -9,9 +9,12 @@ import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
 import { useDateField } from '@/composables/utils/useDateField';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Branch, User } from '@/types';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { inject, PropType, ref, Ref, watch } from 'vue';
+import { UserTranslations } from '@/types/translations';
+
+const translations = inject<UserTranslations>('translations');
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 
@@ -162,7 +165,7 @@ const onDeleteAvatar = () => {
 const cancel = () => {
     form.clearErrors();
     form.reset();
-    window.history.back();
+    router.visit(route('users.index'));
 };
 </script>
 
@@ -183,7 +186,8 @@ const cancel = () => {
                                 size="small"
                                 pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
-                            <label for="name" class="bg-transparent! font-light!">{{ 'Имя:' }}</label>
+                            <label for="name" class="bg-transparent! font-light!">{{ translations?.label?.name
+                                }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.name" />
                         <FloatLabel variant="on" class="">
@@ -196,7 +200,7 @@ const cancel = () => {
                                 size="small"
                                 pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
-                            <label for="middleName" class="bg-transparent! font-light!">{{ 'Отчество:' }}</label>
+                            <label for="middleName" class="bg-transparent! font-light!">{{ translations?.label?.middlename }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.middleName" />
                         <FloatLabel variant="on" class="">
@@ -209,7 +213,7 @@ const cancel = () => {
                                 size="small"
                                 pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
-                            <label for="surname" class="bg-transparent! font-light!">{{ 'Фамилия:' }}</label>
+                            <label for="surname" class="bg-transparent! font-light!">{{ translations?.label?.surname }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.surname" />
                     </div>
@@ -217,7 +221,7 @@ const cancel = () => {
             </template>
             <template #right-center-column>
                 <div class="mb-2 space-y-4">
-                    <InfoCard title="Общая информация">
+                    <InfoCard title="">
                         <div class="space-y-4">
                             <FloatLabel variant="on" class="">
                                 <Select
@@ -231,7 +235,7 @@ const cancel = () => {
                                     size="small"
                                     fluid
                                 />
-                                <label for="branch" class="bg-transparent! font-light!">{{ 'Филиал' }}</label>
+                                <label for="branch" class="bg-transparent! font-light!">{{translations?.label?.branches }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.branch_id" />
                             <FloatLabel variant="on">
@@ -245,7 +249,7 @@ const cancel = () => {
                                     :mask="meta?.phone_mask"
                                     :aria-autocomplete="form.phone"
                                 />
-                                <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? 'Телефон' }}</label>
+                                <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? translations?.label?.phone}}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.phone" />
                             <FloatLabel variant="on" class="">
@@ -259,11 +263,11 @@ const cancel = () => {
                                     size="small"
                                     placeholder="user@admincreate.com"
                                 />
-                                <label for="email" class="bg-transparent! font-light!">Email:</label>
+                                <label for="email" class="bg-transparent! font-light!">{{translations?.label?.email}}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.email" />
                             <Message v-if="!form.email" severity="secondary" variant="simple" size="small"
-                                >If the email is set by an admin/manager, use the @admincreate.com domain; otherwise, use the user’s real email.
+                                >{{translations?.message}}
                             </Message>
                             <FloatLabel variant="on">
                                 <DatePicker
@@ -290,7 +294,7 @@ const cancel = () => {
                                         },
                                     }"
                                 />
-                                <label class="bg-transparent! font-light!" for="birthday1">{{ 'ДР' }}</label>
+                                <label class="bg-transparent! font-light!" for="birthday1">{{translations?.table?.birthday }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.birthday" />
                             <div v-if="hasPermission('users.assign-role')">
@@ -304,8 +308,11 @@ const cancel = () => {
                                         display="chip"
                                         size="small"
                                         class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
+                                        :pt="{
+                                            pcChip:{root:'!bg-transparent'}
+                                        }"
                                     />
-                                    <label for="roles">Роли</label>
+                                    <label class="bg-transparent! font-light!" for="roles">{{translations?.table?.roles}}</label>
                                 </FloatLabel>
                                 <InputError :message="form.errors.role_ids" />
                             </div>
@@ -326,7 +333,7 @@ const cancel = () => {
                                 size="small"
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                             />
-                            <label class="bg-transparent! font-light!" for="comment">Заметка</label>
+                            <label class="bg-transparent! font-light!" for="comment">{{translations?.table?.comment}}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.comment" />
                     </div>
@@ -336,9 +343,10 @@ const cancel = () => {
                 <ProfileCard>
                     <div class="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end md:justify-center">
                         <Button size="small" :disabled="form.processing" class="cursor-pointer" @click.prevent="submit" raised>
-                            {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
+                            {{ form.processing ? translations?.button?.saving : translations?.button?.save }}
                         </Button>
-                        <Button size="small" severity="secondary" @click.prevent="cancel" class="cursor-pointer" raised> Отмена </Button>
+                        <Button size="small" severity="secondary" @click.prevent="cancel" class="cursor-pointer"
+                                raised> {{translations?.button?.cancel}} </Button>
                     </div>
                 </ProfileCard>
             </template>

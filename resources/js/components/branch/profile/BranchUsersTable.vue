@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, PropType, ref } from 'vue';
+import { inject, onMounted, PropType, ref } from 'vue';
 import Toast from 'primevue/toast';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -12,6 +12,7 @@ import { getPhone } from '@/composables/utils/phone/usePhoneLink';
 import { getFullname } from '@/composables/useFullname';
 import { useMediaQuery } from '@vueuse/core';
 import { usePage } from '@inertiajs/vue3';
+import { BranchTranslations } from '@/types/translations';
 
 const props = defineProps({
     branch: {
@@ -22,6 +23,8 @@ const props = defineProps({
         type: Object as PropType<User | null>,
     },
 });
+
+const translations = inject<BranchTranslations>('translations');
 
 const page = usePage();
 
@@ -48,8 +51,8 @@ const loadUsers = () => {
     } catch (error) {
         toast.add({
             severity: 'error',
-            summary: 'Ошибка',
-            detail: 'Не удалось загрузить пользователей' + error,
+            summary: translations?.toast?.error_message,
+            detail: translations?.toast?.failed_to_load_users + (error instanceof Error ? error.message : String(error)),
             life: 5000,
         });
     }
@@ -60,6 +63,7 @@ const loadUsers = () => {
 // Автозагрузка при монтировании
 onMounted(() => {
     loadUsers();
+    console.log('123456',translations);
 });
 
 const onUnscribeSelectedItems = () => {
@@ -92,7 +96,7 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                             :channel="channel"
                             icon-name="pi pi-user-minus"
                             type="multi"
-                            route="branch.unsubscribe"
+                            route="branch.unsubscribe-users"
                             :disabled="!selectedUsers || !selectedUsers.length"
                             @unscribe-items="onUnscribeSelectedItems"
                         />
@@ -108,11 +112,13 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                 :loading="loading"
                 paginator
                 :rows="10"
-                :rowsPerPageOptions="[5, 10, 20]"
-                :rowsPerPageLabel="'Строк на страницу'"
+                paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink  RowsPerPageDropdown"
+                :rowsPerPageOptions="[5, 10]"
+                currentPageReportTemplate="{first} - {last} / {totalRecords}"
             >
-                <template #empty><p class="text-center text-xl font-bold">No employees assigned</p></template>
-                <template #loading>Uploading user data. Please wait.</template>
+                <template
+                    #empty><p class="text-center text-xl font-bold">{{translations?.table?.empty_text}}</p></template>
+                <template #loading>{{translations?.table?.loading}}</template>
                 <!-- Чекбокс для выбора (для массового удаления) -->
                 <Column
                     v-if="hasPermission('users.delete')"
@@ -134,7 +140,7 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                 ></Column>
 
                 <!-- Имя пользователя -->
-                <Column field="name" header="Имя" :sortable="true">
+                <Column field="name" :header="translations?.table?.name" :sortable="true">
                     <template #body="{ data }">
                         <div class="text-sm font-medium text-wrap text-gray-900 dark:text-gray-300">
                             {{ getFullname({ name: data.name, surname: data.surname }) }}
@@ -146,8 +152,8 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                     </template>
                 </Column>
 
-                <!-- Email -->
-                <Column field="phone" header="Phone" :sortable="true" v-if="isLargeScreen">
+                <!-- Phone -->
+                <Column field="phone" :header="translations?.table?.phone" :sortable="true" v-if="isLargeScreen">
                     <template #body="{ data }">
                         <div class="text-sm font-medium text-wrap">
                             <Button class="!px-0" as="a" variant="link" :label="data.phone" :href="'tel:' + getPhone(data.phone)" rel="noopener" />
@@ -156,13 +162,14 @@ const isLargeScreen = useMediaQuery('(min-width: 640px)');
                 </Column>
 
                 <!-- Действия (одиночное удаление) -->
-                <Column header="Tools" class="!text-center" v-if="hasPermission('users.delete')">
+                <Column :header="translations?.table?.actions" class="!text-center"
+                        v-if="hasPermission('users.delete')">
                     <template #body="{ data }">
                         <unsubscribe-confirmation
                             :subscriber="data"
                             :channel="channel"
                             icon-name="pi pi-user-minus"
-                            route="branch.unsubscribe"
+                            route="branch.unsubscribe-users"
                             :disabled="!selectedUsers || !selectedUsers.length"
                             @unscribe-item="onUnscribeItem"
                         />

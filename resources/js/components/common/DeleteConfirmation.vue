@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { getFullname } from '@/composables/useFullname';
 import { useToast } from 'primevue/usetoast';
-import { computed, PropType, ref } from 'vue';
+import { computed, inject, PropType, ref } from 'vue';
 import axios from 'axios';
+import { DeleteDialogTranslations } from '@/types/translations';
+
+const translations = inject<DeleteDialogTranslations>('translations');
 
 const toast = useToast();
 const visible = ref(false);
@@ -30,7 +33,7 @@ const props = defineProps({
         type: String,
         default: '',
     },
-    deleteLabelBtn:{
+    deleteLabelBtn: {
         type: String,
         default: 'Yes, delete account',
     },
@@ -75,7 +78,7 @@ function handleAction() {
             wait();
             toast.add({
                 severity: 'info',
-                summary: 'Info Message',
+                summary: translations?.toast?.info_message,
                 detail: response.data.message,
                 life: 3000,
             });
@@ -93,12 +96,14 @@ function handleAction() {
             wait();
             toast.add({
                 severity: 'error',
-                summary: 'Error Message',
+                summary: translations?.toast?.error_message,
                 detail: error.message,
                 life: 3000,
             });
         });
 }
+
+//onMounted(()=>{console.log('DELETE',translations)})
 </script>
 
 <template>
@@ -121,34 +126,33 @@ function handleAction() {
     <!-- Диалог подтверждения -->
     <Dialog v-model:visible="visible" modal :style="{ width: '25rem' }" :breakpoints="{ '768px': '50vw', '425px': '90vw' }">
         <template #header>
-            <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> Are you absolutely sure? </span>
+            <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> {{ translations?.dialog?.question }}</span>
         </template>
 
         <!-- Список элементов для удаления (если множественное) -->
         <ol v-if="Array.isArray(entity)">
             <li v-for="item in entity" :key="item.id" class="text-surface-500 dark:text-surface-400 mb-1 block font-semibold">
-
-                {{ item.id }} - <span v-if="item.surname">{{ getFullname({ name: item.name, surname:  item.surname })  }}</span>
-                {{item.name}}
+                {{ item.id }} - <span v-if="item.surname">{{ getFullname({ name: item.name, surname: item.surname }) }}</span>
+                {{ item.name }}
             </li>
         </ol>
 
         <!-- Одиночный элемент -->
         <div v-else class="text-surface-500 dark:text-surface-400 mb-1 block font-semibold">
-            {{ entity.id }} - <span v-if="entity.surname">{{ getFullname({ name: entity.name, surname: entity.surname
-        }) }}</span>  {{entity.name}}
+            {{ entity.id }} - <span v-if="entity.surname">{{ getFullname({ name: entity.name, surname: entity.surname }) }}</span> {{ entity.name }}
         </div>
 
         <div v-if="isDeleted" class="text-red-500">
-            <span v-if="text">{{text}} </span>
-            <span v-else>will be moved to the basket. </span>
+            <span v-if="text">{{ text }} </span>
+            <span v-else>{{ translations?.dialog?.delete_to_basket_text }}</span>
         </div>
-        <span v-else class="text-red-500"><b>will be deleted forever.</b></span>
+        <span v-else class="text-red-500"
+            ><b>{{ translations?.dialog?.delete_forever_text }}</b></span
+        >
 
         <div class="mt-2 flex justify-end gap-2">
-            <Button type="button" size="small" label="Cancel" severity="secondary" raised @click="visible = false" />
-            <Button type="button" size="small" :label="deleteLabelBtn" severity="danger" raised
-                    @click="handleAction" />
+            <Button type="button" size="small" :label="translations?.button?.cancel" severity="secondary" raised @click="visible = false" />
+            <Button type="button" size="small" :label="translations?.button?.confirm" severity="danger" raised @click="handleAction" />
         </div>
     </Dialog>
 </template>

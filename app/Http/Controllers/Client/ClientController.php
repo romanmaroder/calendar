@@ -9,6 +9,7 @@ use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Http\Resources\Client\ClientResource;
 use App\Models\Client;
+use App\Services\TranslationService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class ClientController extends Controller
         return Inertia::render('client/Index', [
             'clients' => ClientResource::collection($clients)->resolve(),
             'count' => $clients->total(),
+            'translations'=>TranslationService::forClientPage()
         ]);
     }
 
@@ -35,7 +37,9 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return Inertia::render('client/Create');
+        return Inertia::render('client/Create',[
+            'translations'=>TranslationService::forClientCreatePage()
+        ]);
     }
 
     /**
@@ -63,9 +67,10 @@ class ClientController extends Controller
             return Inertia::render('client/Show', [
                 'client' => $client,
                 'isDeleted' => true,
+                'translations'=>TranslationService::forClientShowPage()
             ]);
         }
-        return Inertia::render('client/Show', ['client' => $client, 'isDeleted' => false]);
+        return Inertia::render('client/Show', ['client' => $client, 'isDeleted' => false,'translations'=>TranslationService::forClientShowPage()]);
     }
 
     /**
@@ -75,6 +80,7 @@ class ClientController extends Controller
     {
         return Inertia::render('client/Edit', [
             'client' => $client,
+            'translations'=>TranslationService::forClientUpdatePage()
         ]);
     }
 
@@ -109,6 +115,7 @@ class ClientController extends Controller
         return Inertia::render('client/Archive', [
             'clients' => $Clients->collect(),
             'count' => $Clients->total(),
+            'translations'=>TranslationService::forClientPage()
         ]);
     }
 
@@ -116,7 +123,7 @@ class ClientController extends Controller
     {
         $resource = Client::findOrFail($id);
         $resource->delete();
-        return response()->json(['success' => true, 'message' => 'Client has been deleted', 'code' => 200]);
+        return response()->json(['success' => true, 'message' => __('toast.has_been_deleted'), 'code' => 200]);
     }
 
     public function bulkSoftDelete(Request $request)
@@ -124,7 +131,7 @@ class ClientController extends Controller
         $ids = $request->input('ids', []);
         Client::whereIn('id', $ids)->delete();
         return response()->json(
-            ['success' => true, 'count' => count($ids), 'message' => 'Move to the basket.', 'code' => 200]
+            ['success' => true, 'count' => count($ids), 'message' => __('toast.move_to_the_basket'), 'code' => 200]
         );
     }
 
@@ -137,7 +144,7 @@ class ClientController extends Controller
         $client->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $client->id . ' ' . $client->surname . ' deleted',
+                                    'message' => 'ID:' . $client->id . ' ' . $client->surname . __('toast.has_been_deleted'),
                                     'code' => 200
                                 ]);
     }
@@ -158,7 +165,7 @@ class ClientController extends Controller
         Client::withTrashed()->whereIn('id', $ids)->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'Clients have been deleted',
+                                    'message' => __('toast.has_been_deleted'),
                                     'count' => count($ids)
                                 ]);
     }
@@ -169,7 +176,7 @@ class ClientController extends Controller
         $client->restore();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $client->id . ' ' . $client->surname . ' restored.',
+                                    'message' => 'ID:' . $client->id . ' ' . $client->surname . __('toast.has_been_restored'),
                                     'code' => 200
                                 ]);
     }
@@ -181,7 +188,7 @@ class ClientController extends Controller
         return response()->json([
                                     'success' => true,
                                     'code' => 200,
-                                    'message' => 'Clients restored'
+                                    'message' => __('toast.has_been_restored')
                                 ]);
     }
 

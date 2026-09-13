@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Services\Admin\Role\RoleService;
+use App\Services\TranslationService;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -31,6 +32,7 @@ class RoleController extends Controller
                 'total' => $roles->total(),
             ],
             'permissions' => $permissions->toArray(),
+            'translations'=> TranslationService::forRolesPage()
         ]);
     }
 
@@ -39,6 +41,7 @@ class RoleController extends Controller
         $permissions = Permission::all();
         return Inertia::render('admin/Role/Create', [
             'permissions' => $permissions->toArray(),
+            'translations'=> TranslationService::forRolesCreatePage()
         ]);
     }
 
@@ -59,6 +62,7 @@ class RoleController extends Controller
             'role' => $role->toArray(),
             'assignedPermissions' => $assignedPermissions,
             'permissions' => $permissions->toArray(),
+            'translations'=> TranslationService::forRolesUpdatePage()
         ]);
     }
 

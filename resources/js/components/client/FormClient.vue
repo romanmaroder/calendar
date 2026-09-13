@@ -5,13 +5,16 @@ import AvatarUploader from '@/components/AvatarUploader.vue';
 import InputError from '@/components/InputError.vue';
 import InfoCard from '@/components/user/profile/InfoCard.vue';
 import ProfileCard from '@/components/user/profile/ProfileCard.vue';
+import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
+import { useDateField } from '@/composables/utils/useDateField';
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Client } from '@/types';
+import { ClientTranslations } from '@/types/translations';
 import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
-import { PropType, watch } from 'vue';
-import { useDateField } from '@/composables/utils/useDateField';
-import { usePhoneMeta } from '@/composables/utils/phone/usePhoneMeta';
+import { inject, PropType, watch } from 'vue';
+
+const translations = inject<ClientTranslations>('translations');
 
 const emit = defineEmits(['createUser', 'updateUser', 'drawerData']);
 
@@ -63,7 +66,7 @@ const submit = () => {
                 toast.add({
                     severity: 'info',
                     summary: 'Info',
-                    detail: form.name + ' - update successfully.',
+                    detail: form.name + translations?.toast?.update,
                     life: 3000,
                 });
                 emit('updateUser');
@@ -84,7 +87,7 @@ const submit = () => {
                 toast.add({
                     severity: 'info',
                     summary: 'Info',
-                    detail: form.name + ' ' + form.surname + ' - add successfully.',
+                    detail: form.name + ' ' + form.surname + translations?.toast?.create,
                     life: 3000,
                 });
                 emit('createUser');
@@ -155,7 +158,7 @@ load();
                                 size="small"
                                 pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
-                            <label for="name" class="bg-transparent! font-light!">{{ 'Имя:' }}</label>
+                            <label for="name" class="bg-transparent! font-light!">{{ translations?.label?.name }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.name" />
                         <FloatLabel variant="on" class="">
@@ -168,7 +171,7 @@ load();
                                 size="small"
                                 pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
-                            <label for="middleName" class="bg-transparent! font-light!">{{ 'Отчество:' }}</label>
+                            <label for="middleName" class="bg-transparent! font-light!">{{ translations?.label?.middlename }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.middleName" />
                         <FloatLabel variant="on" class="">
@@ -181,7 +184,7 @@ load();
                                 size="small"
                                 pattern="/^[A-Za-zА-Яа-яЁё\d\s.,\-]+$/"
                             />
-                            <label for="surname" class="bg-transparent! font-light!">{{ 'Фамилия:' }}</label>
+                            <label for="surname" class="bg-transparent! font-light!">{{ translations?.label?.surname }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.surname" />
                     </div>
@@ -189,7 +192,7 @@ load();
             </template>
             <template #right-center-column>
                 <div class="mb-2 space-y-4">
-                    <InfoCard title="Общая информация">
+                    <InfoCard title="">
                         <div class="space-y-4">
                             <FloatLabel variant="on">
                                 <InputMask
@@ -202,7 +205,7 @@ load();
                                     :mask="meta?.phone_mask"
                                     :aria-autocomplete="form.phone"
                                 />
-                                <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? 'Телефон' }}</label>
+                                <label for="phone" class="bg-transparent! font-light!">{{ meta?.phone_mask ?? translations?.label?.phone }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.phone" />
 
@@ -216,7 +219,7 @@ load();
                                     aria-labelledby="email"
                                     size="small"
                                 />
-                                <label for="email" class="bg-transparent! font-light!">Email:</label>
+                                <label for="email" class="bg-transparent! font-light!">{{ translations?.label?.email }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.email" />
                             <FloatLabel variant="on">
@@ -244,7 +247,7 @@ load();
                                         },
                                     }"
                                 />
-                                <label class="bg-transparent! font-light!" for="birthday1">{{ 'ДР' }}</label>
+                                <label class="bg-transparent! font-light!" for="birthday">{{ translations?.table?.birthday }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.birthday" />
                             <FloatLabel variant="on" class="">
@@ -257,7 +260,7 @@ load();
                                     aria-labelledby="source"
                                     size="small"
                                 />
-                                <label for="source" class="bg-transparent! font-light!">Источник:</label>
+                                <label for="source" class="bg-transparent! font-light!">{{ translations?.table?.source }}</label>
                             </FloatLabel>
                             <InputError :message="form.errors.source" />
                         </div>
@@ -277,7 +280,7 @@ load();
                                 size="small"
                                 class="w-full !rounded-none !border-0 !border-b-1 !bg-transparent !shadow-none"
                             />
-                            <label class="bg-transparent! font-light!" for="comment">Заметка</label>
+                            <label class="bg-transparent! font-light!" for="comment">{{ translations?.table?.comment }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.comment" />
                     </div>
@@ -302,7 +305,7 @@ load();
                                     },
                                 }"
                             />
-                            <label class="bg-transparent! font-light!" for="discount">Персональная скидка:</label>
+                            <label class="bg-transparent! font-light!" for="discount">{{ translations?.table?.discount }}</label>
                         </FloatLabel>
                         <InputError :message="form.errors.discount" />
                     </div>
@@ -311,24 +314,21 @@ load();
                     <div class="space-y-1">
                         <div class="flex items-center gap-2">
                             <Checkbox v-model="form.blacklist" inputId="blackList" name="blackList" size="small" :tabindex="4" binary />
-                            <label for="blackList"> В черном списке </label>
+                            <label for="blackList">{{ translations?.table?.blacklist }}</label>
                         </div>
                         <div class="flex items-center gap-2">
                             <Checkbox v-model="form.prepayment" inputId="alwaysPrepayment" name="prepayment" size="small" :tabindex="4" binary />
-                            <label for="alwaysPrepayment">Всегда по предоплате</label>
+                            <label for="alwaysPrepayment">{{ translations?.table?.prepayment }}</label>
                         </div>
                     </div>
                 </ProfileCard>
                 <ProfileCard>
                     <div class="flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:justify-end md:justify-center">
-                        <Button size="small" :disabled="form.processing" class="cursor-pointer" @click.prevent="submit"
-                                raised>
-                            {{ form.processing ? 'Сохранение...' : 'Сохранить' }}
+                        <Button size="small" :disabled="form.processing" class="cursor-pointer" @click.prevent="submit" raised>
+                            {{ form.processing ? translations?.button?.saving : translations?.button?.save }}
                         </Button>
                         <Button size="small" severity="secondary" @click.prevent="cancel" class="cursor-pointer"
-                                raised>
-                            Отмена
-                        </Button>
+                                raised> {{translations?.button?.cancel}} </Button>
                     </div>
                 </ProfileCard>
             </template>

@@ -4,6 +4,7 @@ import Layout from '@/layouts/AppLayout.vue';
 import { Branch, BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, provide, ref } from 'vue';
+import { UserTranslations } from '@/types/translations';
 
 const props = defineProps({
     user: {
@@ -16,19 +17,26 @@ const props = defineProps({
     roles: {
         type: Array as PropType<{ id: number; name: string }[]>,
     }, // <-- передаём роли из Inertia
+    translations:{
+        type: Object as PropType<UserTranslations>,
+        required:true,
+    }
 });
 
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Users', href: '/users' },
-    { title: 'Update ' + props.user.surname, href: '' },
+    { title: props.translations?.users, href: '/users' },
+    { title: props.translations?.title + props.user.surname, href: '' },
 ];
 
 // Предоставляем (provide) listOfBranches всем дочерним компонента список филиалов
 const listOfBranches: object = ref(props.branches);
 const roles = ref(props.roles);
 
+provide('translations', props.translations);
 provide('listOfBranches', listOfBranches);
 provide('roles', roles);
+
 </script>
 
 <template>

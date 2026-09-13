@@ -6,13 +6,15 @@ import { Head, router } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
 import { route } from 'ziggy-js';
+import { RolesTranslations } from '@/types/translations';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Roles', href: '/admin/roles' }];
-
-defineProps<{
+const props = defineProps<{
     roles: Array<{ id: number; name: string; permissions: Array<{ name: string }> }>;
     pagination: { current_page: number; last_page: number; total: number };
+    translations: RolesTranslations;
 }>();
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: props.translations.title, href: '/admin/roles' }];
 
 const deleteConfirmationVisible = ref(false);
 const deleteEntity = ref<{ id: number; name: string } | null>(null);
@@ -68,18 +70,25 @@ const goToCreate = () => {
 const goToEdit = (id: number) => {
     router.visit(route('admin.roles.edit', { role: id }));
 };
-
 </script>
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-    <Head title="Roles" />
+        <Head :title="translations.title" />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="grid auto-cols-fr">
                 <Toolbar class="mb-4">
                     <template #end>
                         <div class="flex flex-row items-end">
-                            <Button as="a" icon="pi pi-plus" label="New Role" raised @click="goToCreate" size="small" class="mx-2" />
+                            <Button
+                                as="a"
+                                icon="pi pi-plus"
+                                :label="translations.button.create"
+                                raised
+                                @click="goToCreate"
+                                size="small"
+                                class="mx-2"
+                            />
                         </div>
                     </template>
                 </Toolbar>
@@ -97,16 +106,16 @@ const goToEdit = (id: number) => {
                 >
                     <Column
                         field="id"
-                        header="ID"
+                        :header="translations.table.id"
                         :pt="{
                             root: {
                                 class: 'hidden sm:table-cell',
                             },
                         }"
                     />
-                    <Column field="name" header="Название" />
+                    <Column field="name" :header="translations.table.name" />
                     <Column
-                        header="Разрешения"
+                        :header="translations.table.permissions"
                         :pt="{
                             root: {
                                 class: 'hidden sm:table-cell',
@@ -114,7 +123,7 @@ const goToEdit = (id: number) => {
                         }"
                     >
                         <template #body="slotProps">
-                            <div class="space-x-1 space-y-1">
+                            <div class="space-y-1 space-x-1">
                                 <Tag v-for="perm in slotProps.data?.permissions" :key="perm.id" severity="info">
                                     {{ perm.name }}
                                 </Tag>
@@ -122,7 +131,7 @@ const goToEdit = (id: number) => {
                         </template>
                     </Column>
                     <Column
-                        header="Действия"
+                        :header="translations.table.actions"
                         :pt="{
                             root: {
                                 class: 'hidden sm:table-cell',
@@ -212,19 +221,22 @@ const goToEdit = (id: number) => {
         <!-- Модальное окно подтверждения (PrimeVue Dialog) -->
         <Dialog v-model:visible="deleteConfirmationVisible" modal :style="{ width: '25rem' }" :breakpoints="{ '768px': '50vw', '425px': '90vw' }">
             <template #header>
-                <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> Are you absolutely sure? </span>
+                <span class="dark:text-surface-400 m-0 text-[17px] font-semibold">{{ translations.dialog.roles_permission_question }} </span>
             </template>
             <div class="text-surface-500 dark:text-surface-400 mb-1 block font-semibold">
-                {{ deleteEntity?.id }} - <span v-if="deleteEntity?.name">{{ deleteEntity?.name }} - will be deleted forever.</span>
+                {{ deleteEntity?.id }} -
+                <span v-if="deleteEntity?.name">{{ deleteEntity?.name }} - {{ translations.dialog.roles_permission_text }}</span>
             </div>
             <span class="text-red-500">
                 <b>
-                    <strong>All users will lose this role.</strong>
+                    <strong>{{ translations.dialog.roles_text }}</strong>
                 </b>
             </span>
             <div class="mt-2 flex justify-end gap-2">
-                <Button type="button" size="small" label="Cancel" severity="secondary" raised @click="closeDeleteModal" />
-                <Button type="button" size="small" label="Confirm" severity="danger" raised @click="handleDeleteConfirmed" />
+                <Button type="button" size="small" :label="translations.button.cancel" severity="secondary" raised
+                        @click="closeDeleteModal" />
+                <Button type="button" size="small" :label="translations.button.confirm" severity="danger" raised
+                        @click="handleDeleteConfirmed" />
             </div>
         </Dialog>
     </Layout>

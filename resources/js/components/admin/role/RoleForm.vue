@@ -3,12 +3,16 @@ import { useToast } from 'primevue/usetoast';
 import { router, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import InputError from '@/components/InputError.vue';
+import { inject, Ref } from 'vue';
+import { RolesTranslations } from '@/types/translations';
 
 const props = defineProps<{
     role?: { id: number; name: string };
     assignedPermissions?: number[];
     permissions: Array<{ id: number; name: string }>;
 }>();
+
+const translations = inject<Ref<RolesTranslations>>('formTranslations');
 
 const emit = defineEmits<{
     (e: 'submit-success'): void;
@@ -53,28 +57,28 @@ const cancel = () => {
     <form @submit.prevent="submit">
         <div class="mb-4">
             <FloatLabel variant="on">
-                <InputText v-model="form.name" class="w-full" placeholder="Название роли" />
-                <label>Название роли</label>
+                <InputText v-model="form.name" class="w-full" :placeholder="translations?.placeholder?.name" />
+                <label>{{ translations?.placeholder?.name }}</label>
             </FloatLabel>
             <InputError :message="form.errors.name" />
         </div>
 
         <div class="mb-4">
-            <label class="mb-2 block font-medium">Разрешения</label>
+            <label class="mb-2 block font-medium">{{ translations?.placeholder?.permissions }}</label>
             <MultiSelect
                 v-model="form.permission_ids"
                 :options="permissions"
                 option-value="id"
                 option-label="name"
-                placeholder="Выберите разрешения"
+                :placeholder="translations?.placeholder?.permissions"
                 class="w-full"
             />
             <InputError :message="form.errors.permission_ids" />
         </div>
 
         <div class="flex justify-end gap-2">
-            <Button size="small" label="Сохранить" type="submit" :loading="form.processing" raised />
-            <Button size="small" severity="secondary" @click="cancel" label="Отмена" raised />
+            <Button size="small" :label="translations?.button?.save" type="submit" :loading="form.processing" raised />
+            <Button size="small" severity="secondary" @click="cancel" :label="translations?.button?.cancel" raised />
         </div>
     </form>
 </template>

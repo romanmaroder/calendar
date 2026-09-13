@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { getFullname } from '@/composables/useFullname';
 import { useToast } from 'primevue/usetoast';
-import { computed, PropType, ref } from 'vue';
+import { computed, inject, PropType, ref } from 'vue';
 import axios from 'axios';
+import { DeleteDialogTranslations } from '@/types/translations';
+
+const translations = inject<DeleteDialogTranslations>('translations');
 
 const toast = useToast();
 const visible = ref(false);
@@ -93,6 +96,7 @@ function handleAction() {
             });
         });
 }
+
 </script>
 
 <template>
@@ -105,7 +109,7 @@ function handleAction() {
         raised
         :disabled="disabled"
         @click="visible = true"
-        v-tooltip.top="'Отписать от филиала'"
+        v-tooltip.top="translations?.button?.unsubscribe"
     >
         <i :class="iconName"></i>
         {{text}}
@@ -118,14 +122,14 @@ function handleAction() {
             severity="danger"
             variant="outlined"
             size="small"
-            v-tooltip.top="'Отписать от филиала'"
+            v-tooltip.top="translations?.button?.unsubscribe"
             raised
     />
 
     <!-- Диалог подтверждения -->
     <Dialog v-model:visible="visible" modal :style="{ width: '25rem' }" :breakpoints="{ '768px': '50vw', '425px': '90vw' }">
         <template #header>
-            <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> Are you absolutely sure? </span>
+            <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> {{ translations?.dialog?.question }} </span>
         </template>
 
         <!-- Список элементов для удаления (если множественное) -->
@@ -140,11 +144,12 @@ function handleAction() {
             {{ subscriber.id }} - {{ getFullname({ name: subscriber.name, surname: subscriber.surname }) }}
         </div>
 
-        <span class="text-red-500"><b>will be detached from the branch.</b></span>
+        <span class="text-red-500"><b>{{ translations?.dialog?.unsubscribe }}</b></span>
 
         <div class="mt-2 flex justify-end gap-2">
-            <Button type="button" size="small" label="Cancel" severity="secondary" raised @click="visible = false" />
-            <Button type="button" size="small" label="Yes, unsubscribe" severity="danger" raised @click="handleAction" />
+            <Button type="button" size="small" :label="translations?.button?.cancel" severity="secondary" raised @click="visible = false" />
+            <Button type="button" size="small" :label="translations?.button?.unsubscribe" severity="danger" raised
+                    @click="handleAction" />
         </div>
     </Dialog>
 </template>

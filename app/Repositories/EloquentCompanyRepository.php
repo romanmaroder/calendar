@@ -45,7 +45,8 @@ class EloquentCompanyRepository implements Contracts\CompanyRepositoryInterface
             'contact',
             'info',
             'avatar',
-            'created_at'
+            'created_at',
+            'deleted_at',
         )
             ->findOrFail($id);
     }

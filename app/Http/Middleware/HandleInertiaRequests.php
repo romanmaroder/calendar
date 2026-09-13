@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\TranslationService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -39,6 +40,19 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $routeName = $request->route()?->getName();
+
+        // Список страниц, где НЕ нужны переводы сайдбара
+        $publicRoutes = [
+            'login',
+            'password.request',      // forgot-password
+            'password.reset',       // reset-password
+            'register',
+            'home',
+        ];
+
+        $isPublicPage = in_array($routeName, $publicRoutes, true);
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -59,6 +73,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'message' => $request->session()->get('message'),
+
+            // Глобальные переводы для сайдбара (доступны во всех вьюхах)
+            'appSidebarTranslations' => fn () => $isPublicPage ? [] : TranslationService::forSidebar(),
         ];
     }
 }

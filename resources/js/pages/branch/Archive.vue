@@ -4,14 +4,10 @@ import { Branch, BreadcrumbItem } from '@/types';
 import Table from '@/components/branch/Table.vue';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { onMounted, PropType, ref } from 'vue';
+import { onMounted, PropType, provide, ref } from 'vue';
+import { BranchTranslations } from '@/types/translations';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Branches', href: '/branch' },
-    { title: 'Archive', href: '' },
-];
-
-const props =defineProps({
+const props = defineProps({
     branches: {
         type: Object as PropType<Branch>,
         required: true,
@@ -19,21 +15,33 @@ const props =defineProps({
     count: {
         type: Number,
     },
+    translations: {
+        type: Object as PropType<BranchTranslations>,
+        required: true,
+    },
 });
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: props.translations?.title, href: '/branch' },
+    { title: props.translations?.label.archive, href: '' },
+];
+
+provide('translations', props.translations);
+
 
 const total = ref();
 const counter = (num: number) => {
     total.value = num;
 };
 
-onMounted(()=>{
-    console.log(props.branches);
+onMounted(() => {
+    console.log(props.translations);
 });
 </script>
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head title="Archive" />
+        <Head :title="translations?.label?.archive" />
         <Toast
             :pt="{
                 root: {

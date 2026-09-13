@@ -85,16 +85,16 @@ const updateCompany = () => {
         :closeIcon="company?.id ? 'pi pi-chevron-right' : 'pi pi-chevron-left'"
         :pt="{
             root: {
-                class: 'w-[20rem]!',
+                class: 'w-[20rem]!'
             },
             header: {
-                class: '!py-[0.5rem]',
+                class: '!py-[0.5rem]'
             },
             content: {
-                class: 'p-0!',
+                class: 'p-0!'
             },
             title: {
-                class: '!text-lg',
+                class: '!text-lg'
             },
         }"
     >
@@ -106,8 +106,8 @@ const updateCompany = () => {
                     :icon="avatar ? '' : 'pi pi-building'"
                     :pt="{
                         image: {
-                            class: 'object-cover',
-                        },
+                            class: 'object-cover'
+                        }
                     }"
                 />
                 <span v-if="form.name" class="inline-block w-[150px] truncate font-bold">

@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/vue3';
 import { BreadcrumbItem, Company } from '@/types';
 import FormCompany from '@/components/company/FormCompany.vue';
 import { PropType, provide, ref } from 'vue';
+import { CompanyTranslations } from '@/types/translations';
 
 const props = defineProps({
     company: {
@@ -13,12 +14,20 @@ const props = defineProps({
     countries: {
         type: Object,
     },
+    translations: {
+        type: Object as PropType<CompanyTranslations>,
+        required: true,
+    }
 });
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Companies', href: '/company' },
-    { title: 'Update ' + props.company.name, href: '' },
+    { title: props.translations.companies, href: '/company' },
+    { title: props.translations.title + props.company.name, href: '' },
 ];
+
+const translations = ref(props.translations);
+provide('translations', translations);
+
 
 const countries: object = ref(props.countries);
 provide('countries', countries);
@@ -26,7 +35,7 @@ provide('countries', countries);
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head :title="props.company.name" />
+        <Head :title="translations.title" />
         <form-company :company="company" />
     </Layout>
 </template>

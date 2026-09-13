@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\TranslationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ class AuthenticatedSessionController extends Controller
         return Inertia::render('auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
+            'translations' => TranslationService::forLoginPage(),
         ]);
     }
 
@@ -39,7 +41,7 @@ class AuthenticatedSessionController extends Controller
             $request->session()->regenerateToken();
 
             return redirect()->route('login')
-                ->with('status', 'Нет права доступа.'); //TODO файл перевода
+                ->with('status', __('login.login_status'));
         }
 
         $request->session()->regenerate();
@@ -50,7 +52,7 @@ class AuthenticatedSessionController extends Controller
             // Добавляем сообщение в сессию (оно пропадёт после показа)
             session()->flash('profile_warning', [
                 'type' => 'warning',
-                'message' => 'Please provide your real email address.', //TODO файл перевода
+                'message' => __('settings.profile_warning_message_email'),
             ]);
 
             return redirect()->route('profile.update');
@@ -61,7 +63,7 @@ class AuthenticatedSessionController extends Controller
             // Добавляем сообщение в сессию (оно пропадёт после показа)
             session()->flash('profile_warning', [
                 'type' => 'warning',
-                'message' => 'Please set a permanent password.', //TODO файл перевода
+                'message' => __('settings.profile_warning_message_password'),
             ]);
 
             return redirect()->route('password.update');

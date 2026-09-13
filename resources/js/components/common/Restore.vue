@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
-import { computed, PropType } from 'vue';
+import { computed, inject, PropType } from 'vue';
 import axios from 'axios';
+import { RestoreTranslations } from '@/types/translations';
+
+const translations = inject<RestoreTranslations>('translations');
 
 const toast = useToast();
 const wait = (time = 2000) => new Promise((resolve) => setTimeout(resolve, time));
@@ -59,7 +62,7 @@ function restore() {
             wait();
             toast.add({
                 severity: 'info',
-                summary: 'Info Message',
+                summary: translations?.toast?.info_message,
                 detail: response.data.message,
                 life: 3000,
             });
@@ -75,7 +78,7 @@ function restore() {
             wait();
             toast.add({
                 severity: 'error',
-                summary: 'Error Message',
+                summary: translations?.toast?.error_message,
                 detail: error.message,
                 life: 3000,
             });
@@ -97,10 +100,5 @@ function restore() {
         <!-- Показываем Badge только для множественного удаления -->
         <Badge severity="secondary">{{ count }}</Badge>
     </Button>
-    <Button v-if="type === 'single'"
-            :icon="iconName"
-            severity="success"
-            variant="text"
-            size="small"
-            @click.prevent="restore()" />
+    <Button v-if="type === 'single'" :icon="iconName" severity="success" variant="text" size="small" @click.prevent="restore()" />
 </template>

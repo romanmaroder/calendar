@@ -2,16 +2,12 @@
 import Layout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { BreadcrumbItem, Company } from '@/types';
-import { PropType, ref } from 'vue';
+import { PropType, provide, ref } from 'vue';
 import Toast from 'primevue/toast';
 import Table from '@/components/company/Table.vue';
+import { CompanyTranslations } from '@/types/translations';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Companies', href: '/company' },
-    { title: 'Archive', href: '' },
-];
-
-defineProps({
+const props =defineProps({
     companies: {
         type: Object as PropType<Company>,
         required: true,
@@ -19,7 +15,22 @@ defineProps({
     count: {
         type: Number,
     },
+    translations:{
+        type: Object as PropType<CompanyTranslations>,
+        required: true,
+    }
 });
+
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: props.translations.title, href: '/company' },
+    { title: props.translations.label.archive, href: '' },
+];
+
+provide('translations', props.translations);
+
+
+
 const total = ref();
 const counter = (num: number) => {
     total.value = num;
@@ -28,7 +39,7 @@ const counter = (num: number) => {
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head title="Archive" />
+        <Head :title="translations.label.archive" />
         <Toast
             :pt="{
                 root: {

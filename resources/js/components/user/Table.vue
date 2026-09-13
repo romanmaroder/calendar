@@ -8,11 +8,12 @@ import { getInitials } from '@/composables/useInitials';
 import { usePhoneLink } from '@/composables/utils/phone/usePhoneLink';
 import { workingWithTableItems } from '@/composables/workingWithTableItems';
 import { User } from '@/types';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useMediaQuery } from '@vueuse/core';
-import { computed, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
+import { computed, inject, onBeforeMount, PropType, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
+import { UserTranslations } from '@/types/translations';
 
 const props = defineProps({
     entities: {
@@ -35,6 +36,8 @@ const props = defineProps({
         },
     },
 });
+
+const translations = inject<UserTranslations>('translations');
 
 const emit = defineEmits(['count']);
 
@@ -71,7 +74,7 @@ watch(items, () => {
 });
 
 watch(count, () => {
-    emit('count', count);
+    emit('count', count.value);
 });
 
 const isDeleted = computed(() => {
@@ -118,9 +121,6 @@ const filterFields = () => {
        });
    }
 };*/
-onMounted(() => {
-    console.log(props.entities);
-});
 </script>
 
 <template>
@@ -139,18 +139,17 @@ onMounted(() => {
                             @new-user="onLoadItem"
                             icon-name="pi pi-user-plus"
                             raised
-                            label="New"
-                            title="New user"
+                            :label="translations?.button?.create"
+                            :title="translations?.button?.create"
                         />
                         <Button
                             v-if="tools.create && isLargeScreen && hasPermission('users.create')"
-                            as="a"
                             icon="pi pi-user-plus"
-                            label="New"
+                            :label="translations?.button?.create"
                             raised
-                            :href="route('users.create')"
                             size="small"
                             class="mx-2"
+                            @click="router.visit(route('users.create'))"
                         />
                     </span>
                     <span class="hidden space-x-2 sm:flex">
@@ -182,19 +181,24 @@ onMounted(() => {
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" name="search" class="w-full sm:w-auto" placeholder="Search..." size="small" />
+                        <InputText
+                            v-model="filters['global'].value"
+                            name="search"
+                            class="w-full sm:w-auto"
+                            :placeholder="translations?.toolbar.search"
+                            size="small"
+                        />
                     </IconField>
                     <Button
                         v-if="page.url === '/users' && hasPermission('users.delete')"
-                        as="a"
-                        :href="route('users.archive')"
                         icon="pi pi-box"
                         size="small"
                         severity="warn"
                         raised
                         variant="text"
-                        v-tooltip.bottom="'Archive'"
-                        label="ARC"
+                        v-tooltip.bottom="translations?.label.archive"
+                        :label="translations?.toolbar?.archive"
+                        @click="router.visit(route('users.archive'))"
                     />
                 </div>
             </template>
@@ -212,13 +216,15 @@ onMounted(() => {
             :globalFilterFields="['name', 'surname', 'middleName', 'phone', 'email', 'comment', 'created_at', 'birthday', 'branch.name']"
             sortMode="multiple"
             removable-sort
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            :rowsPerPageOptions="[5, 10, 15, 20, 25]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
+            paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink  RowsPerPageDropdown"
+            :rowsPerPageOptions="[5, 10]"
+            currentPageReportTemplate="{first} - {last} / {totalRecords}"
             :loading="loading"
         >
-            <template #empty><p class="text-center text-xl font-bold">Add users</p></template>
-            <template #loading>Uploading user data. Please wait.</template>
+            <template #empty
+                ><p class="text-center text-xl font-bold">{{ translations?.table?.empty_text }}</p></template
+            >
+            <template #loading>{{ translations?.table?.loading }}</template>
             <Column
                 v-if="hasPermission('users.delete')"
                 selectionMode="multiple"
@@ -239,7 +245,7 @@ onMounted(() => {
             ></Column>
             <Column
                 field="avatar"
-                header="Avatar"
+                :header="translations?.table?.avatar"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell',
@@ -271,7 +277,7 @@ onMounted(() => {
                     />
                 </template>
             </Column>
-            <Column field="name" header="Name" :sortable="true">
+            <Column field="name" :header="translations?.table?.name" :sortable="true">
                 <template #body="slotProps">
                     <div class="text-sm font-medium text-wrap text-gray-900 dark:text-white">
                         {{
@@ -287,14 +293,14 @@ onMounted(() => {
                     </p>
                     <p>
                         <small class="text-xs font-normal text-gray-900 dark:text-gray-300">
-                            Roles:
+                            {{ translations?.table?.roles }}
                             <span v-if="slotProps.data.roles && slotProps.data.roles.length">
                                 <template v-for="(role, idx) in slotProps.data.roles" :key="role.id">
                                     <span class="text-sky-500 dark:text-sky-300"> {{ role.name }}</span>
                                     <span v-if="idx < slotProps.data.roles.length - 1">,</span>
                                 </template>
                             </span>
-                            <span v-else class="text-gray-400 italic">No roles</span>
+                            <span v-else class="text-gray-400 italic">{{ translations?.table?.no_roles }}</span>
                         </small>
                     </p>
                     <p class="sm:hidden">
@@ -307,7 +313,7 @@ onMounted(() => {
             </Column>
             <Column
                 field="phone"
-                header="Info"
+                :header="translations?.table?.info"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -372,7 +378,7 @@ onMounted(() => {
             </Column>
             <Column
                 field="phone"
-                header="Phone/Email"
+                :header="translations?.table?.phone_email"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -398,7 +404,7 @@ onMounted(() => {
             </Column>
             <Column
                 field="email"
-                header="Email"
+                :header="translations?.table?.email"
                 :pt="{
                     root: {
                         class: 'hidden 2xl:table-cell',
@@ -407,7 +413,7 @@ onMounted(() => {
             ></Column>
             <Column
                 field="birthday"
-                header="Birthday"
+                :header="translations?.table?.birthday"
                 :sortable="true"
                 :pt="{
                     root: {
@@ -418,7 +424,7 @@ onMounted(() => {
             </Column>
             <Column
                 field="comment"
-                header="Comment"
+                :header="translations?.table?.comment"
                 :pt="{
                     root: {
                         class: 'hidden lg:table-cell max-w-[250px] lg:truncate',
@@ -427,7 +433,7 @@ onMounted(() => {
             ></Column>
             <Column
                 :exportable="false"
-                header="Tools"
+                :header="translations?.table?.actions"
                 :pt="{
                     root: {
                         class: 'hidden sm:table-cell',
@@ -438,12 +444,11 @@ onMounted(() => {
                     <span class="flex flex-row flex-wrap items-start justify-start">
                         <Button
                             v-if="tools.update && hasPermission('users.edit')"
-                            as="a"
                             variant="link"
                             icon="pi pi-user-edit"
                             label=""
-                            :href="route('users.edit', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('users.edit', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',
@@ -451,12 +456,11 @@ onMounted(() => {
                             }"
                         />
                         <Button
-                            as="a"
                             variant="link"
                             icon="pi pi-user"
                             label=""
-                            :href="route('users.show', slotProps.data)"
                             size="small"
+                            @click="router.visit(route('users.show', slotProps.data))"
                             :pt="{
                                 icon: {
                                     class: 'mx-1 text-sky-600 hover:text-sky-900 focus:text-sky-900',

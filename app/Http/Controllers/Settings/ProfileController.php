@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Services\TranslationService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class ProfileController extends Controller
             'session' => [
                 'profile_warning' => session('profile_warning'),
             ],
+            'translations' => TranslationService::forSettingsProfilePage(),
         ]);
     }
 

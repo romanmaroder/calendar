@@ -2,22 +2,24 @@
 import { useDateField } from '@/composables/utils/useDateField';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
+import { PermissionTranslations } from '@/types/translations';
 import { Head, router } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import { useToast } from 'primevue/usetoast';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { route } from 'ziggy-js';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Permission', href: '/admin/permissions' }];
-
-defineProps<{
+const props = defineProps<{
     permissions: {
         data: Array<{ id: number; name: string; guard_name: string }>;
         links?: any;
     };
+    translations: PermissionTranslations;
 }>();
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: props.translations.title, href: '/admin/permissions' }];
 
 const deleteConfirmationVisible = ref(false);
 const deleteEntity = ref<{ id: number; name: string } | null>(null);
@@ -72,31 +74,36 @@ const goToCreate = () => {
 const goToEdit = (id: number) => {
     router.visit(route('admin.permissions.edit', { permission: id }));
 };
+
+onMounted(() => {
+    console.log(props.translations);
+});
 </script>
 
 <template>
     <Layout :breadcrumbs="breadcrumbs">
-        <Head title="Permissions" />
+        <Head :title="translations.title" />
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="card">
-                <Message closable severity="warn" icon="pi pi-exclamation-triangle">«Configure create and edit
-                    permissions via seed files only manually editing rights may break access control and cause authorization errors.»</Message>
+                <Message closable severity="warn" icon="pi pi-exclamation-triangle">{{ translations.message }}</Message>
             </div>
             <div class="grid auto-cols-fr">
                 <Toolbar class="mb-4">
                     <template #end>
                         <div class="flex flex-row items-end">
-                            <Button as="a" icon="pi pi-plus" label="New Permission" raised @click="goToCreate" size="small" class="mx-2" />
+                            <Button as="a" icon="pi pi-plus" :label="translations.button.create" raised
+                                    @click="goToCreate"
+                                    size="small" class="mx-2" />
                         </div>
                     </template>
                 </Toolbar>
             </div>
 
             <DataTable :value="permissions.data" paginator :rows="20" :paginator-rows="20">
-                <Column field="name" header="Название" />
+                <Column field="name" :header="translations.table.name" />
                 <Column
                     field="guard_name"
-                    header="Guard"
+                    :header="translations.table.guard"
                     :pt="{
                         root: {
                             class: 'hidden sm:table-cell',
@@ -104,7 +111,7 @@ const goToEdit = (id: number) => {
                     }"
                 />
                 <Column
-                    header="Действия"
+                    :header="translations.table.actions"
                     :pt="{
                         root: {
                             class: 'hidden sm:table-cell',
@@ -134,7 +141,7 @@ const goToEdit = (id: number) => {
                 </Column>
                 <Column
                     field="name"
-                    header="Действия"
+                    :header="translations.table.actions"
                     :sortable="true"
                     :pt="{
                         root: {
@@ -187,18 +194,20 @@ const goToEdit = (id: number) => {
         <!-- Модальное окно подтверждения (PrimeVue Dialog) -->
         <Dialog v-model:visible="deleteConfirmationVisible" modal :style="{ width: '25rem' }" :breakpoints="{ '768px': '50vw', '425px': '90vw' }">
             <template #header>
-                <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> Are you absolutely sure? </span>
+                <span class="dark:text-surface-400 m-0 text-[17px] font-semibold"> {{translations.dialog.roles_permission_question}} </span>
             </template>
             <div class="text-surface-500 dark:text-surface-400 mb-1 block font-semibold">
-                {{ deleteEntity?.id }} - <span v-if="deleteEntity?.name">{{ deleteEntity?.name }} - will be deleted forever.</span>
+                {{ deleteEntity?.id }} - <span v-if="deleteEntity?.name">{{ deleteEntity?.name }} - {{translations
+                .dialog.roles_permission_text}}</span>
             </div>
             <span class="text-red-500">
                 <b>
-                    <strong>All users will lose this role.</strong>
+                    <strong>{{translations.dialog.permissions_text}}</strong>
                 </b>
             </span>
             <div class="mt-2 flex justify-end gap-2">
-                <Button type="button" size="small" label="Cancel" severity="secondary" raised @click="closeDeleteModal" />
+                <Button type="button" size="small" :label="translations.button.cancel" severity="secondary" raised
+                        @click="closeDeleteModal" />
                 <Button type="button" size="small" label="Confirm" severity="danger" raised @click="handleDeleteConfirmed" />
             </div>
         </Dialog>

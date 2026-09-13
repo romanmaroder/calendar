@@ -15,6 +15,7 @@ use App\Models\Branch\Branch;
 use App\Models\Company\Company;
 use App\Repositories\Contracts\BranchRepositoryInterface;
 use App\Services\BranchUserService;
+use App\Services\TranslationService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,7 +42,8 @@ class BranchController extends Controller
         return Inertia::render('branch/Index', [
             'branches' => BranchResource::collection($branches)->resolve(),
             'count' => $branches->total(),
-            'companies' => $this->getCompanies()
+            'companies' => $this->getCompanies(),
+            'translations'=>TranslationService::forBranchPage()
         ]);
     }
 
@@ -50,7 +52,8 @@ class BranchController extends Controller
      */
     public function create()
     {
-        return Inertia::render('branch/Create', ['companies' => $this->getCompanies()]);
+        return Inertia::render('branch/Create', ['companies' => $this->getCompanies(),
+            'translations'=>TranslationService::forBranchCreatePage()]);
     }
 
     /**
@@ -73,13 +76,15 @@ class BranchController extends Controller
         if ($branch->trashed()) {
             return Inertia::render('branch/Show', [
                 'branch' => (new BranchWithUsersResource($branch))->resolve(),
-                'isDeleted' => true
+                'isDeleted' => true,
+                'translations'=>TranslationService::forBranchShowPage()
             ]);
         }
 
         return Inertia::render('branch/Show', [
             'branch' => (new BranchWithUsersResource($branch))->resolve(),
-            'isDeleted' => false
+            'isDeleted' => false,
+            'translations'=>TranslationService::forBranchShowPage()
         ]);
     }
 
@@ -92,7 +97,8 @@ class BranchController extends Controller
 
         return Inertia::render('branch/Edit', [
             'branch' => (new BranchMinResource($branch))->resolve(),
-            'companies' => $this->getCompanies()
+            'companies' => $this->getCompanies(),
+            'translations'=>TranslationService::forBranchUpdatePage()
         ]);
     }
 
@@ -132,6 +138,7 @@ class BranchController extends Controller
         return Inertia::render('branch/Archive', [
             'branches' => BranchMinResource::collection($branches)->resolve(),
             'count' => $branches->total(),
+            'translations'=>TranslationService::forBranchPage()
         ]);
     }
 
@@ -148,7 +155,7 @@ class BranchController extends Controller
         $branch->delete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'Branch has been deleted',
+                                    'message' => __('toast.has_been_deleted'),
                                     'code' => 200
                                 ]);
     }
@@ -174,7 +181,7 @@ class BranchController extends Controller
             [
                 'success' => true,
                 'count' => count($ids),
-                'message' => 'Move to the basket.',
+                'message' =>  __('toast.move_to_the_basket'),
                 'code' => 200
             ]
         );
@@ -191,7 +198,7 @@ class BranchController extends Controller
         $branch->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $branch->id . ' ' . $branch->name . ' deleted',
+                                    'message' => 'ID:' . $branch->id . ' ' . $branch->name . __('toast.has_been_deleted'),
                                     'code' => 200
                                 ]);
     }
@@ -212,7 +219,7 @@ class BranchController extends Controller
         Branch::withTrashed()->whereIn('id', $ids)->forceDelete();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'Branches have been deleted',
+                                    'message' => __('toast.has_been_deleted'),
                                     'count' => count($ids)
                                 ]);
     }
@@ -223,7 +230,7 @@ class BranchController extends Controller
         $branch->restore();
         return response()->json([
                                     'success' => true,
-                                    'message' => 'ID:' . $branch->id . ' ' . $branch->name . ' restored.',
+                                    'message' => 'ID:' . $branch->id . ' ' . $branch->name . __('toast.has_been_restored'),
                                     'code' => 200
                                 ]);
     }
@@ -235,7 +242,7 @@ class BranchController extends Controller
         return response()->json([
                                     'success' => true,
                                     'code' => 200,
-                                    'message' => 'Branches restored'
+                                    'message' => __('toast.has_been_restored')
                                 ]);
     }
 

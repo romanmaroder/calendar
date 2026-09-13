@@ -4,14 +4,11 @@ import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Toast from 'primevue/toast';
-import { PropType, ref } from 'vue';
+import { PropType, provide, ref } from 'vue';
+import { UserTranslations } from '@/types/translations';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Users', href: '/users' },
-    { title: 'Archive', href: '' },
-];
 
-defineProps({
+const props = defineProps({
     users: {
         type: Object as PropType<User>,
         required: true,
@@ -19,7 +16,18 @@ defineProps({
     count: {
         type: Number,
     },
+    translations:{
+        type: Object as PropType<UserTranslations>,
+        required: true,
+    }
 });
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: props.translations?.title, href: '/users' },
+    { title: props.translations?.label?.archive, href: '' },
+];
+
+provide('translations', props.translations);
 
 const total = ref();
 const counter = (num: number) => {
@@ -28,7 +36,7 @@ const counter = (num: number) => {
 </script>
 
 <template>
-    <Head title="Archive" />
+    <Head :title="translations?.label?.archive" />
     <Layout :breadcrumbs="breadcrumbs">
         <Toast
             :pt="{

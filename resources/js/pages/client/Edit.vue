@@ -2,21 +2,28 @@
 import FormClient from '@/components/client/FormClient.vue';
 import Layout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, Client } from '@/types';
+import { ClientTranslations } from '@/types/translations';
 import { Head } from '@inertiajs/vue3';
-import { PropType } from 'vue';
+import { PropType, provide } from 'vue';
 
-const props =defineProps({
+const props = defineProps({
     client: {
         type: Object as PropType<Client>,
         required: true,
     },
+    translations: {
+        type: Object as PropType<ClientTranslations>,
+        required: true,
+    },
 });
 
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Clients', href: '/clients' },
-    { title: 'Update ' +props.client.surname, href: '' },
+    { title: props.translations.clients, href: '/clients' },
+    { title: props.translations.title + props.client.surname, href: '' },
 ];
 
+provide('translations',props.translations);
 </script>
 
 <template>

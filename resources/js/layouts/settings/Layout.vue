@@ -4,18 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
+import { inject, Ref } from 'vue';
+import { LayoutTranslations } from '@/types/translations';
+
+const translations = inject<Ref<LayoutTranslations>>('layout');
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: translations?.value.profile ?? 'Profile',
         href: '/settings/profile',
     },
     {
-        title: 'Password',
+        title: translations?.value.password ?? 'Password',
         href: '/settings/password',
     },
     {
-        title: 'Appearance',
+        title: translations?.value.appearance ?? 'Appearance',
         href: '/settings/appearance',
     },
 ];
@@ -27,11 +31,10 @@ const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.locati
 
 <template>
     <div class="px-4 py-6">
-        <Heading title="Settings" description="Manage your profile and account settings" />
-
-        <div class="flex flex-col space-y-8 md:space-y-0 lg:flex-row lg:space-x-12 lg:space-y-0">
+        <Heading :title="translations?.title" :description="translations?.description" />
+        <div class="flex flex-col space-y-8 md:space-y-0 lg:flex-row lg:space-y-0 lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
-                <nav class="flex flex-col space-x-0 space-y-1">
+                <nav class="flex flex-col space-y-1 space-x-0">
                     <Button
                         v-for="item in sidebarNavItems"
                         :key="item.href"

@@ -10,6 +10,7 @@ import { LoaderCircle } from 'lucide-vue-next';
 interface Props {
     token: string;
     email: string;
+    translations: Record<string, string>;
 }
 
 const props = defineProps<Props>();
@@ -31,19 +32,19 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthLayout title="Reset password" description="Please enter your new password below">
-        <Head title="Reset password" />
+    <AuthLayout :title="translations.reset_title" :description="translations.reset_description">
+        <Head :title="translations.reset_title" />
 
         <form @submit.prevent="submit">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Email</Label>
+                    <Label for="email">{{translations.email}}</Label>
                     <Input id="email" type="email" name="email" autocomplete="email" v-model="form.email" class="mt-1 block w-full" readonly />
                     <InputError :message="form.errors.email" class="mt-2" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password">Password</Label>
+                    <Label for="password">{{translations.password}}</Label>
                     <Input
                         id="password"
                         type="password"
@@ -52,13 +53,13 @@ const submit = () => {
                         v-model="form.password"
                         class="mt-1 block w-full"
                         autofocus
-                        placeholder="Password"
+                        :placeholder="translations.password"
                     />
                     <InputError :message="form.errors.password" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password_confirmation"> Confirm Password </Label>
+                    <Label for="password_confirmation">{{translations.password_confirmation}}</Label>
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -66,14 +67,14 @@ const submit = () => {
                         autocomplete="new-password"
                         v-model="form.password_confirmation"
                         class="mt-1 block w-full"
-                        placeholder="Confirm password"
+                        :placeholder="translations.password_confirmation"
                     />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
 
                 <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                    Reset password
+                    {{translations.reset_password}}
                 </Button>
             </div>
         </form>

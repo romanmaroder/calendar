@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import ProfileLayout from '@/layouts/profile/ProfileLayout.vue';
 import { Client } from '@/types';
-import { computed, PropType, ref } from 'vue';
+import { ClientTranslations } from '@/types/translations';
+import { router, usePage } from '@inertiajs/vue3';
+import { computed, inject, PropType, ref } from 'vue';
+import { route } from 'ziggy-js';
 import FinanceCard from './FinanceCard.vue';
 import InfoCard from './InfoCard.vue';
 import ProfileCard from './ProfileCard.vue';
 import VisitsList from './VisitsList.vue';
-import { usePage } from '@inertiajs/vue3';
+
+const translations = inject<ClientTranslations>('translations');
+const isDeleted = inject('isDeleted');
 
 const props = defineProps({
     client: {
         type: Object as PropType<Client>,
-        required:true,
+        required: true,
     },
 });
 
@@ -21,7 +26,6 @@ const hasPermission = (permission: string) => {
     const userPermissions = page.props.auth?.user?.permissions ?? [];
     return userPermissions.includes(permission);
 };
-
 
 /* demo data */
 const patient = {
@@ -201,26 +205,26 @@ const aov = computed(() => {
 
 const items = ref([
     {
-        label: 'Edit',
+        label: translations?.button.edit,
         icon: 'pi pi-pencil',
         permission: 'companies.edit',
         command: () => {
             try {
-                window.location.href = route('clients.edit', props.client.id);
+                router.visit(route('clients.edit', props.client.id));
             } catch (error) {
-                console.error('Маршрут не найден:', error);
+                console.error(translations?.toast?.route_not_found, error);
             }
         },
     },
     {
-        label: 'Clients',
+        label: translations?.clients,
         icon: 'pi pi-users',
         permission: null,
         command: () => {
             try {
-                window.location.href = route('clients.index');
+                router.visit(route('clients.index'));
             } catch (error) {
-                console.error('Маршрут не найден:', error);
+                console.error(translations?.toast?.route_not_found, error);
             }
         },
     },
@@ -228,9 +232,8 @@ const items = ref([
 
 // Фильтруем: показываем только те пункты, у которых нет permission ИЛИ есть нужное право
 const filteredItems = computed(() =>
-    items.value.filter(item => item.permission === null || hasPermission(item.permission))
+    items.value.filter((item) => item.permission === null || (hasPermission(item.permission) && !(isDeleted && item.icon === 'pi pi-pencil'))),
 );
-
 </script>
 
 <template>
@@ -240,7 +243,7 @@ const filteredItems = computed(() =>
         </template>
 
         <template #right-center-column>
-            <InfoCard :client="client" title="Общая информация" />
+            <InfoCard :client="client" title="" />
         </template>
 
         <template #center-column>
@@ -248,8 +251,8 @@ const filteredItems = computed(() =>
         </template>
 
         <template #right-column>
-            <FinanceCard :data="{ total: client?.total, records: client?.records, aov: aov }" title="Доходность" />
-            <ContextMenu global :model="filteredItems" class="mobile-area"/>
+            <FinanceCard :data="{ total: client?.total, records: client?.records, aov: aov }" title="" />
+            <ContextMenu global :model="filteredItems" class="mobile-area" />
         </template>
     </ProfileLayout>
 </template>

@@ -7,10 +7,22 @@ import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
+import { provide, ref } from 'vue';
+import { AppearanceTranslations } from '@/types/translations';
+
+const props = defineProps<{
+    translations: AppearanceTranslations;
+}>();
+
+const layout = ref(props.translations.layout);
+provide('layout', layout);
+
+const tabs = ref(props.translations.tabs);
+provide('tabs', tabs);
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Appearance settings',
+        title: props.translations.appearance_settings,
         href: '/settings/appearance',
     },
 ];
@@ -18,11 +30,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Appearance settings" />
+        <Head :title="translations.appearance_settings" />
 
         <SettingsLayout>
             <div class="space-y-6">
-                <HeadingSmall title="Appearance settings" description="Update your account's appearance settings" />
+                <HeadingSmall :title="translations.appearance_settings" :description="translations.appearance_description" />
                 <AppearanceTabs />
             </div>
         </SettingsLayout>
